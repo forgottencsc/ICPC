@@ -46,7 +46,18 @@
 		</Compiler>
 		<Unit filename="1.in" />
 		<Unit filename="1.out" />
-		<Unit filename="Problems/counting.hpp" />
+		<Unit filename="Problems/counting/counting.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/database/database.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/database/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/generator.h" />
 		<Unit filename="Problems/kcore/gen.cpp">
 			<Option compile="0" />
@@ -96,11 +107,19 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="Problems/repeatersV/gen.cpp">
+		<Unit filename="Problems/repeatersVI/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="Problems/repeatersV/repeatersV.cpp">
+		<Unit filename="Problems/repeatersVI/repeatersVI.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersX/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersX/repeatersX.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
