@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+#define N 200007
+using namespace std;
+int n,m,k,a[N],b[N],c[N];
+int rt[N],l[N],r[N],npl[N],tag[N];
+void pushdown(int x){
+    if(l[x])c[l[x]]-=tag[x],tag[l[x]]+=tag[x];
+    if(r[x])c[r[x]]-=tag[x],tag[r[x]]+=tag[x];
+    tag[x]=0;
+}
+int Merge(int x,int y){
+	if(!x)return y;
+	if(!y)return x;
+	if(c[x]>c[y])swap(x,y);
+	if(tag[x])pushdown(x);
+	r[x]=Merge(r[x],y);
+	if(npl[l[x]]<npl[r[x]])swap(l[x],r[x]);
+	npl[x]=npl[r[x]]+1;
+	return x;
+}
+bool zr[N],vis[N];
+int top,s[N],f[N];
+int find(int x){return f[x]==x ? x:f[x]=find(f[x]);}
+long long solve(int root){
+    long long res=0;
+    zr[root]=vis[root]=1,top=0;
+    for(int i=1;i<=n;++i)f[i]=i;
+    for(int i=1;i<=n;++i){
+        if(vis[i])continue;
+        for(int x=i;;){
+            if(!vis[x])vis[x]=1,s[++top]=x;
+            int e=rt[x];
+            if(!e)return -1;
+            res+=c[e],tag[e]+=c[e],c[e]=0;
+            x=find(a[e]==x ? b[e]:a[e]);
+            if(zr[x]){
+                for(;top;--top)zr[s[top]]=1;
+                break;
+            }
+            if(vis[x]){
+                for(int y=s[top];y!=x;y=s[--top]){
+                    if(tag[rt[x]])pushdown(rt[x]);
+                    rt[f[y]=x]=Merge(rt[x],rt[y]);
+                }
+                while(rt[x] && find(a[rt[x]])==find(b[rt[x]])){
+                    if(tag[rt[x]])pushdown(rt[x]);
+                    rt[x]=Merge(l[rt[x]],r[rt[x]]);
+                }
+            }
+        }
+    }
+    return res;
+}
+int main(){
+    scanf("%d%d%d",&n,&m,&k);
+    for(int i=1;i<=m;++i){
+        scanf("%d%d%d",&a[i],&b[i],&c[i]);
+        rt[b[i]]=Merge(rt[b[i]],i);
+    }
+    printf("%lld",solve(k));
+}

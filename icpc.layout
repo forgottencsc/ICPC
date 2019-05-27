@@ -2,40 +2,133 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
+	<File name="Templates\GraphTheory\tarjan.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="540" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Problems\generator.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1687" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="7" />
+			<Collapse line="11" />
+			<Collapse line="20" />
+			<Collapse line="25" />
+			<Collapse line="32" />
+			<Collapse line="39" />
+			<Collapse line="49" />
+		</Folding>
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="209" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Problems\kcore\kcore.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1994" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\NumberTheory\basic_number_theory.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2803" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\NumberTheory\multiplicative.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1574" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersII\repeatersII.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="765" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\NumberTheory\primality.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="756" topLine="39" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersIV\gen.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2307" topLine="51" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\matrix.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="602" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersIV\repeatersIV.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1162" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\misc.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2915" topLine="99" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersIV\tle.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="Templates\String\kmp.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1172" topLine="39" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersI\gen.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="352" topLine="11" />
+		</Cursor>
+	</File>
+	<File name="1.in" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="18" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Problems\repeatersI\repeatersI.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="323" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Templates\String\suffix_array.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="551" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="Problems\repeatersI\tle1.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="518" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Unsolved\Neko_And_Triangle.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="185" topLine="0" />
+			<Cursor1 position="2135" topLine="36" />
 		</Cursor>
 	</File>
-	<File name="Problems\repeatersVII\gen.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Problems\repeatersVII\gen.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2981" topLine="71" />
-		</Cursor>
-		<Folding>
-			<Collapse line="19" />
-			<Collapse line="26" />
-			<Collapse line="41" />
-			<Collapse line="51" />
-		</Folding>
-	</File>
-	<File name="Problems\repeatersVII\repeatersVII.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3592" topLine="125" />
+			<Cursor1 position="48" topLine="29" />
 		</Cursor>
 	</File>
-	<File name="Problems\repeatersV\gen.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Unsolved\P3676.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1586" topLine="45" />
+			<Cursor1 position="2310" topLine="69" />
 		</Cursor>
 	</File>
-	<File name="Problems\repeatersV\repeatersV.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Problems\repeatersVII\repeatersVII.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="587" topLine="3" />
+			<Cursor1 position="2276" topLine="81" />
+		</Cursor>
+	</File>
+	<File name="1.out" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Problems\statistics\gen.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -80,126 +173,12 @@
 	</File>
 	<File name="Templates\DataStructures\divide_and_conquer.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="411" topLine="4" />
+			<Cursor1 position="516" topLine="4" />
 		</Cursor>
 	</File>
 	<File name="Templates\DataStructures\heavy_chain_decomposition.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="127" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="1.in" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="56" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Templates\GraphTheory\tarjan.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="540" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="1.out" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Problems\counting.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="252" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="Problems\generator.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1687" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="7" />
-			<Collapse line="11" />
-			<Collapse line="20" />
-			<Collapse line="25" />
-			<Collapse line="32" />
-			<Collapse line="39" />
-			<Collapse line="49" />
-		</Folding>
-	</File>
-	<File name="Templates\Math\NumberTheory\basic_number_theory.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2803" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\NumberTheory\multiplicative.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1574" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Problems\kcore\kcore.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1994" topLine="48" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\NumberTheory\primality.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="756" topLine="39" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\matrix.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="602" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersII\repeatersII.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="765" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\misc.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2915" topLine="99" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersIV\gen.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2307" topLine="51" />
-		</Cursor>
-	</File>
-	<File name="Templates\String\kmp.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1172" topLine="39" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersIV\repeatersIV.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1162" topLine="54" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersIV\tle.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="54" />
-		</Cursor>
-	</File>
-	<File name="Templates\String\suffix_array.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="551" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersI\gen.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="352" topLine="11" />
-		</Cursor>
-	</File>
-	<File name="Unsolved\Neko_And_Triangle.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2135" topLine="36" />
-		</Cursor>
-	</File>
-	<File name="Problems\repeatersI\repeatersI.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="323" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Unsolved\P3676.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2310" topLine="69" />
+			<Cursor1 position="373" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
