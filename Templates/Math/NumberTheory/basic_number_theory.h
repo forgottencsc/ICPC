@@ -54,6 +54,7 @@ vector<ll> ifd(ll n) {
 	return v;
 }
 
+//  a^b(mod p) = a^(b%phi(p)+phi(p))
 ll qpm(ll a, ll b, ll p) {
 	ll r = 1;
 	for (ll i = 1; i <= b; i <<= 1, a = a * a % p)
@@ -76,6 +77,7 @@ bool lce(ll& a, ll& b, ll& p) {
 	return a == 1;
 }
 
+//  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
 bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	ll a = m1, b = b2 - b1, p = m2;
 	if (!lce(a, b, p)) return false;

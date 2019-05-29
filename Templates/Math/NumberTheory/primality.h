@@ -33,7 +33,7 @@ bool mr(ll n) {
     return true;
 }
 
-inline ll pr(ll n) {
+ll pr(ll n) {
     ll x = 0, y = 0, t = 1, q = 1, c = rand() % (n - 1) + 1;
     for (int k = 2;; k <<= 1, y = x, q = 1) {
         for (int i = 1; i <= k; ++i) {

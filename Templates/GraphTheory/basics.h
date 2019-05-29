@@ -5,15 +5,6 @@ using namespace std;
 int n, m, d[N];
 vector<int> g[N];
 
-void dfs_euler(vector<int>& s, int u) {
-    while(g[u].size()) {
-        int v = g[u].back();
-        g[u].pop_back();
-        dfs_euler(s, v);
-    }
-    s.push_back(u);
-}
-
 vector<int> eulerian_path() {
     int s = 0;
     vector<int> res; res.reserve(m + 1);
@@ -26,7 +17,13 @@ vector<int> eulerian_path() {
         if(g[i].empty()) continue;
         s = i;
     }
-    dfs_euler(res, s);
+    vector<int> stk; stk.reserve(n + 1);
+    stk.push_back(s);
+    while(!stk.empty()) {
+        int u = stk.back();
+        if (g[u].empty()) res.push_back(u), stk.pop_back();
+        else stk.push_back(g[u].back()), g[u].pop_back();
+    }
     if(res.size() != m + 1) res.clear();
     else reverse(res.begin(), res.end());
     return res;
