@@ -52,6 +52,6 @@ int isap(int s, int t) {
             gap[dis[v]]++; q.push(v);
         }
     }
-    while(dis[s] < nc) sf += dfs_sap(s, t, s, 1<<30);
+    while(dis[s] < nc) sf += dfs_isap(s, t, s, 1<<30);
     return sf;
 }

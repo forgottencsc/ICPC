@@ -158,7 +158,7 @@
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
 		<Unit filename="Templates/GraphTheory/basics.h" />
-		<Unit filename="Templates/GraphTheory/tarjan.h" />
+		<Unit filename="Templates/GraphTheory/flows.h" />
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
 		<Unit filename="Templates/Math/Geometry/basic_geometry.h" />
 		<Unit filename="Templates/Math/NumberTheory/basic_number_theory.h" />
