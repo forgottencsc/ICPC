@@ -1,40 +1,42 @@
 #include <bits/stdc++.h>
-#define N 300001
+#define N 2000002
 using namespace std;
 
-int n, m;
-vector<int> g[N];
-int dfn[N], low[N], bel[N], dfc, bcc;
-int bcs[N], *bct = bcs;
-void bcc_clr() { fill(dfn + 1, dfn + n + 1, 0); }
-int dfs_bcc(int u, int f) {
-    *bct++ = u; dfn[u] = low[u] = ++dfc;
-    for (int v : g[u]) {
-        if (v == f) continue;
-        if (!dfn[v]) low[u] = min(low[u], dfs_bcc(v, u));
-        else low[u] = min(low[u], low[v]);
-    }
-    if (dfn[u] == low[u])
-        for (++bcc; *bct != u; --bct)
-            bel[bct[-1]] = bcc;
-    return low[u];
+char s[N]; int n;
+int g[N][26], f[N], l[N], w[N], nc;
+
+int gn(int len, int q = 0) {
+    int p = nc++; l[p] = len; f[p] = f[q];
+    memcpy(g[p], g[q], sizeof(g[p]));
+    return p;
 }
 
-vector<int> g1[N];
-int d[N];
+void clr() { nc = 1; gn(0); }
 
-int bfs(int s) {
-    fill(d + 1, d + n + 1, INT_MIN);
-    queue<int> q; q.push(s); d[s] = 0;
-    while(!q.empty()) {
-        int u = q.front(); q.pop();
-        for (int v : g1[u]) {
-            if (d[v] != INT_MIN) continue;
-            d[v] = d[u] + 1;
-            q.push(v);
+int extend(int p, int o) {
+    int np = gn(l[p] + 1);
+    for (; p && !g[p][o]; p = f[p])
+        g[p][o] = np;
+    if (!p) f[np] = 1;
+    else {
+        int q = g[p][o];
+        if (l[q] == l[p] + 1) f[np] = q;
+        else {
+            int nq = gn(l[p] + 1, q);
+            f[np] = f[q] = nq;
+            for (; p && g[p][o] == q; p = f[p])
+                g[p][o] = nq;
         }
     }
-    return max_element(d + 1, d + n + 1) - d;
+    return np;
+}
+
+int c[N], pos[N];
+void sort_sam() {
+    iota(pos, pos + nc, 0);
+    for (int p = 0; p != nc; ++p) c[l[p]]++;
+    for (int i = 1; i <= n; ++i) c[i] += c[i - 1];
+    for (int p = 0; p != nc; ++p) pos[--c[l[p]]] = p;
 }
 
 int main(void) {
@@ -42,25 +44,22 @@ int main(void) {
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    cin >> n >> m;
-    for (int i = 1; i <= m; ++i) {
-        int u, v; cin >> u >> v;
-        g[u].push_back(v);
-        g[v].push_back(u);
+    cin >> s; n = strlen(s);
+    int p = 1; clr();
+    for (int i = 0; i != n; ++i) {
+        p = extend(p, s[i] - 'a');
+        w[p]++;
     }
-
-    dfs_bcc(1, 0);
-
-    for (int u = 1; u <= n; ++u)
-        for (int v : g[u])
-            g1[bel[u]].push_back(bel[v]);
-
-    for (int u = 1; u <= n; ++u) {
-        sort(g1[u].begin(), g1[u].end());
-        g1[u].erase(unique(g1[u].begin(), g1[u].end()), g1[u].end());
+    sort_sam();
+    for (int i = nc - 1; l[pos[i]]; --i) {
+        int p = pos[i];
+        w[f[p]] += w[p];
     }
-
-    cout << d[bfs(bfs(1))] << endl;
-
+    typedef long long ll; ll ans = 0;
+    for (int i = 1; i != nc; ++i) {
+        if (w[i] > 1)
+            ans = max(ans, 1ll * w[i] * l[i]);
+    }
+    cout << ans << endl;
     return 0;
 }

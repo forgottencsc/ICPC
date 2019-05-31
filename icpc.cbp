@@ -167,7 +167,8 @@
 		<Unit filename="Templates/Math/matrix.h" />
 		<Unit filename="Templates/Math/misc.h" />
 		<Unit filename="Templates/String/kmp.h" />
-		<Unit filename="Templates/String/string_automata.h" />
+		<Unit filename="Templates/String/string_automata_arr.h" />
+		<Unit filename="Templates/String/string_automata_ptr.h" />
 		<Unit filename="Templates/String/suffix_array.h" />
 		<Unit filename="Unsolved/Neko_And_Triangle.cpp">
 			<Option compile="0" />
