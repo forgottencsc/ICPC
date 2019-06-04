@@ -19,7 +19,7 @@ void getl(const string& s, const string& t, const vector<int>& f, vector<int>& l
         while(j && t[i] != s[j]) j = f[j - 1];
         if (t[i] == s[j]) ++j;
         l[i] = j;
-        if (j == m) j = f[j - 1];
+        if (j == n) j = f[j - 1];
     }
     for (int i = 0; i != m; ++i) cout << l[i] << " \n"[i == m - 1];
 }
