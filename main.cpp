@@ -1,65 +1,86 @@
 #include <bits/stdc++.h>
-#define N 2000002
+#define int unsigned
 using namespace std;
 
-char s[N]; int n;
-int g[N][26], f[N], l[N], w[N], nc;
-
-int gn(int len, int q = 0) {
-    int p = nc++; l[p] = len; f[p] = f[q];
-    memcpy(g[p], g[q], sizeof(g[p]));
-    return p;
+#define W 1000000001
+bool ip[W]; vector<int> ps;
+vector<int> dc, px, pk;
+//int dc[W], px[W], pk[W];
+void eulersieve() {
+    dc.resize(W);
+    px.resize(W);
+    pk.resize(W);
+	ps.reserve(W * 1.2 / log(W));
+	memset(ip, 1, sizeof(ip)); ip[1] = 0;
+    dc[1] = 1; px[1] = 1; pk[1] = 0;
+	for (int i = 2; i != W; ++i) {
+        if (i % (W / 10) == 0) cout << (i / (W / 10)) << endl;
+		if (ip[i]) {
+			ps.push_back(i);
+            pk[i] = 1;
+            px[i] = i;
+            dc[i] = 2;
+		}
+		for (int p : ps) {
+			if (1ll * i * p >= W) break;
+			ip[i * p] = 0;
+			if (i % p) {
+				pk[i * p] = 1;
+				px[i * p] = p;
+				dc[i * p] = dc[i] * 2;
+			}
+			else {
+                pk[i * p] = pk[i] + 1;
+                px[i * p] = px[i] * p;
+                dc[i * p] = dc[i] / (pk[i] + 1) * (pk[i] + 2);
+				break;
+			}
+		}
+	}
 }
 
-void clr() { nc = 1; gn(0); }
+void match() {
+    int p = 0;
+    for (char ch : t) {
+        int o = ch - 'a';
+        while (p && !g[p][o])
+            p = f[p];
+        p = g[p][o];
+        for (int q = p; q; q = f[q])
+            c[q]++;
+    }
+}
 
-int extend(int p, int o) {
-    int np = gn(l[p] + 1);
-    for (; p && !g[p][o]; p = f[p])
-        g[p][o] = np;
-    if (!p) f[np] = 1;
-    else {
-        int q = g[p][o];
-        if (l[q] == l[p] + 1) f[np] = q;
-        else {
-            int nq = gn(l[p] + 1, q);
-            f[np] = f[q] = nq;
-            for (; p && g[p][o] == q; p = f[p])
-                g[p][o] = nq;
+void build() {
+    queue<int> q;
+    for (int o = 0; o != 26; ++o) if (g[0][o]) q.push(g[0][o]);
+    while(h != t) {
+        int u = q.front(); q.pop();
+        for (int o = 0; o != 26; ++o) {
+            int& v = g[u][o];
+            if (v) {
+                int w = f[u];
+                while(w && !g[w][o]) w = f[w];
+                f[v] = g[w][o];
+                q.push(v);
+            }
         }
     }
-    return np;
 }
 
-int c[N], pos[N];
-void sort_sam() {
-    iota(pos, pos + nc, 0);
-    for (int p = 0; p != nc; ++p) c[l[p]]++;
-    for (int i = 1; i <= n; ++i) c[i] += c[i - 1];
-    for (int p = 0; p != nc; ++p) pos[--c[l[p]]] = p;
-}
-
-int main(void) {
+signed main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    cin >> s; n = strlen(s);
-    int p = 1; clr();
-    for (int i = 0; i != n; ++i) {
-        p = extend(p, s[i] - 'a');
-        w[p]++;
+    eulersieve();
+    int mx = 0, mc = 0;
+    for (int i = 1; i != W; ++i) {
+        if (mc < dc[i]) {
+            mx = i;
+            mc = dc[i];
+            cout << i << ": " << ' ' << mc << endl;
+        }
     }
-    sort_sam();
-    for (int i = nc - 1; l[pos[i]]; --i) {
-        int p = pos[i];
-        w[f[p]] += w[p];
-    }
-    typedef long long ll; ll ans = 0;
-    for (int i = 1; i != nc; ++i) {
-        if (w[i] > 1)
-            ans = max(ans, 1ll * w[i] * l[i]);
-    }
-    cout << ans << endl;
     return 0;
 }

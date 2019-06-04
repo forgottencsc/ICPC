@@ -58,10 +58,12 @@ ll moebiusmu(ll n) {
 //	DivisorCount dc[i];
 //	(1): 2;		(2): dc[i] * 2;
 //	(3): dc[i] / (pk[i] + 1) * (pk[i] + 2);
+//	(3): dc[i] + dc[i] / (pk[i] + 1);
 
 //	DivisorSum ds[i];
 //	(1): i + 1;	(2): ds[i] * (p + 1);
 //	(3): ds[i / px[i]] * (qpow(p, pk[i] + 2) - 1) / (p - 1)
+//	(3): ds[i / px[i]] * ((px[i] * p * p) - 1) / (p - 1)
 
 //	Sum of coprime numbers; sigma[i] = i * ph[i] / 2;
 #define W 1000001
