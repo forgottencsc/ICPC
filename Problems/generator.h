@@ -62,17 +62,19 @@ string sqgp(int n, const string& t, double p, char cl, char cr) {
 
 vector<string> svg(const vector<sgen>& sgv, int n, int minn = 0, int maxn = 0) {
     if (!maxn) maxn = n / 10;
-    if (!maxn) maxn = n;
+    //if (!maxn) maxn = n;
     if (!minn) minn = 4;
-    if (minn > n) minn = 1;
+    if (minn > min(n, maxn)) minn = 1;
     vector<string> sv;
+    set<string> ss;
     while(n) {
         int len;
         if (n < minn) break;
         else len = igr(minn, min(n, maxn));
         if (n - len < minn) len = n;
         string s = sgv[igr(0,sgv.size()-1)](len);
-        sv.push_back(s);
+        if (ss.insert(s).second)
+            sv.push_back(s);
         n -= s.size();
     }
     return sv;

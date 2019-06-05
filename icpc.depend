@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1559632350 source:d:\cosecant\projects\icpc\main.cpp
+1559744446 source:d:\cosecant\projects\icpc\main.cpp
 	<bits/stdc++.h>
 
 1557167711 source:d:\cosecant\projects\icpc\problems\throughput\gen.cpp
@@ -43,7 +43,7 @@
 	<bits/stdc++.h>
 	"../generator.h"
 
-1558774202 d:\cosecant\projects\icpc\problems\generator.h
+1559747918 d:\cosecant\projects\icpc\problems\generator.h
 	<bits/stdc++.h>
 
 1558345680 source:d:\cosecant\projects\icpc\problems\repeatersii\repeatersii.cpp
@@ -58,4 +58,25 @@
 
 1558783934 source:d:\cosecant\projects\icpc\problems\repeatersi\tle1.cpp
 	<bits/stdc++.h>
+
+1559742152 source:d:\cosecant\projects\icpc\problems\repeatersiii\repeatersiii.cpp
+	<bits/stdc++.h>
+
+1559742238 source:d:\cosecant\projects\icpc\problems\repeatersiii\gen.cpp
+	<bits/stdc++.h>
+	"../generator.h"
+
+1559742721 source:d:\cosecant\projects\icpc\problems\repeatersiii\tle1.cpp
+	<bits/stdc++.h>
+	<functional>
+
+1559748408 source:d:\cosecant\projects\icpc\problems\repeatersviii\repeatersviii.cpp
+	<bits/stdc++.h>
+
+1559748288 source:d:\cosecant\projects\icpc\problems\repeatersviii\repeatersviii-2.cpp
+	<bits/stdc++.h>
+
+1559748428 source:d:\cosecant\projects\icpc\problems\repeatersviii\gen.cpp
+	<bits/stdc++.h>
+	"../generator.h"
 
