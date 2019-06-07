@@ -66,6 +66,24 @@ vector<string> svg(const vector<sgen>& sgv, int n, int minn = 0, int maxn = 0) {
     if (!minn) minn = 4;
     if (minn > min(n, maxn)) minn = 1;
     vector<string> sv;
+    while(n) {
+        int len;
+        if (n < minn) break;
+        else len = igr(minn, min(n, maxn));
+        if (n - len < minn) len = n;
+        string s = sgv[igr(0,sgv.size()-1)](len);
+        sv.push_back(s);
+        n -= s.size();
+    }
+    return sv;
+}
+
+vector<string> svg2(const vector<sgen>& sgv, int n, int minn = 0, int maxn = 0) {
+    if (!maxn) maxn = n / 10;
+    //if (!maxn) maxn = n;
+    if (!minn) minn = 4;
+    if (minn > min(n, maxn)) minn = 1;
+    vector<string> sv;
     set<string> ss;
     while(n) {
         int len;
@@ -80,3 +98,17 @@ vector<string> svg(const vector<sgen>& sgv, int n, int minn = 0, int maxn = 0) {
     return sv;
 }
 
+vector<string> svg3(const vector<sgen>& sgv, int n, int avg) {
+    poisson_distribution<int> pd(avg);
+    vector<string> sv;
+    while(n) {
+        int len = pd(mt) + 1;
+        for (int i = 0; i != 10 && len > n; ++i)
+            len = pd(mt) + 1;
+        len = min(len, n);
+        string s = sgv[igr(0,sgv.size()-1)](len);
+        sv.push_back(s);
+        n = max(n - (int)s.size(), 0);
+    }
+    return sv;
+}
