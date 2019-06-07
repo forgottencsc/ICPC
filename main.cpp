@@ -1,53 +1,48 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
-    #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
-    #endif // ONLINE_JUDGE
-    typedef long long ll;
-    ll p3[30]; for (int i = p3[0] = 1; i != 30; ++i) p3[i] = p3[i - 1] * 3;
-    int n, k, m; ll t; cin >> n >> k >> t; m = n / 2;
-    vector<ll> a; copy_n(istream_iterator<ll>(cin), n, back_inserter(a));
-    vector<vector<ll>> x(m + 1);
-    for (int i = 0; i != p3[m]; ++i) {
-        int w = 0; ll s = 0;
-        for (int j = 0; j != m; ++j) {
-            int o = (i / p3[j]) % 3;
-            if (o == 1)
-                s += a[j];
-            else if(o == 2) {
-                s += (a[j] * (a[j] + 1)) / 2;
-                w++;
-            }
-        }
-        for (int j = w; j <= m; ++j)
-            x[j].push_back(s);
-    }
-    for (int i = 0; i <= m; ++i) {
-        sort(x[i].begin(), x[i].end());
-        //cout << x[i].size() << endl;
-        //for (int j : x[i]) cout << j << ' '; cout << endl;
-    }
+const int N = 1e5 + 10;
+const unsigned long long lim = (1ll << 32) - 1;
 
-    ll ans = 0;
-    for (ll i = 0; i != p3[n]; i += p3[m]) {
-        int w = 0; ll s = 0;
-        for (int j = m; j != n; j++) {
-            int o = (i / p3[j]) % 3;
-            if (o == 1)
-                s += a[j];
-            else if (o == 2) {
-                s += (a[j] * (a[j] + 1)) / 2;
-                w++;
-            }
-        }
-        if (w > k) continue;
-        int y = min(k - w, m);
-        auto[lb, ub] = equal_range(x[y].begin(), x[y].end(), t - s);
-        ans += distance(lb, ub);
-    }
-    cout << ans << endl;
-    return 0;
+char cmd[N];
+unsigned long long a[N], b[N];
+unsigned long long sum, c[N], cur;
+
+int main (void) {
+	unsigned long long n;
+	scanf("%llu", &n);
+	for (int i = 1; i <= n; i++) {
+		scanf("%s", cmd);
+		if (cmd[0] == 'a') a[i] = 1;
+		else if (cmd[0] == 'f') a[i] = 2;
+		else a[i] = 3;
+		if (a[i] == 2) scanf("%llu", &b[i]);
+		b[i] = min(lim + 1, b[i]);
+	}
+	stack<unsigned long long> v;
+	v.push(1);
+	unsigned long long sum = 0;
+	for (int i = 1; i <= n; i++) {
+		v.top() = min(v.top(), lim + 1);
+		if (a[i] == 1) {
+			if (v.top() == lim + 1) {
+				puts("OVERFLOW!!!");
+				return 0;
+			}
+			sum += v.top();
+			if (sum > lim) {
+				puts("OVERFLOW!!!");
+				return 0;
+			}
+		} else if (a[i] == 2) {
+			if (v.top() == lim + 1 || b[i] == lim + 1 || v.top() * b[i] > lim) v.push(lim + 1);
+			else {
+				unsigned long long vv = v.top();
+				v.push(vv * b[i]);
+			}
+		} else {
+			v.pop();
+		}
+	}
+	printf("%llu\n", sum);
 }
