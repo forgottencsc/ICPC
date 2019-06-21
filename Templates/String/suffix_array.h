@@ -2,7 +2,7 @@ int sa[N], rk[N], sh[N];
 int st[N][21], lg2[N];
 int sw1[N], sw2[N], sc[N];
 void build_sa(const char* s) {
-    int n = strlen(s), m = 128, *x = sw1, *y = sw2;
+    int n = strlen(s + 1), m = 128, *x = sw1, *y = sw2;
     memset(sc + 1, 0, m << 2);
     for (int i = 1; i <= n; ++i) sc[x[i] = s[i]]++;
     for (int i = 1; i <= m; ++i) sc[i] += sc[i - 1];
