@@ -17,6 +17,9 @@ void gen_batch(int& id, int n, int t) {
     gen(id, sqgr(n, 0.0001, '1', '2', '3'), t);
     gen(id, sqgr(n, 0.01, '1', '1', '1'), t);
     gen(id, sqgr(n, 0.01, '0', '1', '9'), t);
+    gen(id, sgr(n, '0', '9'), t);
+    gen(id, sgr(n, '0', '1'), t);
+    gen(id, sgr(n, '1', '1'), t);
 }
 
 void solve(istream& cin, ostream& cout);

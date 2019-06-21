@@ -47,7 +47,7 @@ string sgp(int n, const string& t) {
 string sg(const string& t) { return t; }
 
 //  generate a string consisting mainly of cm with [cl, cr] doped.
-string sqgr(int n, double p, char cm, char cl, char cr) {
+string sqgr(int n, char cm, double p, char cl, char cr) {
     string s(n, cm);
     stq(s, p, cl, cr);
     return s;

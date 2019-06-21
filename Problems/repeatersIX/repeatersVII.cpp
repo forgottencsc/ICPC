@@ -81,7 +81,7 @@ struct aca_t {
     }
 
     mat extract_mat() {
-        mat r(nc + 2, vec(nc + 2, 0));
+        mat r(nc + 1, vec(nc + 1, 0));
         for (int u = 0; u != nc; ++u) {
             if (e[u]) continue;
             for (int o = 0; o != 26; ++o) {
@@ -91,9 +91,7 @@ struct aca_t {
             }
         }
 
-        r[nc][nc] = 26;
-        r[nc + 1][nc] = 1;
-        r[nc + 1][nc + 1] = 1;
+        r[nc][nc] = 27;
         return r;
     }
 
@@ -115,8 +113,8 @@ void solve(istream& cin, ostream& cout) {
     }
     aca.build();
     ul l; cin >> l;
-    mat w = qpow(aca.extract_mat(), l + 1);
-    cout << w[aca.nc + 1][0] << endl;
+    mat w = qpow(aca.extract_mat(), l);
+    cout << w[aca.nc][0] << endl;
 }
 
 
@@ -124,7 +122,6 @@ int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
-    ofstream cout("1.out");
     #endif
     //gen();
     solve(cin, cout);

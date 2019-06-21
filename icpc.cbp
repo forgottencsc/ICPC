@@ -79,7 +79,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="Problems/repeatersIII/tle1.cpp" />
+		<Unit filename="Problems/repeatersIII/tle1.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/repeatersII/repeatersII.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -96,6 +99,14 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Problems/repeatersIX/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersIX/repeatersVII.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/repeatersI/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -108,7 +119,18 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="Problems/repeatersVIII/repeatersVIII.cpp" />
+		<Unit filename="Problems/repeatersVIII/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersVIII/repeatersVIII-2.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersVIII/repeatersVIII.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/repeatersVII/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -117,11 +139,31 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Problems/repeatersVII/tle.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/repeatersVI/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
 		<Unit filename="Problems/repeatersVI/repeatersVI.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersXII/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersXII/repeatersXII.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersXI/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/repeatersXI/repeatersXI.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
@@ -188,10 +230,7 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="main.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-		</Unit>
+		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

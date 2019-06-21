@@ -35,10 +35,13 @@ vector<string> svgen3(sgen g, int n) {
 }
 
 vector<string> svgen4(sgen g, int n) {
-    int w = sqrt(n);
+    int w = 0;
     vector<string> sv;
-    for (int i = 0; i != w; ++i)
-        sv.emplace_back(g(w));
+    while(w <= n) {
+        string s = g(0);
+        w += s.size();
+        if (w <= n) sv.push_back(s);
+    }
     return sv;
 }
 
@@ -67,6 +70,9 @@ void gen_batch(int& id, int n) {
     gen(id, n, bind(svgen3, (sgen)(bind(sqgr, _1, 0.01, 'a', 'b', 'b')), _1));
     gen(id, n, bind(svgen3, (sgen)(bind(sgt, _1, "ab")), _1));
     gen(id, n, bind(svgen3, (sgen)(bind(sqgp, _1, "ab"s, 0.001, 'a', 'b')), _1));
+    gen(id, n, bind(svgen4, (sgen)(bind(sg, "abcba"s)), _1));
+    gen(id, n, bind(svgen4, (sgen)(bind(sg, "aba"s)), _1));
+    gen(id, n, bind(svgen4, (sgen)(bind(sg, "a"s)), _1));
 }
 
 int main(void) {

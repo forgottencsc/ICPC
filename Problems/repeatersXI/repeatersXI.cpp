@@ -6,7 +6,7 @@ int g[N][26], f[N], l[N], w[N], nc;
 int v[N], e[N]; bool vis[N];
 
 int gn(int len, int q = 0) {
-    int p = nc++; l[p] = len;
+    int p = nc++; l[p] = len; w[p] = 0;
     if (!q) memset(g[p], 0, sizeof(g[p])), f[p] = 0;
     else memcpy(g[p], g[q], sizeof(g[p])), f[p] = f[q];
     return p;
@@ -34,6 +34,7 @@ int extend(int p, int o) {
 
 int c[N], pos[N], ans[N];
 void sort_sam(int n) {
+    for (int i = 0; i <= n; ++i) c[i] = 0;
     for (int i = 0; i != nc; ++i) c[l[i]]++;
     for (int i = 1; i <= n; ++i) c[i] += c[i - 1];
     for (int i = 0; i != nc; ++i) pos[--c[l[i]]] = i;
@@ -47,6 +48,9 @@ void solve(istream& cin, ostream& cout) {
         p = extend(p, s[i] - 'a');
 
     sort_sam(n);
+
+    for (int i = 0; i <= n; ++i)
+        ans[i] = 0;
 
     for (int i = nc - 1; i > 0; --i) {
         int p = pos[i];

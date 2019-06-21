@@ -61,7 +61,7 @@ void solve(istream& cin, ostream& cout) {
     cout << ans << endl;
 }
 
-int main1(void) {
+int main(void) {
 	ios::sync_with_stdio(0); cin.tie(0);
 #ifndef ONLINE_JUDGE
 	ifstream cin("1.in");

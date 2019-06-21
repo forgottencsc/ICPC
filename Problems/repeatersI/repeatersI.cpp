@@ -24,8 +24,8 @@ int ins(const string& s, int p) {
 }
 
 void solve(istream& cin, ostream& cout) {
-    int n; cin >> n;
     clr();
+    int n; cin >> n;
     for (int i = 1; i <= n; ++i) {
         string s; cin >> s;
         cout << ins(s, 0) << ' ';
@@ -34,7 +34,8 @@ void solve(istream& cin, ostream& cout) {
     }
 }
 
-int main1(void) {
+
+int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");

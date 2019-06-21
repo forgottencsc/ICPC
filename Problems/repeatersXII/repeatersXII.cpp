@@ -9,8 +9,8 @@ int g[N][26], f[N], l[N], nc;
 
 int gn(int l_, int q = 0) {
     int p = nc++; l[p] = l_;
-    //if (!q) memset(g[p], 0, sizeof(g[p])), f[p] = 0;
-    if(q) memcpy(g[p], g[q], sizeof(g[p])), f[p] = f[q];
+    if (!q) memset(g[p], 0, sizeof(g[p])), f[p] = 0;
+    else memcpy(g[p], g[q], sizeof(g[p])), f[p] = f[q];
     return p;
 }
 
@@ -94,25 +94,13 @@ int query(int l, int r, int lp, int rp, int lb, int rb) {
     }
 }
 
-inline int read_int() {
-	char c;
-	int ret = 0, sgn = 1;
-	do { c = getchar(); } while ((c < '0' || c > '9') && c != '-');
-	if (c == '-') sgn = -1; else ret = c - '0';
-	while ((c = getchar()) >= '0' && c <= '9') ret = ret * 10 + (c - '0');
-	return sgn * ret;
-}
-
-char str[N + 5];
-
-void solve() {
-    int n = read_int();
-    int q = read_int();
-    scanf("%s", str);
+void solve(istream& cin, ostream& cout) {
+    int n, q; string s;
+    cin >> n >> q >> s;
 
     int p = 0; clr();
-    for (int i = 0; str[i]; ++i) {
-        int o = str[i] - 'a';
+    for (int i = 0; i != s.size(); ++i) {
+        int o = s[i] - 'a';
         p = extend(p, o, i + 1);
     }
 
@@ -120,15 +108,12 @@ void solve() {
     dfc = 0; dfs_num(0);
 
     sc = 0;
-    for (int i = 1; str[i - 1]; ++i)
+    for (int i = 1; i <= s.size(); ++i)
         ins(dlb[nid[i]], rt[i] = cp(rt[i - 1]), 1, dfc + 1);
 
     while(q--) {
         int l1, r1, l2, r2, lv, rv;
-        l1 = read_int();
-        r1 = read_int();
-        l2 = read_int();
-        r2 = read_int();
+        cin >> l1 >> r1 >> l2 >> r2;
         int res;
         if (r1 - l1 + 1 > r2 - l2 + 1)
             res = 0;
@@ -138,15 +123,15 @@ void solve() {
             rv = r2;
             res = query(dlb[p], drb[p] + 1, rt[lv - 1], rt[rv], 1, dfc + 1);
         }
-        printf("%d\n", res);
+        cout << res << endl;
     }
 }
 
-int main(void) {
+int main1(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif
-    solve();
+    solve(cin, cout);
     return 0;
 }

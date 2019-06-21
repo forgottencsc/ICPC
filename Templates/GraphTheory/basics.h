@@ -66,3 +66,39 @@ vector<int> eulerian_path() {
     else reverse(res.begin(), res.end());
     return res;
 }
+
+ll g[N][N], val[N];
+bool vis[N], del[N];
+
+ll stoer_wagner(int n) {
+    fill (del + 1, del + n + 1, 0);
+    ll ans = LLONG_MAX;
+    for (int cnt = n; cnt > 1; --cnt) {
+        fill (vis + 1, vis + n + 1, 0);
+        int s, t = 1; vis[1] = 1;
+
+        for (int i = 2; i <= n; ++i) val[i]
+        for (int i = cnt - 1; i; --i) {
+            int u; ll wu = 0;
+            for (int v = 1; v <= n; ++v) {
+                if (vis[v] || del[v]) continue;
+                ll wv = 0;
+                for (pair<const int, ll> e : g[v])
+                    if (vis[e.first]) wv += e.second;
+                if (wu < wv) u = v, wu = wv;
+            }
+            s = t; t = u; vis[u] = 1;
+        }
+        ll res = 0;
+        for (pair<const int, ll> e : g[t]) {
+            if (vis[e.first]) res += e.second;
+            if (e.first == s) continue;
+            g[s][e.first] += e.second;
+            g[e.first][s] += e.second;
+            g[e.first].erase(t);
+        }
+        g[t].clear(); del[t] = 1;
+        ans = min(ans, res);
+    }
+    return ans;
+}
