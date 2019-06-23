@@ -59,6 +59,45 @@ void quadr(dbl a0, dbl a1, dbl a2, dbl a3, dbl a4,
 	x3 = (-f1 - sqrt(f3 + f2)) / k - a3; x4 = (-f1 + sqrt(f3 + f2)) / k - a3;
 }
 
+//  Solve polynomial equations
+const dbl eps = 1e-10;
+int dc(dbl d) { return d < -eps ? -1 : d > eps ? 1 : 0; }
+
+dbl val(const vector<dbl>& p, dbl x) {
+    dbl w = 1, r = 0;
+    for(int i = 0; i != p.size(); ++i, w *= x)
+        r += p[i] * w;
+    return r;
+}
+
+dbl fr(vector<dbl> p, dbl lb, dbl ub, bool flg) {
+    dbl x = (lb + ub) / 2;
+    while(dc(ub - lb)) {
+        dbl res = val(p, x);
+        if (!dc(res)) break;
+        else if (flg ^ (dc(res) == 1)) lb = x;
+        else ub = x;
+        x = (ub + lb) / 2;
+    }
+    return x;
+}
+
+vector<dbl> peq(vector<dbl> p) {
+    if (p.size() < 2) return {};
+    else if (p.size() == 2) return { -p[0] / p[1] };
+    else {
+        vector<dbl> p_, res, sx, sy; dbl b = 0;
+        for (int i = 1; i != p.size(); ++i) p_.push_back(p[i] * i);
+        for (int i = 0; i != p.size(); ++i) b = max(b, abs(p[i]) + 1);
+        sx = peq(p_); sx.insert(sx.begin(), -b); sx.push_back(b);
+        for (dbl x : sx) sy.push_back(val(p, x));
+        for (int i = 0; i != sx.size() - 1; ++i)
+            if (dc(sy[i] * sy[i + 1]) == -1)
+                res.push_back(fr(p, sx[i], sx[i + 1], dc(sy[i]) == -1));
+        return res;
+    }
+}
+
 //	Simpson's Rule
 template<class F> dbl sps0(const F& f,dbl l, dbl r) {
 	return (f(l) + 4 * f((l + r) / 2) + f(r)) * (r - l) / 6;
