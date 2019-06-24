@@ -87,8 +87,8 @@ vector<dbl> peq(vector<dbl> p) {
     else if (p.size() == 2) return { -p[0] / p[1] };
     else {
         vector<dbl> p_, res, sx, sy; dbl b = 0;
+        for (int i = 0; i != p.size(); ++i) b = max(b, abs(p[i] / p[0]) + 1);
         for (int i = 1; i != p.size(); ++i) p_.push_back(p[i] * i);
-        for (int i = 0; i != p.size(); ++i) b = max(b, abs(p[i]) + 1);
         sx = peq(p_); sx.insert(sx.begin(), -b); sx.push_back(b);
         for (dbl x : sx) sy.push_back(val(p, x));
         for (int i = 0; i != sx.size() - 1; ++i)
