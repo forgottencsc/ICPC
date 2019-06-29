@@ -71,7 +71,7 @@ bool ip[W]; vector<ll> ps;
 void eulersieve() {
 	ps.reserve(N * 1.2 / log(N));
 	memset(ip, 1, sizeof(ip)); ip[1] = 0;
-	//  f[1] =
+	//  f[1] = 1
 	for (int i = 2; i != N; ++i) {
 		if (ip[i]) {
 			ps.push_back(i);

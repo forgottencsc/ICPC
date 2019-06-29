@@ -1,4 +1,44 @@
 #include <bits/stdc++.h>
+#define N 100001
+#define M(x) (((x) + P) % P)
+#define P 1000000007
+typedef long long ll;
+
+//  Lagrangian Interpolation
+ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+ll lintp(const vector<ll>& y, const vector<ll>& x, ll m) {
+    int n = y.size(); ll res = 0;
+    for (int i = 0; i != n; ++i) {
+        ll t = y[i];
+        for (int j = 0; j != n; ++j)
+            if (j != i)
+                t = M(t * M((P+m-x[j]) * inv(P+x[i]-x[j])));
+        res = M(res + t);
+    }
+    return res;
+}
+
+ll inv[N], fi[N], lp[N], ls[N];
+void init() {
+    fi[0] = fi[1] = inv[1] = 1;
+    for (int i = 2; i != N; ++i) {
+        inv[i] = M(inv[P % i] * (P - P / i));
+        fi[i] = M(fi[i - 1] * inv[i]);
+    }
+}
+
+ll lintp(const vector<ll>& y, ll x) {
+    int n = y.size(); ll res = 0; lp[0] = x; ls[n - 1] = x - (n - 1);
+    for (int i = 1; i != n; ++i) lp[i] = M(lp[i - 1] * (x - i));
+    for (int i = n - 2; i >= 0; --i) ls[i] = M(ls[i + 1] * (x - i));
+    for (int i = 0; i != n; ++i) {
+        ll t = (n - i + 1) & 1 ? P - y[i] : y[i];
+        if (i)          t = M(t * M(lp[i - 1] * fi[i]));
+        if (i != n - 1) t = M(t * M(ls[i + 1] * fi[n - 1 - i]));
+        res = M(res + t);
+    }
+    return res;
+}
 
 //  Cantor expansion
 ll cexp(array<int, S> a) {
@@ -21,6 +61,7 @@ array<int, S> icexp(ll x) {
 	return res;
 }
 
+//  Fraction
 struct frac {
     ll n, d;
     frac(ll nn = 0, ll dd = 1) { ll w = gcd(nn, dd); n = nn / w; d = dd / w;}
@@ -76,8 +117,7 @@ dbl fr(vector<dbl> p, dbl lb, dbl ub, bool flg) {
         dbl res = val(p, x);
         if (!dc(res)) break;
         else if (flg ^ (dc(res) == 1)) lb = x;
-        else ub = x;
-        x = (ub + lb) / 2;
+        else ub = x; x = (ub + lb) / 2;
     }
     return x;
 }

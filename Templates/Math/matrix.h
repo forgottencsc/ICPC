@@ -2,22 +2,8 @@
 #define R(m) (int)(m).size()
 #define C(m) (int)((m)[0].size())
 const dbl eps = 1e-8;
-
 typedef vector<dbl> vec;
 typedef vector<vec> mat;
-
-void row_reduction(mat& a) {
-	const int n = R(a), m = C(a);
-	for (int r = 0, c = 0; r != n && c != m; ++r, ++c) {
-		do for (int i = r; i != n; ++i)
-			if (abs(a[r][c]) < abs(a[i][c])) swap(a[r], a[i]);
-		while (abs(a[r][c]) < eps && ++c != n);
-		for (int j = m - 1; j >= c; --j) a[r][j] /= a[r][c];
-		for (int i = 0; c != m && i != n; ++i)
-			for (int j = m - 1; i != r && j >= c; --j)
-				a[i][j] -= a[r][j] * a[i][c];
-	}
-}
 
 mat operator*(const mat& a, const mat& b) {
     mat r(R(a), vec(C(b), 0));
@@ -47,6 +33,62 @@ ostream& operator<<(ostream& os, const mat& w) {
             os << w[i][j] << " \n"[j == C(w) - 1];
     return os;
 }
+
+//  Gaussian Elimination
+void row_reduction(mat& a) {
+	const int n = R(a), m = C(a);
+	for (int r = 0, c = 0; r != n && c != m; ++r, ++c) {
+		do for (int i = r; i != n; ++i)
+			if (abs(a[r][c]) < abs(a[i][c])) swap(a[r], a[i]);
+		while (abs(a[r][c]) < eps && ++c != n);
+		for (int j = m - 1; j >= c; --j) a[r][j] /= a[r][c];
+		for (int i = 0; c != m && i != n; ++i)
+			for (int j = m - 1; i != r && j >= c; --j)
+				a[i][j] -= a[r][j] * a[i][c];
+	}
+}
+
+//  Get a base of null space of a
+mat nsp(mat& a) {
+    const int n = C(a);
+    while(R(a) < n) a.push_back(vec(n, 0));
+    int w = row_reduction(a); mat b(n, vec(n - w, 0));
+    vector<int> p, vis(n, 0);
+    for (int c = 0, r = 0; c != n; ++c)
+        if (abs(a[r][c]) > eps) ++r, vis[c] = 1;
+    for (int i = 0; i != n; ++i) if (vis[i]) p.push_back(i);
+    for (int i = 0; i != n; ++i) if (!vis[i]) p.push_back(i);
+    for (int i = 0; i != n - w; ++i) {
+        for (int j = 0; j != n; ++j)
+            b[j][i] = a[p[j]][p[i + w]];
+        b[p[i + w]][i] = -1;
+    }
+    return b;
+}
+
+//  Gram–Schmidt Orthogonalization
+void gso(mat& a) {
+    const int n = R(a), m = C(a);
+    for (int i = 1; i != m; ++i) {
+        for (int j = 0; j != i; ++j) {
+            dbl u = 0, v = 0;
+            for (int k = 0; k != n; ++k)
+                u += a[k][j] * a[k][i],
+                v += a[k][j] * a[k][j];
+            for (int k = 0; k != n; ++k)
+                a[k][i] -= u / v * a[k][j];
+        }
+    }
+    for (int i = 0; i != m; ++i) {
+        dbl len = 0;
+        for (int k = 0; k != n; ++k)
+            len += a[k][i] * a[k][i];
+        len = sqrt(len);
+        for (int k = 0; k != n; ++k)
+            a[k][i] /= len;
+    }
+}
+
 
 namespace LP {
 

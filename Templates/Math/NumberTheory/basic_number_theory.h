@@ -54,14 +54,6 @@ vector<ll> ifd(ll n) {
 	return v;
 }
 
-//  a^b(mod p) = a^(b%phi(p)+phi(p))
-ll qpm(ll a, ll b, ll p) {
-	ll r = 1;
-	for (ll i = 1; i <= b; i <<= 1, a = a * a % p)
-		if (i & b) r = r * a % p;
-	return r % p;
-}
-
 ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
 
 //	Extended Euclidean Algorithm
@@ -70,12 +62,40 @@ ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
 	else d = a, u = 1, v = 0; return d;
 }
 
+//  a^b(mod p) = a^(b%phi(p)+phi(p))
+ll qpm(ll a, ll b, ll p) {
+	ll r = 1;
+	do if (b & 1) r = r * a % p;
+    while (a = a * a % p, b >>= 1);
+	return r % p;
+}
+
+// Tonelli-Shanks algorithm. O(log^2p)
+ll msqrt(ll n, ll p) {
+    ll q = p - 1, s = 0, z = 2;
+    while (~q & 1) q >>= 1, s++;
+    if (s == 1) return qpm(n, (p + 1) / 4, p);
+    while(qpm(z, (p - 1) / 2, p) == 1) ++z;
+    ll c = qpm(z, q, p), t = qpm(n, q, p),
+       r = qpm(n, (q + 1) / 2, p), m = s;
+    while(t % p != 1) {
+        ll i = 1; while(qpm(t, 1ll << i, p) != 1) ++i;
+        ll b = qpm(c, 1ll << (m - i - 1), p);
+        r = r * b % p; c = (b * b) % p;
+        t = (t * c) % p; m = i;
+    }
+    return min(r, p - r); //    r^2=(p-r)^2=n
+}
+
 //	Try to reduce ax = b(mod p) to x = b'(mod p')
+//  Solve linear congurence equation
 bool lce(ll& a, ll& b, ll& p) {
 	ll x, k, d = exgcd(a, p, x, k);
 	if (b % d == 0) a = 1, b = mod(x * b / d, p /= d);
 	return a == 1;
 }
+
+ll inv(ll x, ll p) { ll b; lce(x %= p, b, p); return b; }
 
 //  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
 bool crt(ll& b1, ll& m1, ll b2, ll m2) {
@@ -84,7 +104,15 @@ bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	else { b1 += b * m1; m1 *= p; return true; }
 }
 
-ll inv(ll x, ll p) { ll b; lce(x %= p, b, p); return b; }
+//  Solve quadratic congurence equation
+bool qce(ll a, ll b, ll c, ll p, ll& x1, ll& x2) {
+    if (qpm(mod(b*b-4*a*c, p), (p-1)/2, p) != 1) return false;
+    ll r1 = msqrt(mod(b*b-4*a*c, p), p), r2 = p - r1;
+    ll a1 = 2 * a % p, a2 = 2 * a % p;
+    x1 = (r1 + p - b) % p; x2 = (r2 + p - b) % p;
+    lce(a1, x1, p); lce(a2, x2, p);
+    return true;
+}
 
 //	Basic Lucas Theorem
 ll lucas(ll n, ll k, ll p) {
@@ -118,6 +146,7 @@ ll bsgs(ll a, ll b, ll p) {
 	return -1;
 }
 
+//  Find a primitive root of p. O(p^(1/4))
 ll primitive_root(ll p) {
     vector<ll> ds; ll n = p - 1;
     for (ll d = 2; d * d <= n; ++d) {
@@ -130,9 +159,8 @@ ll primitive_root(ll p) {
     while(1) {
         bool fail = 0;
         for (int d : ds)
-            if (qpm(g, (p - 1) / d, p) == 1)
+            if (qpm(g, (p-1)/d, p) == 1)
                 fail = 1;
-        if (!fail) return g;
-        else g++;
+        if (!fail) return g; else g++;
     }
 }
