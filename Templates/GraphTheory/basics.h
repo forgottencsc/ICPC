@@ -44,8 +44,8 @@ int n, m;
 vector<int> g[N];
 int deg[N]; // deg[i] == out deg - in deg of vertex i
 vector<int> eulerian_path() {
-    int s = 0;
     vector<int> res; res.reserve(m + 1);
+    int s = 0;
     for (int i = 1; i <= n; ++i) {
         sort(g[i].begin(), g[i].end(), greater<int>());
         if (abs(deg[i]) >= 2 || deg[i] == 1 && s) return res;
@@ -67,38 +67,48 @@ vector<int> eulerian_path() {
     return res;
 }
 
-ll g[N][N], val[N];
-bool vis[N], del[N];
+struct edge { int v, p; };
+vector<edge> g[N];
 
-ll stoer_wagner(int n) {
-    fill (del + 1, del + n + 1, 0);
-    ll ans = LLONG_MAX;
-    for (int cnt = n; cnt > 1; --cnt) {
-        fill (vis + 1, vis + n + 1, 0);
-        int s, t = 1; vis[1] = 1;
+void adde(int u, int v, int w) {
+    g[u].push_back({ v, w, g[v].size() });
+    g[v].push_back({ u, w, g[u].size() - 1 });
+}
 
-        for (int i = 2; i <= n; ++i) val[i]
-        for (int i = cnt - 1; i; --i) {
-            int u; ll wu = 0;
-            for (int v = 1; v <= n; ++v) {
-                if (vis[v] || del[v]) continue;
-                ll wv = 0;
-                for (pair<const int, ll> e : g[v])
-                    if (vis[e.first]) wv += e.second;
-                if (wu < wv) u = v, wu = wv;
-            }
-            s = t; t = u; vis[u] = 1;
-        }
-        ll res = 0;
-        for (pair<const int, ll> e : g[t]) {
-            if (vis[e.first]) res += e.second;
-            if (e.first == s) continue;
-            g[s][e.first] += e.second;
-            g[e.first][s] += e.second;
-            g[e.first].erase(t);
-        }
-        g[t].clear(); del[t] = 1;
-        ans = min(ans, res);
+int finde(int u, int v) {
+    for (int i = 0; i != g[u].size(); ++i)
+        if (g[u][i].v == v) return i;
+}
+
+void dele(int u, int v) {
+    int i = finde(u, v), j = g[u][i].p;
+    if (i != g[u].size() - 1) {
+        g[g[u].back().v][g[u].back().p].p = i;
+        swap(g[u].back(), g[u][i]);
     }
-    return ans;
+    g[u].pop_back();
+    if (j != g[v].size() - 1) {
+        g[g[v].back().v][g[v].back().p].p = j;
+        swap(g[v].back(), g[v][j]);
+    }
+    g[v].pop_back();
+}
+
+vector<int> eulerian_path(int s) {
+    vector<int> res, stk;
+    stk.push_back(s);
+    while (!stk.empty()) {
+        int u = stk.back();
+        if (g[u].empty()) {
+            res.push_back(u);
+            stk.pop_back();
+        }
+        else {
+            int v = g[u].front().v;
+            dele(u, e.v);
+            stk.push_back(v);
+        }
+    }
+    reverse(res.begin(), res.end());
+    return res;
 }

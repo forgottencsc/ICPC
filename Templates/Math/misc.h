@@ -204,11 +204,11 @@ void ntt_res(ul* p) {
 		p[i] = M(p[i] * is);
 }
 
-void fwt(ui* a, ui n) {
-	for (ui k = 1; k < n; k <<= 1)
-		for (ui m = k << 1, i = 0; i < n; i += m)
-			for (ui j = 0; j != k; j++) {
-				ui x = a[i + j], y = a[i + j + k];
+void fwt(ll* a, int n) {
+	for (int k = 1; k < n; k <<= 1)
+		for (int m = k << 1, i = 0; i < n; i += m)
+			for (int j = 0; j != k; j++) {
+				ll x = a[i + j], y = a[i + j + k];
 				//^: a[i + j] = x + y, a[i + j + d]= x - y;
 				//&: a[i + j] = x + y;
 				//|: a[i + j + d] = x + y;
@@ -216,11 +216,11 @@ void fwt(ui* a, ui n) {
 }
 
 
-void ifwt(ui* a, ui n) {
-	for (ui k = 1; k < n; k <<= 1)
-		for (ui m = k << 1, i = 0; i < n; i += m)
-			for (ui j = 0; j != k; j++) {
-				ui x = a[i + j], y = a[i + j + k];
+void ifwt(ll* a, int n) {
+	for (int k = 1; k < n; k <<= 1)
+		for (int m = k << 1, i = 0; i < n; i += m)
+			for (int j = 0; j != k; j++) {
+				ll x = a[i + j], y = a[i + j + k];
 				//^: a[i + j] = (x + y) / 2, a[i + j + d] = (x - y) /2;
 				//&: a[i + j] = x - y;
 				//|: a[i + j + d] = y - x;
