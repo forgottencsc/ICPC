@@ -67,13 +67,35 @@ vector<int> eulerian_path() {
     return res;
 }
 
-int n, m;
 struct edge { int v, p; };
-vector<edge> g[N]; int deg[N];
-typedef pair<int, int> pii;
+vector<edge> g[N];
+
+void adde(int u, int v, int w) {
+    g[u].push_back({ v, w, g[v].size() });
+    g[v].push_back({ u, w, g[u].size() - 1 });
+}
+
+int finde(int u, int v) {
+    for (int i = 0; i != g[u].size(); ++i)
+        if (g[u][i].v == v) return i;
+}
+
+void dele(int u, int v) {
+    int i = finde(u, v), j = g[u][i].p;
+    if (i != g[u].size() - 1) {
+        g[g[u].back().v][g[u].back().p].p = i;
+        swap(g[u].back(), g[u][i]);
+    }
+    g[u].pop_back();
+    if (j != g[v].size() - 1) {
+        g[g[v].back().v][g[v].back().p].p = j;
+        swap(g[v].back(), g[v][j]);
+    }
+    g[v].pop_back();
+}
+
 vector<int> eulerian_path(int s) {
-    vector<int> res;
-    vector<int> stk;
+    vector<int> res, stk;
     stk.push_back(s);
     while (!stk.empty()) {
         int u = stk.back();
@@ -82,16 +104,11 @@ vector<int> eulerian_path(int s) {
             stk.pop_back();
         }
         else {
-            edge e = g[u].back();
-            int v = e.v, p = e.p;
-            if (e.p != g[v].size() - 1) {
-                g[g[v].back().v][g[v].back().p].p = e.p;
-                swap(g[v].back(), g[v][p]);
-            }
+            int v = g[u].front().v;
+            dele(u, e.v);
             stk.push_back(v);
-            g[u].pop_back();
-            g[v].pop_back();
         }
     }
+    reverse(res.begin(), res.end());
     return res;
 }
