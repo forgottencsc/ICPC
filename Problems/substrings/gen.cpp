@@ -12,7 +12,7 @@ void solve(istream& cin, ostream& cout);
 
 int check(istream& cin, istream& cout);
 
-int main(void) {
+int main1(void) {
     int id = 1;
     gen(id, 12, "245684");
     gen(id, 5, "252525252505050505055020502050205020502");

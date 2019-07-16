@@ -2,6 +2,15 @@
 using namespace std;
 using namespace placeholders;
 mt19937_64 mt(chrono::system_clock::now().time_since_epoch().count());
+#define gfs(in, out) \
+    ifstream in(to_string(i) + ".in"); \
+    ofstream out(to_string(i) + ".out");
+
+#define cfs(in, out) \
+    ifstream in(to_string(i) + ".in"); \
+    ifstream out(to_string(i) + ".out");
+
+
 
 typedef long long ll;
 

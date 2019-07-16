@@ -21,20 +21,17 @@ bool lce(ll& a, ll& b, ll& p) {
 int n, k, w;
 char str[N]; int s[N];
 ll p10[N];
-vector<int> d;
 
 ll dc(int l, int r) {
     if (l == r) return s[l] % k == 0;
     int m = (l + r) >> 1;
     ll res = dc(l, m) + dc(m + 1, r);
-    unordered_map<int, int> cnt(w);
+    unordered_map<ll, int> cnt;
 
-    vector<int> x(w, 0);
+    ll x = 0;
     for (int i = m; i >= l; --i) {
-        for (int j = 0; j != w; ++j) {
-            x[j] = (x[j] + p10[m - i] * s[i]) % d[j];
-            cnt[j][x[j]]++;
-        }
+        x = (x + p10[m - i] * s[i]) % k;
+        cnt[x]++;
     }
 
     ll y = 0;
@@ -43,10 +40,11 @@ ll dc(int l, int r) {
         ll a = p10[i - m], b = k - y, p = k;
         if (!lce(a, b, p)) continue;
         else {
-            ll j = lower_bound(d.begin(), d.end(), p) - d.begin();
-            auto it = cnt[j].find(b);
-            if (it == cnt[j].end()) continue;
-            else res += it->second;
+            for (ll w = b; w < k; w += p) {
+                auto it = cnt.find(w);
+                if (it == cnt.end()) continue;
+                res += it->second;
+            }
         }
     }
 
