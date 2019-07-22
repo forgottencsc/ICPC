@@ -183,6 +183,30 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Problems/substrings/digit_string_on_a_tree.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/gen.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/gen2.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/substrings.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/tle1.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/tle2.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/throughput/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -213,6 +237,7 @@
 		<Unit filename="Templates/GraphTheory/flows.h" />
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
 		<Unit filename="Templates/Math/Geometry/basic_geometry.h" />
+		<Unit filename="Templates/Math/Geometry/basic_geometry0.h" />
 		<Unit filename="Templates/Math/NumberTheory/basic_number_theory.h" />
 		<Unit filename="Templates/Math/NumberTheory/multiplicative.h" />
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
