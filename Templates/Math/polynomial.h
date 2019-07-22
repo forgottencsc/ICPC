@@ -1,17 +1,8 @@
 #include <bits/stdc++.h>
-#define N (1<<20)
-#define P 998244353ll
+#define N (1<<18)
+#define P 998244353
 #define M(x) (((x) + P) % P)
-using namespace std;
-
 typedef long long ll;
-
-ll qp(ll a, ll b) {
-    ll r = 1;
-    do if (b & 1) r = M(r * a);
-    while (a = M(a * a), b >>= 1);
-    return r;
-}
 
 ll invs[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
@@ -155,44 +146,4 @@ namespace poly {
         return exp(mul(log(p1), k));
     }
 
-}
-
-using namespace poly;
-
-int main(void) {
-//    ios::sync_with_stdio(0); cin.tie(0);
-//    #ifndef ONLINE_JUDGE
-//    ifstream cin("1.in");
-//    #endif // ONLINE_JUDGE
-//freopen("1.in", "r", stdin);
-    ginv();
-    int T;
-    scanf("%d", &T);
-    while(T--) {
-        int n, m;
-        scanf("%d%d", &n, &m);
-        vector<ll> a(n);
-        for (int i = 0; i != n; ++i) {
-            scanf("%lld", &a[i]);
-            a[i] = M(a[i]);
-        }
-
-        vector<vector<ll>> d(3, vector<ll>(n, 0));
-        for (int i = 0; i != 3; ++i)
-            for (int j = 0; j < n; j += (i + 1))
-                d[i][j] = 1;
-
-        int c[3] = { 0 };
-        for (int i = 0; i != m; ++i) {
-            int t; scanf("%d", &t);
-            c[t - 1]++;
-        }
-
-        vector<ll> b = mul(mul(a, pow(d[0], c[0]), n), mul(pow(d[1], c[1]), pow(d[2], c[2]), n), n);
-        ll ans = 0;
-        for (int i = 0; i != n; ++i)
-            ans ^= (i + 1) * b[i];
-        printf("%lld\n", ans);
-    }
-    return 0;
 }
