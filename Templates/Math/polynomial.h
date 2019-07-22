@@ -69,8 +69,7 @@ namespace poly {
     vector<ll> mul(const vector<ll>& p1, int k) {
         int n1 = p1.size();
         vector<ll> p2(n1);
-        for (int i = 0; i != n1; ++i)
-            p2[i] = M(k * p1[i]);
+        for (int i = 0; i != n1; ++i) p2[i] = M(k * p1[i]);
         return p2;
     }
 
@@ -80,8 +79,7 @@ namespace poly {
         copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
         copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
         ntt(pa, 1); ntt(pb, 1);
-        for (int i = 0; i != fs; ++i)
-            pc[i] = M(pa[i] * pb[i]);
+        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
         ntt(pc, -1); copy(pc, pc + n3, pr.begin());
         if (n) pr.resize(n, 0);
         return pr;
@@ -94,7 +92,7 @@ namespace poly {
         else {
             vector<ll> p1_(p1.begin(), p1.begin() + n2);
             vector<ll> p2 = inv(p1_);
-            return sub(add(p2, p2), mul(p1, mul(p2, p2, n1), n1));
+            return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
         }
     }
 
