@@ -97,11 +97,9 @@ namespace poly {
 
     vector<ll> inv(const vector<ll>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1)
-            return vector<ll>(1, ::inv(p1[0]));
+        if (n1 == 1) return vector<ll>(1, ::inv(p1[0]));
         else {
-            vector<ll> p1_(p1.begin(), p1.begin() + n2);
-            vector<ll> p2 = inv(p1_);
+            vector<ll> p2 = inv(vector<ll>(p1.begin(), p1.begin() + n2));
             return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
         }
     }
