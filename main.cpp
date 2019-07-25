@@ -1,24 +1,25 @@
 #include <bits/stdc++.h>
-#define N 100001
+#define N (1<<18)
 #define P 998244353
 #define M(x) (((x) + P) % P)
+typedef long long ll;
+
 using namespace std;
 
-typedef long long ll;
+ll invs[N], f[N], fi[N];
+ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+void ginv() {
+    invs[1] = 1; f[0] = fi[0] = 1;
+    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
+    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
+}
 
 ll qp(ll a, ll b) {
     ll r = 1;
     do if (b & 1) r = M(r * a);
     while (a = M(a * a), b >>= 1);
     return r;
-}
-
-ll invs[N];
-ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
-void ginv() {
-    invs[1] = 1;
-    for (int i = 2; i != N; ++i)
-        invs[i] = M(invs[P % i] * (P - P / i));
 }
 
 namespace poly {
@@ -78,8 +79,7 @@ namespace poly {
     vector<ll> mul(const vector<ll>& p1, int k) {
         int n1 = p1.size();
         vector<ll> p2(n1);
-        for (int i = 0; i != n1; ++i)
-            p2[i] = M(k * p1[i]);
+        for (int i = 0; i != n1; ++i) p2[i] = M(k * p1[i]);
         return p2;
     }
 
@@ -89,8 +89,7 @@ namespace poly {
         copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
         copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
         ntt(pa, 1); ntt(pb, 1);
-        for (int i = 0; i != fs; ++i)
-            pc[i] = M(pa[i] * pb[i]);
+        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
         ntt(pc, -1); copy(pc, pc + n3, pr.begin());
         if (n) pr.resize(n, 0);
         return pr;
@@ -103,7 +102,7 @@ namespace poly {
         else {
             vector<ll> p1_(p1.begin(), p1.begin() + n2);
             vector<ll> p2 = inv(p1_);
-            return sub(add(p2, p2), mul(p1, mul(p2, p2, n1), n1));
+            return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
         }
     }
 
@@ -160,39 +159,16 @@ namespace poly {
 using namespace poly;
 
 int main(void) {
-//    ios::sync_with_stdio(0); cin.tie(0);
-//    #ifndef ONLINE_JUDGE
-//    ifstream cin("1.in");
-//    #endif // ONLINE_JUDGE
-//freopen("1.in", "r", stdin);
-    ginv();
-    int T;
-    scanf("%d", &T);
-    while(T--) {
-        int n, m;
-        scanf("%d%d", &n, &m);
-        vector<ll> a(n);
-        for (int i = 0; i != n; ++i) {
-            scanf("%lld", &a[i]);
-            a[i] = M(a[i]);
-        }
+    ios::sync_with_stdio(0); cin.tie(0);
+    #ifndef ONLINE_JUDGE
+    ifstream cin("1.in");
+    #endif // ONLINE_JUDGE
 
-        vector<vector<ll>> d(3, vector<ll>(n, 0));
-        for (int i = 0; i != 3; ++i)
-            for (int j = 0; j < n; j += (i + 1))
-                d[i][j] = 1;
+    vector<ll> p = { 1, P - 1 };
+    p.resize(11);
+    vector<ll> q = inv(p);
 
-        int c[3] = { 0 };
-        for (int i = 0; i != m; ++i) {
-            int t; scanf("%d", &t);
-            c[t - 1]++;
-        }
+    cout << mul(q, p, 11) << endl;
 
-        vector<ll> b = mul(mul(a, pow(d[0], c[0]), n), mul(pow(d[1], c[1]), pow(d[2], c[2]), n), n);
-        ll ans = 0;
-        for (int i = 0; i != n; ++i)
-            ans ^= (i + 1) * b[i];
-        printf("%lld\n", ans);
-    }
     return 0;
 }

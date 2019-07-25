@@ -4,12 +4,22 @@
 #define M(x) (((x) + P) % P)
 typedef long long ll;
 
-ll invs[N];
+using namespace std;
+
+ll invs[N], f[N], fi[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 void ginv() {
-    invs[1] = 1;
-    for (int i = 2; i != N; ++i)
-        invs[i] = M(invs[P % i] * (P - P / i));
+    invs[1] = 1; f[0] = fi[0] = 1;
+    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
+    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
+}
+
+ll qp(ll a, ll b) {
+    ll r = 1;
+    do if (b & 1) r = M(r * a);
+    while (a = M(a * a), b >>= 1);
+    return r;
 }
 
 namespace poly {
