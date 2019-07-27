@@ -43,7 +43,7 @@ vector<vec> minkovski_sum(const vector<vec>& c1, const vector<vec>& c2) {
     int n1 = c1.size(), n2 = c2.size();
     vector<vec> res = { c1[0] + c2[0] };
     int p1 = 0, p2 = 0;
-    while (p1 != n1 && p2 != ns2) {
+    while (p1 != n1 || p2 != n2) {
         vec v1, v2;
         if (p1 != n1) v1 = (c1[(p1 == n1 - 1 ? 0 : p1)] - c1[p1]);
         if (p2 != n2) v2 = (c2[(p2 == n2 - 1 ? 0 : p2)] - c2[p2]);
@@ -54,7 +54,7 @@ vector<vec> minkovski_sum(const vector<vec>& c1, const vector<vec>& c2) {
             else res.push_back(v2), p2++;
         }
     }
-    for (int i = 1; i != n1 + n2; ++i)¡¡res[i] = res[i] + res[i - 1];
+    for (int i = 1; i != n1 + n2; ++i)res[i] = res[i] + res[i - 1];
     return res;
 }
 
