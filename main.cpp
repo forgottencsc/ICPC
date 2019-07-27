@@ -3,158 +3,232 @@
 #define C(x) ((x)[0].size())
 using namespace std;
 
-typedef long double dbl;
-const dbl eps = 1e-7;
-int dc(dbl f) { return f < -eps ? -1 : f > eps ? 1 : 0; }
+struct db
+{
+	int a[T],n;
+	bool is_neg;
+	int& operator [](int x) { return a[x]; }
+	int operator [](int x) const { return a[x]; }
+	void left_move(int l) {
+		for (int i = n - 1; i >= 0; --i) a[i+l]=a[i];
+        for (int i = 0; i <= l - 1; ++i) a[i]=0;
+		n+=l;
+	}
+	db (int x=0)
+	{
+		memset(a,0,sizeof(a));n=B;
+		is_neg=0;
+		if(x<0){is_neg=1;x=-x;}
+		while(x){a[n++]=x%W;x/=W;}
+	}
+	void print(char c='\n')const
+	{
+		if(is_neg)putchar('-');
+		if(n>B)
+		{
+			printf("%d",a[n-1]);
+			per(i,n-2,B)printf("%.8d",a[i]);
+		}
+		else printf("0");
 
-typedef vector<dbl> vec;
-typedef vector<vec> mat;
+		printf(".");
+		per(i,B-1,B-2)printf("%.8d",a[i]);
+		printf("%c",c);
+	}
+	long double evalu(int l)const
+	{
+		long double x=0;
+		per(i,n-1,l)x=x*W+a[i];
+		return x;
+	}
+};
+bool operator <(const db &a,const db &b)
+{
+	if(a.is_neg)
+	{
+		if(!b.is_neg)return 1;
+		per(i,T-1,0)
+		if(a[i]!=b[i])return a[i]>b[i];
+		return 0;
+	}
+	else
+	{
+		if(b.is_neg)return 0;
+		per(i,T-1,0)
+		if(a[i]!=b[i])return a[i]<b[i];
+		return 0;
+	}
+}
+bool operator >=(const db &a,const db &b)
+{
+	return !(a<b);
+}
+bool operator <=(const db &a,const db &b)
+{
+	return b>=a;
+}
+bool operator >(const db &a,const db &b)
+{
+	return b<a;
+}
+bool operator !(const db &a)
+{
+	int n=a.n;
+	while(n&&!a[n-1])--n;
+	return !n;
+}
+db operator -(db a)
+{
+	a.is_neg^=1;
+	return a;
+}
+db operator +(db a,const db &b);
+db operator -(db a,db b)
+{
+	b=-b;
+	if(a.is_neg)
+	{
+		if(!b.is_neg)
+		{
+			a=-a;
+			swap(a,b);
+		}
+		else return a+b;
+	}
+	else
+	{
+		if(b.is_neg)
+		{
+			b=-b;
+		}
+		else return a+b;
+	}
+	if(a<b)return -(b-a);
 
-mat operator*(const mat& a, const mat& b) {
-    mat r(R(a), vec(C(b), 0));
-    for (int i = 0; i != R(a); ++i)
-        for (int j = 0; j != C(b); ++j)
-            for (int k = 0; k != C(a); ++k)
-                r[i][j] += a[i][k] * b[k][j];
-    return r;
+	rep(i,0,a.n-1)
+	if((a[i]-=b[i])<0)
+	{
+		a[i]+=W;
+		--a[i+1];
+	}
+	while(a.n&&!a[a.n-1])--a.n;
+	return a;
+}
+db operator +(db a,const db &b)
+{
+	if(a.is_neg)
+	{
+		if(!b.is_neg)return b-(-a);
+	}
+	else
+	{
+		if(b.is_neg)return a-(-b);
+	}
+	chmax(a.n,b.n);
+	rep(i,0,a.n-1)
+	if((a[i]+=b[i])>=W)
+	{
+		a[i]-=W;
+		++a[i+1];
+	}
+	if(a[a.n])++a.n;
+	return a;
+}
+void operator +=(db &a,const db &b)
+{
+	a=a+b;
+}
+void operator -=(db &a,const db &b)
+{
+	a=a-b;
+}
+db eps1,eps2,eps3;
+db operator *(const db &a,const db &b)
+{
+	db ans;
+	ans.is_neg=a.is_neg^b.is_neg;
+	ans.n=max(0,a.n+b.n-B);
+	rep(i,0,ans.n)
+	{
+		int jk=i+B;s64 sum=0;
+		rep(j,max(0,jk-(b.n-1)),min(jk,a.n-1))sum+=(s64)a[j]*b[jk-j];
+		int x=i;
+		while(sum)
+		{
+			ans[x]+=sum%W;
+			sum/=W;
+			++x;
+		}
+	}
+	rep(i,0,ans.n)
+	while(ans[i]>=W)
+	{
+		ans[i]-=W;
+		++ans[i+1];
+	}
+	if(ans.n&&!ans[ans.n-1])--ans.n;
+	return ans;
+}
+void operator *=(db &a,const db &b)
+{
+	a=a*b;
+}
+db operator *(db a,int k)
+{
+	per(i,a.n-1,0)
+	{
+		s64 sum=(s64)a[i]*k;
+		a[i]=sum%W;
+		a[i+1]+=sum/W;
+	}
+	rep(i,0,a.n-1)
+	while(a[i]>=W)
+	{
+		a[i]-=W;
+		++a[i+1];
+	}
+	if(a[a.n])++a.n;
+	return a;
+}
+db operator *(int k,const db &a)
+{
+	return a*k;
+}
+db operator /(db a,db b)
+{
+	a.is_neg^=b.is_neg;
+	b.is_neg=0;
+	a.left_move(B);
+	int l=max(0,b.n-20);
+	long double b_e=b.evalu(l);
+	db x;x.n=0;
+	per(i,a.n-1,0)
+	{
+		x.left_move(1);x[0]=a[i];
+		if(x>=b)
+		{
+			int k=x.evalu(l)/b_e;
+			if(k)--k;
+			a[i]=k;
+			x-=k*b;
+			while(x>=b)
+			{
+				x-=b;
+				++a[i];
+			}
+		}else a[i]=0;
+	}
+	while(a.n&&!a[a.n-1])--a.n;
+	return a;
+}
+void operator /=(db &a,const db &b)
+{
+	a=a/b;
 }
 
-//  returns rk(a)
-int row_reduction(mat& a) {
-    const int& n = R(a), m = C(a);
-    for (int i = 0, j = 0; i != n; ++i) {
-        do for (int k = i + 1; k != n; ++k)
-            if (fabs(a[i][j]) < fabs(a[k][j]))
-                swap(a[i], a[k]);
-        while (!dc(a[i][j]) && ++j != n);
-        if (j == n) return i;
-        for (int l = m - 1; l >= i; --l)
-            a[i][l] /= a[i][j];
-        for (int k = 0; k != n; ++k)
-            if (k != i) for (int l = m - 1; l >= i; --l)
-                a[k][l] -= a[k][j] * a[i][l];
-    }
-    return n;
-}
-
-mat transpose(const mat& a) {
-    int n = R(a), m = C(a);
-    mat b(m, vec(n));
-    for (int i = 0; i != n; ++i)
-        for (int j = 0; j != m; ++j)
-            b[j][i] = a[i][j];
-    return b;
-}
-
-ostream& operator<<(ostream& os, const mat& w) {
-    for (int i = 0; i != R(w); ++i)
-        for (int j = 0; j != C(w); ++j)
-            os << w[i][j] << " \n"[j == C(w) - 1];
-    return os;
-}
-
-
-mat nsp(mat& a, int w0) {
-    const int n = C(a);
-    while(R(a) < n) a.push_back(vec(n, 0));
-    int w = row_reduction(a); mat b(n, vec(n - w, 0));
-    //cout << w << ' ' << w0 << endl;
-    assert(w == w0);
-    vector<int> p, vis(n, 0);
-    for (int c = 0, r = 0; c != n; ++c)
-        if (dc(a[r][c])) ++r, vis[c] = 1;
-    for (int i = 0; i != n; ++i) if (vis[i]) p.push_back(i);
-    for (int i = 0; i != n; ++i) if (!vis[i]) p.push_back(i);
-    for (int i = 0; i != n - w; ++i) {
-        for (int j = 0; j != n; ++j)
-            b[j][i] = a[p[j]][p[i + w]];
-        b[p[i + w]][i] = -1;
-    }
-    return b;
-}
-
-void gso(mat& b) {
-    if (!R(b) || !C(b)) return;
-    mat a = transpose(b);
-    const int& n = R(a), m = C(a);
-    //if (!n || !m) return;
-    for (int i = 0; i != n; ++i) {
-        for (int j = 0; j != i; ++j) {
-            dbl l = 0;
-            for (int k = 0; k != m; ++k)
-                l += a[i][k] * a[j][k];
-            for (int k = 0; k != m; ++k)
-                a[i][k] -= a[j][k] * l;
-        }
-        dbl l = 0;
-        for (int k = 0; k != m; ++k)
-            l += a[i][k] * a[i][k];
-        l = sqrt(l);
-        for (int k = 0; k != m; ++k)
-            a[i][k] /= l;
-    }
-    b = transpose(a);
-}
-
-dbl dis(const mat& a, const mat& b) {
-    if (!R(a) || !C(a)) return 0;
-    int n = R(a), m = C(a);
-    dbl sum = 0;
-    for (int i = 0; i != n; ++i) {
-        for (int j = 0; j != m; ++j) {
-            dbl res = a[i][j] - b[i][j];
-            //assert(fabs(res) < 1e-3);
-            sum += res * res;
-        }
-    }
-    return sqrt(sum);
-}
-
-mt19937_64 mt(time(0));
-uniform_real_distribution<dbl> urd(-1e2, 1e2);
-uniform_int_distribution<int> uid;
-mat gen(int n, int& w) {
-    mat a(n, vec(n));
-    for (int i = 0; i != n; ++i)
-        for (int j = 0; j != n; ++j)
-            a[i][j] = urd(mt);
-    w = uid(mt) % n;
-    vector<int> pos(n), res;
-    iota(pos.begin(), pos.end(), 0);
-    sample(pos.begin(), pos.end(), back_inserter(res), w, mt);
-    set<int> npl(res.begin(), res.end());
-    for (int x : npl) {
-        for (int j = 0; j != n; ++j)
-            a[x][j] = 0;
-        for (int i = 0; i != n; ++i)
-        if (npl.find(i) == npl.end()) {
-            dbl r = urd(mt) / n;
-            for (int j = 0; j != n; ++j)
-                a[x][j] += r * a[i][j];
-        }
-    }
-    w = n - w;
-    return a;
-}
-
-mat I(int n) {
-    mat r(n, vec(n, 0));
-    for (int i = 0; i != n; ++i) r[i][i] = 1;
-    return r;
-}
-
-dbl avg(const vector<dbl>& x) {
-    dbl sum = 0;
-    for (int i = 0; i != x.size(); ++i)
-        sum += x[i];
-    return sum / x.size();
-}
-
-dbl var(const vector<dbl>& x) {
-    dbl a = avg(x), sum = 0;
-    for (int i = 0; i != x.size(); ++i)
-        sum += (x[i] - a) * (x[i] - a);
-    return sqrt(sum / x.size());
+int cmp(const db &x,const db &eps)
+{
+	return x<-eps?-1:x>eps;
 }
 
 int main(void) {
