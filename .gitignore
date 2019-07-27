@@ -1,2 +1,6 @@
 *.o
 *.zip
+*.in
+*.out
+*.a
+*.exe
