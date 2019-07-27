@@ -117,68 +117,139 @@ void gso(mat& a) {
     }
 }
 
-namespace LP {
+int dcmp(const dbl &x) { return x < -eps ? -1 : x > eps; }
+struct simplex_t {
 
-//	a[0][1...n] = c^T; a[1...m][0] = b;
-ui n, m, c[2 * N]; dbl a[N][N], x[N], z;
+    struct cstr_t {
+        vector<pair<int, dbl>> a;
+        dbl b; int t, r;
+    };
 
-int dcmp(dbl d) { return d < -eps ? -1 : d <= eps ? 0 : 1; }
+    vector<cstr_t> cstrs;
+	int m, n; vector<int> c;
+	vector<vector<dbl>> a;
+	vector<dbl> x;
 
-//	u in, v out
-void pivot(ui u, ui v) {
-    swap(c[n + u], c[v]);
-    //	row u *= 1 / a[u][v]
-    dbl k = a[u][v]; a[u][v] = 1;
-    for (ui j = 0; j <= n; ++j) a[u][j] /= k;
-    for (ui i = 0; i <= m; ++i) {
-        if (i == u || !dcmp(a[i][v])) continue;
-        k = a[i][v]; a[i][v] = 0;
-        for (ui j = 0; j <= n; ++j)
-            a[i][j] -= a[u][j] * k;
+    // -1 for coeff, 0 for less, 1 for equal, 2 for greater
+    void add_cstr(const vector<pair<int, dbl>>& a, dbl b, int t) {
+        cstrs.push_back({ a, b, t });
     }
-}
 
-bool init() {
-    for (ui i = 1; i <= n; ++i) c[i] = i;
-    while (1) {
-        ui u = 0, v = 0;
-        for (ui i = 1; i <= m && !u; ++i)
-            if (dcmp(a[i][0]) == -1) u = i;	//	b[u] < 0
-        if (!u) return 1;
-        for (ui j = 1; j <= n && !v; ++j)
-            if (dcmp(a[u][j]) == -1) v = j;	//
-        if (!v) return 0;
-        pivot(u, v);
-    }
-}
+	void pivot(int u, int v) {
+		swap(c[n + u], c[v]);
+		dbl k = a[u][v]; a[u][v] = 1;
+		for (int j = 0; j <= n; ++j) a[u][j] /= k;
+		for (int i = 0; i <= m; ++i) {
+			if (i == u || !dcmp(a[i][v])) continue;
+			k = -a[i][v]; a[i][v] = 0;
+			for (int j = 0; j <= n; ++j)
+				a[i][j] += a[u][j] * k;
+		}
+	}
 
-//	0 for infeasible, 1 for success, 2 for unbounded
-int simplex() {
-    if (!init()) return 0;
-    else while (1) {
-        ui u = 0, v = 0;
-        for (ui j = 1; j <= n; ++j)
-            if (dcmp(a[0][j]) == 1)
-                v = j;
+	bool simplex0() {
+		while (1) {
+			int u = 0, v = 0;
+			for (int j = 1; !v && j <= n; ++j)
+				if (dcmp(a[0][j]) == 1) v = j;
+			if (!v)
+				return true;
+			dbl w = 1e100;
+			for (int i = 1; i <= m; ++i)
+				if (dcmp(a[i][v]) == 1 &&
+					dcmp(w - a[i][0] / a[i][v]) == 1) {
+					w = a[i][0] / a[i][v];
+					u = i;
+				}
+			if (!u)
+                return false;
+			pivot(u, v);
+		}
+	}
 
-        if (!v) {
-            z = -a[0][0];
-            for (ui i = 1; i <= m; ++i)
-                x[c[n + i]] = a[i][0];
-            return 1;
+	//  0 for Infeasible, 2 for Unbounded
+	int simplex() {
+        int r = 0;
+        m = cstrs.size() - 1; n = 0;
+	    for (cstr_t& cstr : cstrs) {
+            for (const pair<int, dbl>& p : cstr.a)
+                n = max(n, p.first);
+            if (cstr.t == 0 || cstr.t == 2)
+                cstr.r = ++r;
+            if (cstr.t == -1)
+                swap(cstr, cstrs.front());
+	    }
+
+	    c.resize(1 + n + r + m, 0);
+        a.resize(m + 1, vector<dbl>(n + r + 1, 0));
+        x.resize(1 + n + r, 0);
+
+        for (const pair<int, dbl>& p : cstrs[0].a)
+            a[0][p.first] = p.second;
+        for (int i = 1; i <= m; ++i) {
+            const cstr_t& cstr = cstrs[i];
+            for (const pair<int, dbl>& p : cstr.a)
+                a[i][p.first] = p.second;
+            if (cstr.t == 0) a[i][cstr.r + n] = 1;
+            if (cstr.t == 2) a[i][cstr.r + n] = -1;
+            a[i][0] = cstr.b;
         }
 
-        dbl w = 1e80;
-        for (ui i = 1; i <= m; ++i)
-            if (dcmp(a[i][v]) == 1 &&
-                dcmp(w - a[i][0] / a[i][v]) == 1) {
-                w = a[i][0] / a[i][v];
-                u = i;
-            }
+        n += r;
 
-        if (!u) return 2;
-        pivot(u, v);
-    }
-}
+		for (int i = 1; i <= n + m; ++i) c[i] = i;
 
-}
+		vector<dbl> a0(n + 1, 0); swap(a0, a[0]);
+		for (int i = 1; i <= m; ++i) {
+			if (a[i][0] < 0)
+				for (int j = 0; j <= n; ++j)
+					a[i][j] = -a[i][j];
+			for (int j = 0; j <= n; ++j)
+				a[0][j] += a[i][j];
+		}
+
+		simplex0();
+
+		if (dcmp(a[0][0])) return 0;
+
+		vector<int> cv(1, 0), rv(1, 0);
+		for (int i = 1; i <= m; ++i) {
+			bool del = 0;
+			if (c[n + i] > n) {
+				int p = i, q = 0;
+				for (int j = 1; !q && j <= n; ++j)
+					if (dcmp(a[i][j]) && c[j] <= n) q = j;
+				if (!q) del = 1;
+				else pivot(p, q);
+			}
+			if (!del) rv.push_back(i);
+		}
+		for (int j = 1; j <= n + m; ++j)
+			if (c[j] <= n) cv.push_back(j);
+
+		m = rv.size() - 1; n = n - m;
+		vector<vector<dbl>> a1(m + 1, vector<dbl>(n + 1, 0));
+
+		for (int j = 1; j <= n; ++j) a1[0][j] = a0[c[cv[j]]];
+		for (int i = 1; i <= m; ++i)
+			for (int j = 0; j <= n; ++j)
+				a1[i][j] = a[rv[i]][cv[j]];
+
+		for (int i = 1; i <= m; ++i)
+			for (int j = 0; j <= n; ++j)
+				a1[0][j] -= a0[c[cv[n + i]]] * a1[i][j];
+
+		for (int i = 1; i <= m + n; ++i) cv[i] = c[cv[i]];
+		swap(c, cv);
+		swap(a, a1);
+
+		if (!simplex0()) return 2;
+
+		x[0] = -a[0][0];
+		for (int i = 1; i <= m; ++i)
+			x[c[n + i]] = a[i][0];
+
+		return 1;
+	}
+
+};
