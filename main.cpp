@@ -1,174 +1,184 @@
 #include <bits/stdc++.h>
-#define N (1<<18)
-#define P 998244353
-#define M(x) (((x) + P) % P)
-typedef long long ll;
-
+#define R(x) ((x).size())
+#define C(x) ((x)[0].size())
 using namespace std;
 
-ll invs[N], f[N], fi[N];
-ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
-void ginv() {
-    invs[1] = 1; f[0] = fi[0] = 1;
-    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
-    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
-    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
-}
+typedef long double dbl;
+const dbl eps = 1e-7;
+int dc(dbl f) { return f < -eps ? -1 : f > eps ? 1 : 0; }
 
-ll qp(ll a, ll b) {
-    ll r = 1;
-    do if (b & 1) r = M(r * a);
-    while (a = M(a * a), b >>= 1);
+typedef vector<dbl> vec;
+typedef vector<vec> mat;
+
+mat operator*(const mat& a, const mat& b) {
+    mat r(R(a), vec(C(b), 0));
+    for (int i = 0; i != R(a); ++i)
+        for (int j = 0; j != C(b); ++j)
+            for (int k = 0; k != C(a); ++k)
+                r[i][j] += a[i][k] * b[k][j];
     return r;
 }
 
-namespace poly {
-
-    ostream& operator<<(ostream& os, const vector<ll>& p) {
-        for (ll w : p) os << w << ' ';
-        return os;
+//  returns rk(a)
+int row_reduction(mat& a) {
+    const int& n = R(a), m = C(a);
+    for (int i = 0, j = 0; i != n; ++i) {
+        do for (int k = i + 1; k != n; ++k)
+            if (fabs(a[i][j]) < fabs(a[k][j]))
+                swap(a[i], a[k]);
+        while (!dc(a[i][j]) && ++j != n);
+        if (j == n) return i;
+        for (int l = m - 1; l >= i; --l)
+            a[i][l] /= a[i][j];
+        for (int k = 0; k != n; ++k)
+            if (k != i) for (int l = m - 1; l >= i; --l)
+                a[k][l] -= a[k][j] * a[i][l];
     }
-
-    int fr[N], fs;
-    ll pa[N], pb[N], pc[N];
-
-    void init(int s) {
-        for (fs = 1; fs < s; fs <<= 1);
-        for (int i = 0; i != fs; ++i)
-            fr[i] = (fr[i >> 1] >> 1) | (i & 1 ? (fs >> 1) : 0);
-    }
-
-    void ntt(ll* p, int f) {
-        static const ll g = 3;
-        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
-        for (int i = 1; i != fs; i <<= 1) {
-            ll e = (P - 1) / (i << 1), w0 = qp(g, f == 1 ? e : P - 1 - e);
-            for (int j = 0; j != fs; j += (i << 1)) {
-                ll w = 1;
-                for (int k = 0; k != i; k++, w = M(w * w0)) {
-                    ll u = p[j + k], v = M(w * p[i + j + k]);
-                    p[j + k] = M(u + v); p[i + j + k] = M(u - v);
-                }
-            }
-        }
-        if (f == -1)
-            for (ll i = 0; i != fs; ++i)
-                p[i] = M(p[i] * invs[fs]);
-    }
-
-    vector<ll> add(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
-        vector<ll> pr(n3);
-        for (int i = 0; i != n3; ++i) {
-            if (i < n1) pr[i] = M(pr[i] + p1[i]);
-            if (i < n2) pr[i] = M(pr[i] + p2[i]);
-        }
-        return pr;
-    }
-
-    vector<ll> sub(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
-        vector<ll> pr(n3);
-        for (int i = 0; i != n3; ++i) {
-            if (i < n1) pr[i] = M(pr[i] + p1[i]);
-            if (i < n2) pr[i] = M(pr[i] - p2[i]);
-        }
-        return pr;
-    }
-
-    vector<ll> mul(const vector<ll>& p1, int k) {
-        int n1 = p1.size();
-        vector<ll> p2(n1);
-        for (int i = 0; i != n1; ++i) p2[i] = M(k * p1[i]);
-        return p2;
-    }
-
-    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
-        init(n3 + 1); vector<ll> pr(n3);
-        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
-        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
-        ntt(pa, 1); ntt(pb, 1);
-        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
-        ntt(pc, -1); copy(pc, pc + n3, pr.begin());
-        if (n) pr.resize(n, 0);
-        return pr;
-    }
-
-    vector<ll> inv(const vector<ll>& p1) {
-        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1)
-            return vector<ll>(1, ::inv(p1[0]));
-        else {
-            vector<ll> p1_(p1.begin(), p1.begin() + n2);
-            vector<ll> p2 = inv(p1_);
-            return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
-        }
-    }
-
-    pair<vector<ll>, vector<ll>> div(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = n1 - n2 + 1;
-        vector<ll> p1r = p1, p2r = p2;
-        reverse(p1r.begin(), p1r.end());
-        reverse(p2r.begin(), p2r.end());
-        p1r.resize(n3, 0); p2r.resize(n3, 0);
-        vector<ll> p3 = mul(p1r, inv(p2r), n3);
-        reverse(p3.begin(), p3.end());
-        vector<ll> p4 = sub(p1, mul(p2, p3));
-        p4.resize(n2 - 1, 0);
-        return { p3, p4 };
-    }
-
-    vector<ll> deriv(const vector<ll>& p1) {
-        int n1 = p1.size();
-        vector<ll> p2(n1 - 1);
-        for (int i = 1; i != n1; ++i) p2[i - 1] = M(i * p1[i]);
-        return p2;
-    }
-
-    vector<ll> integ(const vector<ll>& p1) {
-        int n1 = p1.size();
-        vector<ll> p2(n1 + 1);
-        p2[0] = 0;
-        for (int i = 0; i != n1; ++i) p2[i + 1] = M(p1[i] * invs[i + 1]);
-        return p2;
-    }
-
-    vector<ll> log(const vector<ll>& p1) {
-        int n1 = p1.size();
-        return integ(mul(deriv(p1), inv(p1), n1 - 1));
-    }
-
-    vector<ll> exp(const vector<ll>& p1) {
-        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1) return vector<ll>(1, 1);
-        else {
-            vector<ll> p2 = exp(vector<ll>(p1.begin(), p1.begin() + n2));
-            p2.resize(n1, 0);
-            vector<ll> one(n1, 0); one[0] = 1;
-            return mul(p2, add(sub(one, log(p2)), p1), n1);
-        }
-    }
-
-    vector<ll> pow(const vector<ll>& p1, int k) {
-        return exp(mul(log(p1), k));
-    }
-
+    return n;
 }
 
-using namespace poly;
+mat transpose(const mat& a) {
+    int n = R(a), m = C(a);
+    mat b(m, vec(n));
+    for (int i = 0; i != n; ++i)
+        for (int j = 0; j != m; ++j)
+            b[j][i] = a[i][j];
+    return b;
+}
+
+ostream& operator<<(ostream& os, const mat& w) {
+    for (int i = 0; i != R(w); ++i)
+        for (int j = 0; j != C(w); ++j)
+            os << w[i][j] << " \n"[j == C(w) - 1];
+    return os;
+}
+
+
+mat nsp(mat& a, int w0) {
+    const int n = C(a);
+    while(R(a) < n) a.push_back(vec(n, 0));
+    int w = row_reduction(a); mat b(n, vec(n - w, 0));
+    //cout << w << ' ' << w0 << endl;
+    assert(w == w0);
+    vector<int> p, vis(n, 0);
+    for (int c = 0, r = 0; c != n; ++c)
+        if (dc(a[r][c])) ++r, vis[c] = 1;
+    for (int i = 0; i != n; ++i) if (vis[i]) p.push_back(i);
+    for (int i = 0; i != n; ++i) if (!vis[i]) p.push_back(i);
+    for (int i = 0; i != n - w; ++i) {
+        for (int j = 0; j != n; ++j)
+            b[j][i] = a[p[j]][p[i + w]];
+        b[p[i + w]][i] = -1;
+    }
+    return b;
+}
+
+void gso(mat& b) {
+    if (!R(b) || !C(b)) return;
+    mat a = transpose(b);
+    const int& n = R(a), m = C(a);
+    //if (!n || !m) return;
+    for (int i = 0; i != n; ++i) {
+        for (int j = 0; j != i; ++j) {
+            dbl l = 0;
+            for (int k = 0; k != m; ++k)
+                l += a[i][k] * a[j][k];
+            for (int k = 0; k != m; ++k)
+                a[i][k] -= a[j][k] * l;
+        }
+        dbl l = 0;
+        for (int k = 0; k != m; ++k)
+            l += a[i][k] * a[i][k];
+        l = sqrt(l);
+        for (int k = 0; k != m; ++k)
+            a[i][k] /= l;
+    }
+    b = transpose(a);
+}
+
+dbl dis(const mat& a, const mat& b) {
+    if (!R(a) || !C(a)) return 0;
+    int n = R(a), m = C(a);
+    dbl sum = 0;
+    for (int i = 0; i != n; ++i) {
+        for (int j = 0; j != m; ++j) {
+            dbl res = a[i][j] - b[i][j];
+            //assert(fabs(res) < 1e-3);
+            sum += res * res;
+        }
+    }
+    return sqrt(sum);
+}
+
+mt19937_64 mt(time(0));
+uniform_real_distribution<dbl> urd(-1e2, 1e2);
+uniform_int_distribution<int> uid;
+mat gen(int n, int& w) {
+    mat a(n, vec(n));
+    for (int i = 0; i != n; ++i)
+        for (int j = 0; j != n; ++j)
+            a[i][j] = urd(mt);
+    w = uid(mt) % n;
+    vector<int> pos(n), res;
+    iota(pos.begin(), pos.end(), 0);
+    sample(pos.begin(), pos.end(), back_inserter(res), w, mt);
+    set<int> npl(res.begin(), res.end());
+    for (int x : npl) {
+        for (int j = 0; j != n; ++j)
+            a[x][j] = 0;
+        for (int i = 0; i != n; ++i)
+        if (npl.find(i) == npl.end()) {
+            dbl r = urd(mt) / n;
+            for (int j = 0; j != n; ++j)
+                a[x][j] += r * a[i][j];
+        }
+    }
+    w = n - w;
+    return a;
+}
+
+mat I(int n) {
+    mat r(n, vec(n, 0));
+    for (int i = 0; i != n; ++i) r[i][i] = 1;
+    return r;
+}
+
+dbl avg(const vector<dbl>& x) {
+    dbl sum = 0;
+    for (int i = 0; i != x.size(); ++i)
+        sum += x[i];
+    return sum / x.size();
+}
+
+dbl var(const vector<dbl>& x) {
+    dbl a = avg(x), sum = 0;
+    for (int i = 0; i != x.size(); ++i)
+        sum += (x[i] - a) * (x[i] - a);
+    return sqrt(sum / x.size());
+}
 
 int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
-    #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
-    #endif // ONLINE_JUDGE
-
-    vector<ll> p = { 1, P - 1 };
-    p.resize(11);
-    vector<ll> q = inv(p);
-
-    cout << mul(q, p, 11) << endl;
-
+//    ios::sync_with_stdio(0); cin.tie(0);
+//    #ifndef ONLINE_JUDGE
+//    ifstream cin("1.in");
+//    #endif // ONLINE_JUDGE
+//
+//    freopen("1.in", "r", stdin);
+    int T = 100, n = 200;
+    vector<dbl> x, y;
+    while(T--) {
+        int w0;
+        mat a = gen(n, w0);
+        mat b = a;
+        mat c = nsp(b, w0);
+        gso(c);
+        mat d = a * c;
+        mat e = mat(R(d), vec(C(d), 0));
+        dbl d1 = dis(d, e), d2 = dis(transpose(c) * c, I(n - w0));
+        x.push_back(d1); y.push_back(d2);
+        cout << row_reduction(b) << ' ' << d1 << ' ' << d2 << endl;
+    }
+    cout << *max_element(x.begin(), x.end()) << ' ' << avg(x) << ' ' << var(x) << endl;
+    cout << *max_element(x.begin(), x.end()) << ' ' << avg(y) << ' ' << var(y) << endl;
     return 0;
 }

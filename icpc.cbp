@@ -207,6 +207,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Problems/substrings/tle3.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/throughput/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -243,6 +247,7 @@
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
 		<Unit filename="Templates/Math/matrix.h" />
 		<Unit filename="Templates/Math/misc.h" />
+		<Unit filename="Templates/Math/polynomial.h" />
 		<Unit filename="Templates/String/kmp.h" />
 		<Unit filename="Templates/String/string_automata_arr.h" />
 		<Unit filename="Templates/String/string_automata_ptr.h" />
