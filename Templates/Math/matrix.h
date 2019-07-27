@@ -5,6 +5,13 @@ const dbl eps = 1e-8;
 typedef vector<dbl> vec;
 typedef vector<vec> mat;
 
+ostream& operator<<(ostream& os, const mat& w) {
+    for (int i = 0; i != R(w); ++i)
+        for (int j = 0; j != C(w); ++j)
+            os << w[i][j] << " \n"[j == C(w) - 1];
+    return os;
+}
+
 mat operator*(const mat& a, const mat& b) {
     mat r(R(a), vec(C(b), 0));
     for (int i = 0; i != R(a); ++i)
@@ -12,6 +19,15 @@ mat operator*(const mat& a, const mat& b) {
             for (int k = 0; k != C(a); ++k)
                 r[i][j] += a[i][k] * b[k][j];
     return r;
+}
+
+mat transpose(const mat& a) {
+    int n = R(a), m = C(a);
+    mat b(m, vec(n));
+    for (int i = 0; i != n; ++i)
+        for (int j = 0; j != m; ++j)
+            b[j][i] = a[i][j];
+    return b;
 }
 
 mat I(int n) {
@@ -27,28 +43,43 @@ mat qpow(mat a, ul b) {
     return r;
 }
 
-ostream& operator<<(ostream& os, const mat& w) {
-    for (int i = 0; i != R(w); ++i)
-        for (int j = 0; j != C(w); ++j)
-            os << w[i][j] << " \n"[j == C(w) - 1];
-    return os;
+//  Calculate det(a), O(n^3)
+dbl det(mat& a) {
+    const int n = R(a); dbl res = 1;
+    for (int i = 0; i != n; ++i) {
+        for (int j = i + 1; j != n; ++j)
+            if (fabs(a[j][i]) > fabs(a[i][i]))
+                swap(a[i], a[j]), res = -res;
+        if (!dc(a[i][i])) return 0;
+        else res *= a[i][i];
+        for (int k = n - 1; k >= i; --k)
+            a[i][k] /= a[i][i];
+        for (int j = i + 1; j != n; ++j)
+            for (int k = n - 1; k >= i; --k)
+                a[j][k] -= a[i][k] * a[j][i];
+    }
+    return res;
 }
 
-//  Gaussian Elimination
-void row_reduction(mat& a) {
-	const int n = R(a), m = C(a);
-	for (int r = 0, c = 0; r != n && c != m; ++r, ++c) {
-		do for (int i = r; i != n; ++i)
-			if (abs(a[r][c]) < abs(a[i][c])) swap(a[r], a[i]);
-		while (abs(a[r][c]) < eps && ++c != n);
-		for (int j = m - 1; j >= c; --j) a[r][j] /= a[r][c];
-		for (int i = 0; c != m && i != n; ++i)
-			for (int j = m - 1; i != r && j >= c; --j)
-				a[i][j] -= a[r][j] * a[i][c];
-	}
+//  Gaussian Elimination, O(n^3)
+int row_reduction(mat& a) {
+    const int& n = R(a), m = C(a);
+    for (int i = 0, j = 0; i != n; ++i) {
+        do for (int k = i + 1; k != n; ++k)
+            if (fabs(a[i][j]) < fabs(a[k][j]))
+                swap(a[i], a[k]);
+        while (!dc(a[i][j]) && ++j != n);
+        if (j == n) return i;
+        for (int l = m - 1; l >= i; --l)
+            a[i][l] /= a[i][j];
+        for (int k = 0; k != n; ++k) {
+            if (k != i) for (int l = m - 1; l >= i; --l)
+                a[k][l] -= a[k][j] * a[i][l];
+    }
+    return n;
 }
 
-//  Get a base of null space of a
+//  Get a base of null space of a, O(n^2)
 mat nsp(mat& a) {
     const int n = C(a);
     while(R(a) < n) a.push_back(vec(n, 0));
@@ -66,29 +97,25 @@ mat nsp(mat& a) {
     return b;
 }
 
-//  Gram–Schmidt Orthogonalization
+//  Gram–Schmidt Orthogonalization, O(n^3)
 void gso(mat& a) {
-    const int n = R(a), m = C(a);
-    for (int i = 1; i != m; ++i) {
+    const int& n = R(a), m = C(a);
+    for (int i = 0; i != n; ++i) {
         for (int j = 0; j != i; ++j) {
-            dbl u = 0, v = 0;
-            for (int k = 0; k != n; ++k)
-                u += a[k][j] * a[k][i],
-                v += a[k][j] * a[k][j];
-            for (int k = 0; k != n; ++k)
-                a[k][i] -= u / v * a[k][j];
+            dbl l = 0;
+            for (int k = 0; k != m; ++k)
+                l += a[i][k] * a[j][k];
+            for (int k = 0; k != m; ++k)
+                a[i][k] -= a[j][k] * l;
         }
-    }
-    for (int i = 0; i != m; ++i) {
-        dbl len = 0;
-        for (int k = 0; k != n; ++k)
-            len += a[k][i] * a[k][i];
-        len = sqrt(len);
-        for (int k = 0; k != n; ++k)
-            a[k][i] /= len;
+        dbl l = 0;
+        for (int k = 0; k != m; ++k)
+            l += a[i][k] * a[i][k];
+        l = sqrt(l);
+        for (int k = 0; k != m; ++k)
+            a[i][k] /= l;
     }
 }
-
 
 namespace LP {
 
