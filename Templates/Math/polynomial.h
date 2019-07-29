@@ -4,17 +4,23 @@
 #define M(x) (((x) + P) % P)
 typedef long long ll;
 
+using namespace std;
+
 ll invs[N], f[N], fi[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 ll binom(ll n, ll k) { return M(f[n] * M(fi[n - k] * fi[k])); }
 void ginv() {
-    invs[1] = 1;
-    for (int i = 2; i != N; ++i)
-        invs[i] = M(invs[P % i] * (P - P / i));
-    for (int i = 1; i != N; ++i) {
-        f[i] = M(f[i - 1] * i);
-        fi[i] = M(f[i - 1] * invs[i]);
-    }
+    invs[1] = 1; f[0] = fi[0] = 1;
+    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
+    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
+}
+
+ll qp(ll a, ll b) {
+    ll r = 1;
+    do if (b & 1) r = M(r * a);
+    while (a = M(a * a), b >>= 1);
+    return r;
 }
 
 namespace poly {
@@ -92,11 +98,9 @@ namespace poly {
 
     vector<ll> inv(const vector<ll>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1)
-            return vector<ll>(1, ::inv(p1[0]));
+        if (n1 == 1) return vector<ll>(1, ::inv(p1[0]));
         else {
-            vector<ll> p1_(p1.begin(), p1.begin() + n2);
-            vector<ll> p2 = inv(p1_);
+            vector<ll> p2 = inv(vector<ll>(p1.begin(), p1.begin() + n2));
             return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
         }
     }

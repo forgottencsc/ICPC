@@ -4,8 +4,25 @@
 #define P 1000000007
 typedef long long ll;
 
-//  Lagrangian Interpolation
+ll invs[N], f[N], fi[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+void ginv() {
+    invs[1] = 1; f[0] = fi[0] = 1;
+    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
+    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
+}
+
+//  fraction representation with farey sequence
+pair<ll, ll> get_frac(dbl x, ll p1, ll q1, ll p2, ll q2) {
+    ll p3 = (p1 + p2), q3 = (q1 + q2), d = gcd(p3, q3);
+    p3 /= d; q3 /= d;
+    if (fabs(q3 * x - p3) < eps)return { p3, q3 };
+    else if (x * q3 < p3) return get_frac(x, p1, q1, p3, q3);
+    else return get_frac(x, p3, q3, p2, q2);
+}
+
+//  Lagrangian Interpolation, P(x[0])==y[0], P(x[1])==y[1], ...
 ll lintp(const vector<ll>& y, const vector<ll>& x, ll m) {
     int n = y.size(); ll res = 0;
     for (int i = 0; i != n; ++i) {
@@ -18,15 +35,8 @@ ll lintp(const vector<ll>& y, const vector<ll>& x, ll m) {
     return res;
 }
 
-ll inv[N], fi[N], lp[N], ls[N];
-void init() {
-    fi[0] = fi[1] = inv[1] = 1;
-    for (int i = 2; i != N; ++i) {
-        inv[i] = M(inv[P % i] * (P - P / i));
-        fi[i] = M(fi[i - 1] * inv[i]);
-    }
-}
-
+//  Lagrangian Interpolation, P(0)==y[0], P(1)==y[1], ...
+ll lp[N], ls[N];
 ll lintp(const vector<ll>& y, ll x) {
     int n = y.size(); ll res = 0; lp[0] = x; ls[n - 1] = x - (n - 1);
     for (int i = 1; i != n; ++i) lp[i] = M(lp[i - 1] * (x - i));

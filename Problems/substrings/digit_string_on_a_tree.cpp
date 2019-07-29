@@ -10,7 +10,7 @@ ll p10[N];
 
 vector<int> g[N];
 int sz[N], msz[N]; bool vis[N];
-int x[31]; vector<map<int, int>> cnt;
+int x[31]; vector<map<int, unsigned>> cnt;
 
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
 ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
@@ -48,27 +48,28 @@ void cntx(int u, int f, int h) {
         x[j] = (x[j] + (d[j] - p10[h] * s[u] % d[j])) % d[j];
 }
 
-int cnty(int u, int f, int h, ll y) {
-    int sum = 0, a = p10[h], b = k - y, p = k;
+unsigned cnty(int u, int f, int h, int y) {
+    unsigned sum = 0;
+    int a = p10[h], b = k - y, p = k;
     if (lce(a, b, p)) {
         ll j = lower_bound(d.begin(), d.end(), p) - d.begin();
         auto it = cnt[j].find(b);
         if (it != cnt[j].end()) sum += it->second;
     }
     for (int v : g[u]) if (!vis[v] && v != f)
-        sum += cnty(v, u, h + 1, (10 * y + s[v]) % k);
+        sum += cnty(v, u, h + 1, (10ll * y + s[v]) % k);
     return sum;
 }
 
-int dc(int u, int ss) {
+unsigned dc(int u, int ss) {
     int r = dfs_sz(u, 0, ss); vis[r] = 1;
-    int sum = 0;
-    for (map<int, int>& m : cnt) m.clear();
+    unsigned sum = 0;
+    for (map<int, unsigned>& m : cnt) m.clear();
     for (int j = 0; j != w; ++j) x[j] = 0;
     cntx(r, 0, 0); sum = cnty(r, 0, 0, 0);
     for (int v : g[r]) {
         if (vis[v]) continue;
-        for (map<int, int>& m : cnt) m.clear();
+        for (map<int, unsigned>& m : cnt) m.clear();
         for (int j = 0; j != w; ++j) x[j] = s[r] % d[j];
         cntx(v, r, 1); sum -= cnty(v, r, 1, s[v]);
         sum += dc(v, sz[v] < sz[r] ? sz[v] : ss - sz[r]);

@@ -183,6 +183,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Problems/substrings/digit_string_on_a_tree.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Problems/substrings/gen.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -191,15 +195,19 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
-		<Unit filename="Problems/substrings/substring2.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-		</Unit>
 		<Unit filename="Problems/substrings/substrings.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
 		<Unit filename="Problems/substrings/tle1.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/tle2.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Problems/substrings/tle3.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
@@ -230,20 +238,27 @@
 		<Unit filename="Templates/DataStructures/block.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
+		<Unit filename="Templates/DataStructures/lca.h" />
 		<Unit filename="Templates/GraphTheory/basics.h" />
 		<Unit filename="Templates/GraphTheory/flows.h" />
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
 		<Unit filename="Templates/Math/Geometry/basic_geometry.h" />
+		<Unit filename="Templates/Math/Geometry/basic_geometry0.h" />
 		<Unit filename="Templates/Math/NumberTheory/basic_number_theory.h" />
 		<Unit filename="Templates/Math/NumberTheory/multiplicative.h" />
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
 		<Unit filename="Templates/Math/matrix.h" />
 		<Unit filename="Templates/Math/misc.h" />
 		<Unit filename="Templates/Math/polynomial.h" />
+		<Unit filename="Templates/Math/precision.h" />
 		<Unit filename="Templates/String/kmp.h" />
 		<Unit filename="Templates/String/string_automata_arr.h" />
 		<Unit filename="Templates/String/string_automata_ptr.h" />
 		<Unit filename="Templates/String/suffix_array.h" />
+		<Unit filename="Unsolved/CF1192B.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Unsolved/Neko_And_Triangle.cpp">
 			<Option compile="0" />
 			<Option link="0" />
