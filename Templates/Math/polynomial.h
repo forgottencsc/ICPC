@@ -4,12 +4,17 @@
 #define M(x) (((x) + P) % P)
 typedef long long ll;
 
-ll invs[N];
+ll invs[N], f[N], fi[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+ll binom(ll n, ll k) { return M(f[n] * M(fi[n - k] * fi[k])); }
 void ginv() {
     invs[1] = 1;
     for (int i = 2; i != N; ++i)
         invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) {
+        f[i] = M(f[i - 1] * i);
+        fi[i] = M(f[i - 1] * invs[i]);
+    }
 }
 
 namespace poly {

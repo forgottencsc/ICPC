@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1561116789 source:d:\cosecant\projects\icpc\main.cpp
+1564375107 source:d:\cosecant\projects\icpc\main.cpp
 	<bits/stdc++.h>
 
 1557167711 source:d:\cosecant\projects\icpc\problems\throughput\gen.cpp
@@ -44,7 +44,7 @@
 	<bits/stdc++.h>
 	"../generator.h"
 
-1559893363 d:\cosecant\projects\icpc\problems\generator.h
+1563264553 d:\cosecant\projects\icpc\problems\generator.h
 	<bits/stdc++.h>
 
 1558345680 source:d:\cosecant\projects\icpc\problems\repeatersii\repeatersii.cpp
@@ -102,5 +102,19 @@
 	<bits/stdc++.h>
 
 1558197973 source:d:\cosecant\projects\icpc\problems\repeatersxii\gen.cpp
+	<bits/stdc++.h>
+
+1561784768 source:d:\cosecant\projects\icpc\problems\substrings\gen.cpp
+	<bits/stdc++.h>
+	"../generator.h"
+
+1561784832 source:d:\cosecant\projects\icpc\problems\substrings\substrings.cpp
+	<bits/stdc++.h>
+
+1563267541 source:d:\cosecant\projects\icpc\problems\substrings\gen2.cpp
+	<bits/stdc++.h>
+	"../generator.h"
+
+1563267436 source:d:\cosecant\projects\icpc\problems\substrings\substring2.cpp
 	<bits/stdc++.h>
 

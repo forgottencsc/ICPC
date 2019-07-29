@@ -227,6 +227,7 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Templates/DataStructures/block.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
 		<Unit filename="Templates/GraphTheory/basics.h" />
@@ -238,6 +239,7 @@
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
 		<Unit filename="Templates/Math/matrix.h" />
 		<Unit filename="Templates/Math/misc.h" />
+		<Unit filename="Templates/Math/polynomial.h" />
 		<Unit filename="Templates/String/kmp.h" />
 		<Unit filename="Templates/String/string_automata_arr.h" />
 		<Unit filename="Templates/String/string_automata_ptr.h" />

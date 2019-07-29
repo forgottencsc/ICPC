@@ -1,198 +1,54 @@
 #include <bits/stdc++.h>
-#define N (1<<20)
-#define P 998244353ll
-#define M(x) (((x) + P) % P)
+
 using namespace std;
 
 typedef long long ll;
+typedef __int128 lll;
 
-ll qp(ll a, ll b) {
+ll mul(ll a, ll b, ll p) { return (lll)a * b % p; }
+
+ll qpm(ll a, ll b, ll p) {
     ll r = 1;
-    do if (b & 1) r = M(r * a);
-    while (a = M(a * a), b >>= 1);
+    do if (b & 1) r = mul(r, a, p);
+    while (a = mul(a, a, p), b >>= 1);
     return r;
 }
 
-ll invs[N];
-ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
-void ginv() {
-    invs[1] = 1;
-    for (int i = 2; i != N; ++i)
-        invs[i] = M(invs[P % i] * (P - P / i));
+//	Miller-Rabin primality test(Deterministic)
+//	{ 2, 7, 61 } for 2^32
+//	{ 2, 3, 7, 61, 24251 } for 1e16 (except 46856248255981)
+//	{ 2, 325, 9375, 28178, 450775, 9780504, 1795265022 } for 2^64
+bool mr(ll n) {
+    if (n % 2 == 0) return n == 2;
+    if (n < 128) return (0X816D129A64B4CB6E >> (n / 2)) & 1;
+    const int l[7] = { 2, 325, 9375, 28178, 450775, 9780504, 1795265022 };
+    ll d0 = n - 1; do d0 >>= 1; while(!(d0 & 1));
+    for (ll a : l) {
+        if (a % n == 0) return true;
+        ll d = d0, t = qpm(a, d, n);
+        while(d != n - 1 && t != 1 && t != n - 1)
+            d <<= 1, t = mul(t, t, n);
+        if (t != n - 1 && !(d & 1)) return false;
+    }
+    return true;
 }
 
-namespace poly {
-
-    ostream& operator<<(ostream& os, const vector<ll>& p) {
-        for (ll w : p) os << w << ' ';
-        return os;
-    }
-
-    int fr[N], fs;
-    ll pa[N], pb[N], pc[N];
-
-    void init(int s) {
-        for (fs = 1; fs < s; fs <<= 1);
-        for (int i = 0; i != fs; ++i)
-            fr[i] = (fr[i >> 1] >> 1) | (i & 1 ? (fs >> 1) : 0);
-    }
-
-    void ntt(ll* p, int f) {
-        static const ll g = 3;
-        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
-        for (int i = 1; i != fs; i <<= 1) {
-            ll e = (P - 1) / (i << 1), w0 = qp(g, f == 1 ? e : P - 1 - e);
-            for (int j = 0; j != fs; j += (i << 1)) {
-                ll w = 1;
-                for (int k = 0; k != i; k++, w = M(w * w0)) {
-                    ll u = p[j + k], v = M(w * p[i + j + k]);
-                    p[j + k] = M(u + v); p[i + j + k] = M(u - v);
-                }
-            }
-        }
-        if (f == -1)
-            for (ll i = 0; i != fs; ++i)
-                p[i] = M(p[i] * invs[fs]);
-    }
-
-    vector<ll> add(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
-        vector<ll> pr(n3);
-        for (int i = 0; i != n3; ++i) {
-            if (i < n1) pr[i] = M(pr[i] + p1[i]);
-            if (i < n2) pr[i] = M(pr[i] + p2[i]);
-        }
-        return pr;
-    }
-
-    vector<ll> sub(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
-        vector<ll> pr(n3);
-        for (int i = 0; i != n3; ++i) {
-            if (i < n1) pr[i] = M(pr[i] + p1[i]);
-            if (i < n2) pr[i] = M(pr[i] - p2[i]);
-        }
-        return pr;
-    }
-
-    vector<ll> mul(const vector<ll>& p1, int k) {
-        int n1 = p1.size();
-        vector<ll> p2(n1);
-        for (int i = 0; i != n1; ++i)
-            p2[i] = M(k * p1[i]);
-        return p2;
-    }
-
-    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
-        init(n3 + 1); vector<ll> pr(n3);
-        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
-        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
-        ntt(pa, 1); ntt(pb, 1);
-        for (int i = 0; i != fs; ++i)
-            pc[i] = M(pa[i] * pb[i]);
-        ntt(pc, -1); copy(pc, pc + n3, pr.begin());
-        if (n) pr.resize(n, 0);
-        return pr;
-    }
-
-    vector<ll> inv(const vector<ll>& p1) {
-        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1)
-            return vector<ll>(1, ::inv(p1[0]));
-        else {
-            vector<ll> p1_(p1.begin(), p1.begin() + n2);
-            vector<ll> p2 = inv(p1_);
-            return sub(add(p2, p2), mul(p1, mul(p2, p2, n1), n1));
-        }
-    }
-
-    pair<vector<ll>, vector<ll>> div(const vector<ll>& p1, const vector<ll>& p2) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = n1 - n2 + 1;
-        vector<ll> p1r = p1, p2r = p2;
-        reverse(p1r.begin(), p1r.end());
-        reverse(p2r.begin(), p2r.end());
-        p1r.resize(n3, 0); p2r.resize(n3, 0);
-        vector<ll> p3 = mul(p1r, inv(p2r), n3);
-        reverse(p3.begin(), p3.end());
-        vector<ll> p4 = sub(p1, mul(p2, p3));
-        p4.resize(n2 - 1, 0);
-        return { p3, p4 };
-    }
-
-    vector<ll> deriv(const vector<ll>& p1) {
-        int n1 = p1.size();
-        vector<ll> p2(n1 - 1);
-        for (int i = 1; i != n1; ++i) p2[i - 1] = M(i * p1[i]);
-        return p2;
-    }
-
-    vector<ll> integ(const vector<ll>& p1) {
-        int n1 = p1.size();
-        vector<ll> p2(n1 + 1);
-        p2[0] = 0;
-        for (int i = 0; i != n1; ++i) p2[i + 1] = M(p1[i] * invs[i + 1]);
-        return p2;
-    }
-
-    vector<ll> log(const vector<ll>& p1) {
-        int n1 = p1.size();
-        return integ(mul(deriv(p1), inv(p1), n1 - 1));
-    }
-
-    vector<ll> exp(const vector<ll>& p1) {
-        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1) return vector<ll>(1, 1);
-        else {
-            vector<ll> p2 = exp(vector<ll>(p1.begin(), p1.begin() + n2));
-            p2.resize(n1, 0);
-            vector<ll> one(n1, 0); one[0] = 1;
-            return mul(p2, add(sub(one, log(p2)), p1), n1);
-        }
-    }
-
-    vector<ll> pow(const vector<ll>& p1, int k) {
-        return exp(mul(log(p1), k));
-    }
-
-}
-
-using namespace poly;
 
 int main(void) {
-//    ios::sync_with_stdio(0); cin.tie(0);
-//    #ifndef ONLINE_JUDGE
-//    ifstream cin("1.in");
-//    #endif // ONLINE_JUDGE
-//freopen("1.in", "r", stdin);
-    ginv();
-    int T;
-    scanf("%d", &T);
-    while(T--) {
-        int n, m;
-        scanf("%d%d", &n, &m);
-        vector<ll> a(n);
-        for (int i = 0; i != n; ++i) {
-            scanf("%lld", &a[i]);
-            a[i] = M(a[i]);
+    ios::sync_with_stdio(0); cin.tie(0);
+    #ifndef ONLINE_JUDGE
+    ifstream cin("1.in");
+    #endif // ONLINE_JUDGE
+
+    ll p;
+    while(cin >> p) {
+        ll x = p - 1, y = p - 1;
+        while (!mr(y)){
+            x = mul(x, qpm(y, p - 2, p), p);
+            y--;
         }
-
-        vector<vector<ll>> d(3, vector<ll>(n, 0));
-        for (int i = 0; i != 3; ++i)
-            for (int j = 0; j < n; j += (i + 1))
-                d[i][j] = 1;
-
-        int c[3] = { 0 };
-        for (int i = 0; i != m; ++i) {
-            int t; scanf("%d", &t);
-            c[t - 1]++;
-        }
-
-        vector<ll> b = mul(mul(a, pow(d[0], c[0]), n), mul(pow(d[1], c[1]), pow(d[2], c[2]), n), n);
-        ll ans = 0;
-        for (int i = 0; i != n; ++i)
-            ans ^= (i + 1) * b[i];
-        printf("%lld\n", ans);
+        cout << x << endl;
     }
+
     return 0;
 }
