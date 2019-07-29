@@ -69,7 +69,7 @@ int row_reduction(mat& a) {
             if (fabs(a[i][j]) < fabs(a[k][j]))
                 swap(a[i], a[k]);
         while (!dc(a[i][j]) && ++j != n);
-        if (j == n) return i;
+        if (j == n) return i; //  rk(a)
         for (int l = m - 1; l >= i; --l)
             a[i][l] /= a[i][j];
         for (int k = 0; k != n; ++k) {
@@ -115,6 +115,23 @@ void gso(mat& a) {
         for (int k = 0; k != m; ++k)
             a[i][k] /= l;
     }
+}
+
+pair<mat, mat> QR(const mat& a) {
+    mat q = a; gso(q);
+    return { q, transpose(q) * a };
+}
+
+vector<dbl> eigenvalues(mat a) {
+    pair<mat, mat> qr;
+    for (int i = 0; i != 10; ++i) {
+        qr = QR(a);
+        a = qr.second * qr.first;
+    }
+    vector<dbl> res;
+    for (int i = 0; i != R(a); ++i)
+        res.push_back(a[i][i]);
+    return res;
 }
 
 int dcmp(const dbl &x) { return x < -eps ? -1 : x > eps; }
@@ -253,3 +270,104 @@ struct simplex_t {
 	}
 
 };
+
+//  Incomplete
+struct integer_programming {
+
+    vector<cstr_t> cstrs;
+    unordered_set<int> cstri;
+
+    dbl res; bool flg;
+
+    integer_programming() : flg(0) {}
+
+    void int_cstr(int i) { cstri.insert(i); }
+
+    // -1 for coeff, 0 for less, 1 for equal, 2 for greater
+    void add_cstr(const vector<pair<int, dbl>>& a, dbl b, int t) {
+        cstrs.push_back({ a, b, t });
+    }
+
+    pair<double, int> branch_and_bound(simplex_t s) {
+        pair<dbl, int> r;
+        r.second = s.simplex();
+        if (r.second != 1) return { 0, res };
+        else {
+            r.first = s.x[0];
+            if (flg && r.first < res) return { r.first, 0 };
+            for (int i : cstri) {
+                if (!dc(s.x[i] - round(s.x[i])))
+                    continue;
+                simplex_t s1, s2;
+                s1.cstrs = s2.cstrs = s.cstrs;
+                s1.add_cstr({ i, 1 }, floor(s.x[i]), 0);
+                s2.add_cstr({ i, 1 }, ceil(s.x[i]), 2);
+                pair<dbl, int> r1 = branch_and_bound(s1);
+                pair<dbl, int> r2 = branch_and_bound(s2);
+                if (!r1.second) return r2;
+                if (!r2.second) return r1;
+                return { max(r1.first, r2.first), r1.second };
+            }
+            res = r.first; flg = 1;
+            return r;
+        }
+    }
+
+};
+
+//  Simple simplex method, maximize cTx, s.t.Ax<=B;
+int n, m, c[5001]; dbl a[4001][201], x[201], z;
+
+int dcmp(dbl d) { return d < -eps ? -1 : d <= eps ? 0 : 1; }
+
+void pivot(int u, int v) {
+	swap(c[n + u], c[v]);
+	dbl k = a[u][v]; a[u][v] = 1;
+	for (int j = 0; j <= n; ++j) a[u][j] /= k;
+	for (int i = 0; i <= m; ++i) {
+		if (i == u || !dcmp(a[i][v])) continue;
+		k = a[i][v]; a[i][v] = 0;
+		for (int j = 0; j <= n; ++j)
+			a[i][j] -= a[u][j] * k;
+	}
+}
+
+bool init() {
+	for (int i = 1; i <= n; ++i) c[i] = i;
+	while (1) {
+		int u = 0, v = 0;
+		for (int i = 1; i <= m; ++i)
+			if (dcmp(a[i][0]) == -1 && (!u || dcmp(a[u][0] - a[i][0]) == 1)) u = i;
+		if (!u) return 1;
+		for (int j = 1; j <= n && !v; ++j)
+			if (dcmp(a[u][j]) == -1) v = j;
+		if (!v) return 0;
+		pivot(u, v);
+	}
+}
+
+int simplex() {
+	if (!init()) return 0;
+	while (1) {
+		int u = 0, v = 0;
+		for (int j = 1; j <= n; ++j)
+			if (dcmp(a[0][j]) == 1 && (!v || a[0][j] > a[0][v])) v = j;
+
+		if (!v) {
+			z = -a[0][0];
+			for (int i = 1; i <= m; ++i)
+				x[c[n + i]] = a[i][0];
+			return 1;
+		}
+
+		dbl w = 1e20;
+		for (int i = 1; i <= m; ++i)
+			if (dcmp(a[i][v]) == 1 &&
+				dcmp(w - a[i][0] / a[i][v]) == 1) {
+				w = a[i][0] / a[i][v];
+				u = i;
+			}
+		if (!u) return 2;
+		pivot(u, v);
+	}
+}
