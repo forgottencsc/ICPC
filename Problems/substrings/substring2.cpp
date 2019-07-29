@@ -63,9 +63,7 @@ void cntx(int u, int f, int h) {
 }
 
 ll cnty(int u, int f, int h, ll y) {
-    ll sum = 0;
-    y = (10 * y + s[u]) % k;
-    ll a = p10[h], b = k - y, p = k;
+    ll sum = 0, a = p10[h], b = k - y, p = k;
     if (lce(a, b, p)) {
         ll j = lower_bound(d.begin(), d.end(), p) - d.begin();
         auto it = cnt[j].find(b);
@@ -73,37 +71,22 @@ ll cnty(int u, int f, int h, ll y) {
             sum += it->second;
     }
     for (int v : g[u]) if (!vis[v] && v != f)
-        sum += cnty(v, u, h + 1, y);
-    return sum;
-}
-
-ll cntr(int u) {
-    for (map<ll, int>& m : cnt) m.clear();
-    for (int j = 0; j != w; ++j) x[j] = 0;
-    ll sum = cnt0(u, 0, 0, 0);
-    cntx(u, 0, 0);
-    for (int v : g[u]) {
-        if (vis[v]) continue;
-        sum += cnty(v, u, 1, 0);
-    }
-    return sum;
-}
-
-ll cntw(int u, int f) {
-    for (map<ll, int>& m : cnt) m.clear();
-    for (int j = 0; j != w; ++j) x[j] = s[f] % d[j];
-    cntx(u, f, 1);
-    ll sum = cnty(u, f, 1, 0);
+        sum += cnty(v, u, h + 1, (10 * y + s[v]) % k);
     return sum;
 }
 
 ll dc(int u, int ss) {
     int r = dfs_sz(u, 0, ss); vis[r] = 1;
-    ll sum1 = cntr(r), sum2 = 0;
+    ll sum = 0;
+    for (map<ll, int>& m : cnt) m.clear();
+    for (int j = 0; j != w; ++j) x[j] = 0;
+    cntx(u, 0, 0); sum = cnty(u, 0, 0, 0);
     for (int v : g[r]) {
         if (vis[v]) continue;
-        sum1 -= cntw(v, r);
-        sum2 += dc(v, sz[v] < sz[r] ? sz[v] : ss - sz[r]);
+        for (map<ll, int>& m : cnt) m.clear();
+        for (int j = 0; j != w; ++j) x[j] = s[r] % d[j];
+        cntx(v, r, 1); sum -= cnty(v, r, 1, s[r]);
+        sum += dc(v, sz[v] < sz[r] ? sz[v] : ss - sz[r]);
     }
     return sum1 + sum2;
 }
