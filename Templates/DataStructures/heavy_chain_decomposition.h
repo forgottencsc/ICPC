@@ -4,7 +4,7 @@ using namespace std;
 
 vector<int> g[N];
 int dd[N], df[N], dh[N], ds[N], dt[N], dl[N], dr[N], di[N], dc;
-int dfs_hcd1(int u, int f) {
+int dfs_hld1(int u, int f) {
     dd[u] = dd[f] + 1; df[u] = f;
     dh[u] = 0; ds[u] = 1;
     for (int v : g[u]) {
@@ -15,13 +15,19 @@ int dfs_hcd1(int u, int f) {
     return ds[u];
 }
 
-void dfs_hcd2(int u, int t) {
+void dfs_hld2(int u, int t) {
     dl[u] = ++dc; di[dc] = u; dt[u] = t;
     if (dh[u]) dfs_hcd2(dh[u], t);
     for (int v : g[u])
         if (v != df[u] && v != dh[u])
             dfs_hcd2(v, v);
     dr[u] = dc;
+}
+
+int lca(int u, int v) {
+    for (; dt[u] != dt[v]; u = df[dt[u]])
+        if (dd[dt[u]] < dd[dt[v]]) swap(u, v);
+    return dd[u] < dd[v] ? u : v;
 }
 
 typedef long long ll;
@@ -60,7 +66,7 @@ ll query(int l, int r, ll t, int p, int lb, int rb) {
 
 void modify(int u, int v, ll t) {
     for (; dt[u] != dt[v]; u = df[dt[u]]) {
-        if (dd[u] < dd[v]) swap(u, v);
+        if (dd[dt[u]] < dd[dd[v]]) swap(u, v);
         modify(dl[dt[u]], dl[u] + 1, t, 1, 1, dc + 1);
     }
     if (dd[u] < dd[v]) swap(u, v);
@@ -70,7 +76,7 @@ void modify(int u, int v, ll t) {
 ll query(int u, int v) {
     ll res = 0;
     for (; dt[u] != dt[v]; u = df[dt[u]]) {
-        if (dd[u] < dd[v]) swap(u, v);
+        if (dd[dt[u]] < dd[dt[v]]) swap(u, v);
         res += query(dl[dt[u]], dl[u] + 1, 0, 1, 1, dc + 1);
     }
     if (dd[u] < dd[v]) swap(u, v);
