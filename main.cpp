@@ -1,73 +1,61 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define R(m) (int)(m).size()
-#define C(m) (int)((m)[0].size())
-typedef double dbl;
-const dbl eps = 1e-8;
-typedef vector<dbl> vec;
-typedef vector<vec> mat;
+typedef int ll;
 
-ostream& operator<<(ostream& os, const mat& w) {
-    for (int i = 0; i != R(w); ++i)
-        for (int j = 0; j != C(w); ++j)
-            os << w[i][j] << " \n"[j == C(w) - 1];
-    return os;
-}
+template< typename flow_t, typename cost_t >
+struct PrimalDual {
+    typedef pair<cost_t, int> pii;
+    const cost_t INF;
 
-mat operator*(const mat& a, const mat& b) {
-    mat r(R(a), vec(C(b), 0));
-    for (int i = 0; i != R(a); ++i)
-        for (int j = 0; j != C(b); ++j)
-            for (int k = 0; k != C(a); ++k)
-                r[i][j] += a[i][k] * b[k][j];
-    return r;
-}
+    struct edge { int v, p; flow_t w; cost_t c;  };
+    vector< vector< edge > > g;
+    vector< cost_t > pot, d;
+    vector< int > pv, pe;
 
-mat transpose(const mat& a) {
-    int n = R(a), m = C(a);
-    mat b(m, vec(n));
-    for (int i = 0; i != n; ++i)
-        for (int j = 0; j != m; ++j)
-            b[j][i] = a[i][j];
-    return b;
-}
+    PrimalDual(int V) : g(V), INF(numeric_limits< cost_t >::max()) {}
 
-void gso(mat& a) {
-    const int& n = R(a), m = C(a);
-    for (int i = 0; i != m; ++i) {
-        for (int j = 0; j != i; ++j) {
-            dbl l = 0;
-            for (int k = 0; k != n; ++k)
-                l += a[k][i] * a[k][j];
-            for (int k = 0; k != n; ++k)
-                a[k][i] -= a[k][j] * l;
+    void add_edge(int u, int v, flow_t w, cost_t c) {
+        g[u].emplace_back((edge) {v, g[v].size(), w, c});
+        g[v].emplace_back((edge) {u, g[u].size() - 1, 0, -c});
+    }
+
+    pair<flow_t, cost_t> min_cost_flow(int s, int t, flow_t f) {
+        int V = g.size();
+        flow_t flow = 0;
+        cost_t cost = 0;
+        priority_queue<pii, vector<pii>, greater<pii>> q;
+        pot.assign(V, 0); pe.assign(V, -1); pv.assign(V, -1);
+        while(f > 0) {
+            d.assign(V, INF);
+            q.push({ d[s] = 0, s });
+            while(!q.empty()) {
+                pii p = q.top(); q.pop();
+                int u = p.second; cost_t du = p.first;
+                if(d[u] < du) continue;
+                for(int i = 0; i != g[u].size(); ++i) {
+                    edge& e = g[u][i];
+                    cost_t dv = du + e.c + pot[u] - pot[e.v];
+                    if(e.w > 0 && d[e.v] > dv) {
+                        d[e.v] = dv; pv[e.v] = u, pe[e.v] = i;
+                        q.emplace(d[e.v], e.v);
+                    }
+                }
+            }
+            if(d[t] == INF) return { flow, cost };
+            for(int v = 0; v < V; v++) pot[v] += d[v];
+            flow_t df = f;
+            for(int v = t; v != s; v = pv[v])
+                df = min(df, g[pv[v]][pe[v]].w);
+            f -= df; flow += df; cost += df * pot[t];
+            for(int v = t; v != s; v = pv[v]) {
+                edge &e = g[pv[v]][pe[v]];
+                e.w -= df; g[v][e.p].w += df;
+            }
         }
-        dbl l = 0;
-        for (int k = 0; k != n; ++k)
-            l += a[k][i] * a[k][i];
-        l = sqrt(l);
-        for (int k = 0; k != n; ++k)
-            a[k][i] /= l;
+        return { flow, cost };
     }
-}
-
-pair<mat, mat> QR(const mat& a) {
-    mat q = a; gso(q);
-    return { q, transpose(q) * a };
-}
-
-vector<dbl> eigenvalues(mat a) {
-    pair<mat, mat> qr;
-    for (int i = 0; i != 10; ++i) {
-        qr = QR(a);
-        a = qr.second * qr.first;
-    }
-    vector<dbl> res;
-    for (int i = 0; i != R(a); ++i)
-        res.push_back(a[i][i]);
-    return res;
-}
+};
 
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
@@ -75,10 +63,16 @@ int main(void) {
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
 
-    mat m = { {1, 2, 3}, { 2, 4, 5 }, { 3, 5, 6 } };
-    auto v = eigenvalues(m);
-    for (dbl w : v)
-        cout << w << ' ';
-    cout << endl;
+    int n, m; cin >> n >> m;
+    PrimalDual<ll, ll> mcmf(n + 1);
+    while(m--) {
+        int u, v, w, c;
+        cin >> u >> v >> w >> c;
+        mcmf.add_edge(u, v, w, c);
+    }
+    pair<ll, ll> res = mcmf.min_cost_flow(1, n, mcmf.INF);
+    cout << res.first << ' ' << res.second << endl;
+
+
     return 0;
 }
