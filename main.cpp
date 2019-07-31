@@ -1,78 +1,94 @@
 #include <bits/stdc++.h>
+#define N 100001
+#define P 1000000007
+#define M(x) (((x) + P) % P)
 using namespace std;
 
-typedef int ll;
+typedef long long ll;
 
-template< typename flow_t, typename cost_t >
-struct PrimalDual {
-    typedef pair<cost_t, int> pii;
-    const cost_t INF;
+ll a[N], s1[N], s2[N], t1[N], t2[N];
 
-    struct edge { int v, p; flow_t w; cost_t c;  };
-    vector< vector< edge > > g;
-    vector< cost_t > pot, d;
-    vector< int > pv, pe;
+ll inv(ll x) { return x == 1 ? x : M(inv(P % x) * (P - P / x)); }
 
-    PrimalDual(int V) : g(V), INF(numeric_limits< cost_t >::max()) {}
+void update(ll a, ll b, int p, int lb, int rb) {
+    s2[p] = M(M(M(a * a) * s2[p]) + M(M(2ll * a * b) * s1[p]) + M((rb - lb) * M(b * b)));
+    s1[p] = M(M(s1[p] * a) + M((rb - lb) * b));
+    t1[p] = M(t1[p] * a);
+    t2[p] = M(t2[p] * a + b);
+}
 
-    void add_edge(int u, int v, flow_t w, cost_t c) {
-        g[u].emplace_back((edge) {v, g[v].size(), w, c});
-        g[v].emplace_back((edge) {u, g[u].size() - 1, 0, -c});
+void push_up(int p) {
+    s1[p] = M(s1[p << 1] + s1[p << 1 | 1]);
+    s2[p] = M(s2[p << 1] + s2[p << 1 | 1]);
+}
+
+void build(int p, int lb, int rb) {
+    t1[p] = 1; t2[p] = 0;
+    if (lb + 1 == rb) {
+        s1[p] = a[lb];
+        s2[p] = M(a[lb] * a[lb]);
     }
-
-    pair<flow_t, cost_t> min_cost_flow(int s, int t, flow_t f) {
-        int V = g.size();
-        flow_t flow = 0;
-        cost_t cost = 0;
-        priority_queue<pii, vector<pii>, greater<pii>> q;
-        pot.assign(V, 0); pe.assign(V, -1); pv.assign(V, -1);
-        while(f > 0) {
-            d.assign(V, INF);
-            q.push({ d[s] = 0, s });
-            while(!q.empty()) {
-                pii p = q.top(); q.pop();
-                int u = p.second; cost_t du = p.first;
-                if(d[u] < du) continue;
-                for(int i = 0; i != g[u].size(); ++i) {
-                    edge& e = g[u][i];
-                    cost_t dv = du + e.c + pot[u] - pot[e.v];
-                    if(e.w > 0 && d[e.v] > dv) {
-                        d[e.v] = dv; pv[e.v] = u, pe[e.v] = i;
-                        q.emplace(d[e.v], e.v);
-                    }
-                }
-            }
-            if(d[t] == INF) return { flow, cost };
-            for(int v = 0; v < V; v++) pot[v] += d[v];
-            flow_t df = f;
-            for(int v = t; v != s; v = pv[v])
-                df = min(df, g[pv[v]][pe[v]].w);
-            f -= df; flow += df; cost += df * pot[t];
-            for(int v = t; v != s; v = pv[v]) {
-                edge &e = g[pv[v]][pe[v]];
-                e.w -= df; g[v][e.p].w += df;
-            }
-        }
-        return { flow, cost };
+    else {
+        int mid = (lb + rb) >> 1;
+        build(p << 1, lb, mid);
+        build(p << 1 | 1, mid, rb);
+        push_up(p);
     }
-};
+}
+
+void modify(int l, int r, ll a, ll b, int p, int lb, int rb) {
+    if (l <= lb && rb <= r) update(a, b, p, lb, rb);
+    else {
+        int mid = (lb + rb) >> 1; b = (((a - 1) * t2[p] + b) * inv(t1[p]));
+        if (l < mid) modify(l, r, a, b, p << 1, lb, mid);
+        if (r > mid) modify(l, r, a, b, p << 1 | 1, mid, rb);
+        push_up(p);
+    }
+}
+
+pair<int, int> pii;
+pii combine(pii p1, pii p2) { return { M(p1.first + p2.first), M(p1.second + p2.second) }; }
+
+pii query(int l, int r, int a, int b, int p, int lb, int rb) {
+    if (l <= lb && rb <= r) return st[p];
+    else {
+        int mid = (lb + rb) >> 1;
+        sum res = { 0, 0 };
+        push_down(p, lb, rb);
+        if (l < mid) res = combine(res, query(l, r, p << 1, lb, mid));
+        if (r > mid) res = combine(res, query(l, r, p << 1 | 1, mid, rb));
+        return res;
+    }
+}
 
 int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
+    //ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
 
-    int n, m; cin >> n >> m;
-    PrimalDual<ll, ll> mcmf(n + 1);
-    while(m--) {
-        int u, v, w, c;
-        cin >> u >> v >> w >> c;
-        mcmf.add_edge(u, v, w, c);
+    int n, q; cin >> n >> q;
+    for (int i = 1; i <= n; ++i) cin >> a[i];
+    build(1, 1, n + 1);
+    while(q--) {
+        int o, l, r;
+        cin >> o >> l >> r; ++r;
+        if (o == 4) {
+            sum ress = query(l, r, 1, 1, n + 1);
+            ll s0 = r - l;
+            ll res = M(M((r - l) * ress.s2) - M(ress.s1 * ress.s1));
+            cout << res << endl;
+        }
+        else {
+            int k; cin >> k;
+            if (o == 1)
+                modify(l, r, 1, k, 1, 1, n + 1);
+            else if (o == 2)
+                modify(l, r, k, 0, 1, 1, n + 1);
+            else if (o == 3)
+                modify(l, r, 0, k, 1, 1, n + 1);
+        }
     }
-    pair<ll, ll> res = mcmf.min_cost_flow(1, n, mcmf.INF);
-    cout << res.first << ' ' << res.second << endl;
-
 
     return 0;
 }
