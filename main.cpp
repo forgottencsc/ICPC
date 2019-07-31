@@ -1,84 +1,83 @@
 #include <bits/stdc++.h>
+
 using namespace std;
-
-#define R(m) (int)(m).size()
-#define C(m) (int)((m)[0].size())
-typedef double dbl;
-const dbl eps = 1e-8;
-typedef vector<dbl> vec;
-typedef vector<vec> mat;
-
-ostream& operator<<(ostream& os, const mat& w) {
-    for (int i = 0; i != R(w); ++i)
-        for (int j = 0; j != C(w); ++j)
-            os << w[i][j] << " \n"[j == C(w) - 1];
-    return os;
-}
-
-mat operator*(const mat& a, const mat& b) {
-    mat r(R(a), vec(C(b), 0));
-    for (int i = 0; i != R(a); ++i)
-        for (int j = 0; j != C(b); ++j)
-            for (int k = 0; k != C(a); ++k)
-                r[i][j] += a[i][k] * b[k][j];
-    return r;
-}
-
-mat transpose(const mat& a) {
-    int n = R(a), m = C(a);
-    mat b(m, vec(n));
-    for (int i = 0; i != n; ++i)
-        for (int j = 0; j != m; ++j)
-            b[j][i] = a[i][j];
-    return b;
-}
-
-void gso(mat& a) {
-    const int& n = R(a), m = C(a);
-    for (int i = 0; i != m; ++i) {
-        for (int j = 0; j != i; ++j) {
-            dbl l = 0;
-            for (int k = 0; k != n; ++k)
-                l += a[k][i] * a[k][j];
-            for (int k = 0; k != n; ++k)
-                a[k][i] -= a[k][j] * l;
+typedef long long ll;
+vector<vector<int>> solve(ll n, ll k) {
+    vector<vector<int>> v(k);
+    if (k == 1) {
+        v[0].resize(n);
+        iota(v[0].begin(), v[0].end(), 1);
+    }
+    else if (n * (n + 1) / 2 % k || (n + 1) <= 2 * k)
+        v.clear();
+    else {
+        if (n / k % 2 == 0) {
+            for (int i = 0; i != k; ++i)
+                for (int j = 0; j != n / k; ++j)
+                    v[i].push_back((j * k  + ((j & 1) ? i : k - i - 1)) + 1);
         }
-        dbl l = 0;
-        for (int k = 0; k != n; ++k)
-            l += a[k][i] * a[k][i];
-        l = sqrt(l);
-        for (int k = 0; k != n; ++k)
-            a[k][i] /= l;
+        else {
+            if (n / k % k == 0) {
+                for (int i = 0; i != k; ++i)
+                    for (int j = 0; j != n / k; ++j)
+                        v[i].push_back((j * k + ((j + i) % k)) + 1);
+            }
+            else {
+                if (k % 2) {
+                    for (int i = 0; i != k; ++i) {
+                        v[i].push_back(i + 1);
+                        int j;
+                        if (i <= k / 2) j = k / 2 - i;
+                        else j = 3 * k / 2 - i;
+                        v[i].push_back(k + (k - j - 1) + 1);
+                        int d = i - j;
+                        v[i].push_back(2 * k + k / 2 - d + 1);
+                    }
+                    for (int i = 0; i != k; ++i)
+                        for (int j = 3; j != n / k; ++j)
+                            v[i].push_back((j * k  + ((j & 1) ? i : k - i - 1)) + 1);
+                }
+            }
+        }
     }
-}
-
-pair<mat, mat> QR(const mat& a) {
-    mat q = a; gso(q);
-    return { q, transpose(q) * a };
-}
-
-vector<dbl> eigenvalues(mat a) {
-    pair<mat, mat> qr;
-    for (int i = 0; i != 10; ++i) {
-        qr = QR(a);
-        a = qr.second * qr.first;
-    }
-    vector<dbl> res;
-    for (int i = 0; i != R(a); ++i)
-        res.push_back(a[i][i]);
-    return res;
+//    if (v.size()) {
+//        ll sum = n * (n + 1) / (2 * k);
+//        for (int i = 0; i != k; ++i) {
+//            ll ans = 0;
+//            for (int j = 0; j != n / k; ++j)
+//                ans += v[i][j];
+//            if (ans != sum) {
+//                cout << n << ' ' << k << endl;
+//                for (int u = 0; u != k; ++u)
+//                    for (int w = 0; w != n / k; ++w)
+//                        cout << v[u][w] << " \n"[w == n / k - 1];
+//                cout.flush();
+//                exit(114514);
+//            }
+//        }
+//    }
+    return v;
 }
 
 int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
+    freopen("1.in", "r", stdin);
     #endif // ONLINE_JUDGE
 
-    mat m = { {1, 2, 3}, { 2, 4, 5 }, { 3, 5, 6 } };
-    auto v = eigenvalues(m);
-    for (dbl w : v)
-        cout << w << ' ';
-    cout << endl;
+    int T; scanf("%d", &T);
+    while(T--) {
+        ll n, k; scanf("%lld%lld", &n, &k);
+        vector<vector<int>> v = solve(n, k);
+        if (!v.size()) printf("no\n");
+        else {
+            printf("yes\n");
+            for (int i = 0; i != k; ++i)
+                for (int j = 0; j != n / k; ++j)
+                    printf("%d%c", v[i][j], " \n"[j == n / k - 1]);
+        }
+
+    }
+
+
     return 0;
 }

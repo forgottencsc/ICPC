@@ -77,8 +77,8 @@ unsigned dc(int u, int ss) {
     return sum;
 }
 
-int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
+void solve(istream& cin, ostream& cout) {
+    //ios::sync_with_stdio(0); cin.tie(0);
     int T; cin >> T;
     while(T--) {
         cin >> n >> k >> str;
@@ -97,5 +97,5 @@ int main(void) {
         cnt.resize(w = d.size());
         cout << dc(1, n) << endl;
     }
-    return 0;
+    //return 0;
 }
