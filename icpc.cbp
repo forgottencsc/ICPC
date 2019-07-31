@@ -237,6 +237,7 @@
 		</Unit>
 		<Unit filename="Templates/DataStructures/block.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
+		<Unit filename="Templates/DataStructures/dynamic_diameter.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
 		<Unit filename="Templates/DataStructures/lca.h" />
 		<Unit filename="Templates/GraphTheory/basics.h" />

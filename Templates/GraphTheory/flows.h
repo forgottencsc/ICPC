@@ -79,22 +79,17 @@ struct PrimalDual {
         graph[to].emplace_back((edge) {from, 0, -cost, (int) graph[from].size() - 1, true});
     }
 
-    cost_t min_cost_flow(int s, int t, flow_t f) {
+    pair<flow_t, cost_t> min_cost_flow(int s, int t, flow_t f) {
         int V = (int) graph.size();
-        cost_t ret = 0;
+        cost_t ret = 0; flow_t f0 = 0;
         using Pi = pair< cost_t, int >;
         priority_queue< Pi, vector< Pi >, greater< Pi > > que;
-        potential.assign(V, 0);
-        preve.assign(V, -1);
-        prevv.assign(V, -1);
-
+        potential.assign(V, 0); preve.assign(V, -1); prevv.assign(V, -1);
         while(f > 0) {
             min_cost.assign(V, INF);
-            que.emplace(0, s);
-            min_cost[s] = 0;
+            que.emplace(0, s); min_cost[s] = 0;
             while(!que.empty()) {
-                Pi p = que.top();
-                que.pop();
+                Pi p = que.top(); que.pop();
                 if(min_cost[p.second] < p.first) continue;
                 for(int i = 0; i < graph[p.second].size(); i++) {
                     edge &e = graph[p.second][i];
@@ -106,13 +101,12 @@ struct PrimalDual {
                     }
                 }
             }
-            if(min_cost[t] == INF) return -1;
+            if(min_cost[t] == INF) return { f0, ret };
             for(int v = 0; v < V; v++) potential[v] += min_cost[v];
             flow_t addflow = f;
-            for(int v = t; v != s; v = prevv[v]) {
+            for(int v = t; v != s; v = prevv[v])
                 addflow = min(addflow, graph[prevv[v]][preve[v]].cap);
-            }
-            f -= addflow;
+            f -= addflow; f0 += addflow;
             ret += addflow * potential[t];
             for(int v = t; v != s; v = prevv[v]) {
                 edge &e = graph[prevv[v]][preve[v]];
@@ -120,6 +114,6 @@ struct PrimalDual {
                 graph[v][e.rev].cap += addflow;
             }
         }
-        return ret;
+        return { f0, ret };
     }
 };

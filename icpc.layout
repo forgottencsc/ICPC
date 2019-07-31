@@ -42,9 +42,9 @@
 			<Cursor1 position="2552123" topLine="195142" />
 		</Cursor>
 	</File>
-	<File name="Problems\repeatersVI\repeatersVI.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="1.out" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="44" />
+			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Templates\Math\NumberTheory\basic_number_theory.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -310,5 +310,18 @@
 		<Cursor>
 			<Cursor1 position="1231" topLine="57" />
 		</Cursor>
+	</File>
+	<File name="Templates\Math\NumberTheory\primality.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1120" topLine="1" />
+		</Cursor>
+	</File>
+	<File name="Problems\kcore\gen.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1863" topLine="138" />
+		</Cursor>
+		<Folding>
+			<Collapse line="99" />
+		</Folding>
 	</File>
 </CodeBlocks_layout_file>
