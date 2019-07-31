@@ -8,6 +8,7 @@ using namespace std;
 
 ll invs[N], f[N], fi[N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+ll binom(ll n, ll k) { return M(f[n] * M(fi[n - k] * fi[k])); }
 void ginv() {
     invs[1] = 1; f[0] = fi[0] = 1;
     for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));

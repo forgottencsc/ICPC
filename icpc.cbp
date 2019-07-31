@@ -235,6 +235,7 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Templates/DataStructures/block.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/dynamic_diameter.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
