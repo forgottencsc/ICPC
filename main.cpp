@@ -25,7 +25,7 @@ void dfs_rec(int u, int f) {
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
+    freopen("1.in", "r", stdin);
     #endif // ONLINE_JUDGE
 
     cin >> n;

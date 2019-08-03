@@ -103,20 +103,17 @@ void gso(mat& a) {
     for (int i = 0; i != n; ++i) {
         for (int j = 0; j != i; ++j) {
             dbl l = 0;
-            for (int k = 0; k != m; ++k)
-                l += a[i][k] * a[j][k];
-            for (int k = 0; k != m; ++k)
-                a[i][k] -= a[j][k] * l;
+            for (int k = 0; k != m; ++k) l += a[i][k] * a[j][k];
+            for (int k = 0; k != m; ++k) a[i][k] -= a[j][k] * l;
         }
         dbl l = 0;
-        for (int k = 0; k != m; ++k)
-            l += a[i][k] * a[i][k];
+        for (int k = 0; k != m; ++k) l += a[i][k] * a[i][k];
         l = sqrt(l);
-        for (int k = 0; k != m; ++k)
-            a[i][k] /= l;
+        for (int k = 0; k != m; ++k) a[i][k] /= l;
     }
 }
 
+//  QR Decomposition
 pair<mat, mat> QR(const mat& a) {
     mat q = a; gso(q);
     return { q, transpose(q) * a };
