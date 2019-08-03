@@ -20,15 +20,14 @@ int dfs_sz(int u, int f, int s) {
 }
 
 int vdc(int u, int s) {
-    int r = dfs_sz(u, 0, s);
-    vis[r] = 1;
+    vis[u = dfs_sz(u, 0, s)] = 1;
 
-    for (int v : g[r]) {
+    for (int v : g[u]) {
         if (vis[v]) continue;
-        int w = dc(v, sz[v] < sz[r] ? sz[v] : s - sz[r]);
+        int w = dc(v, sz[v] < sz[u] ? sz[v] : s - sz[u]);
 
     }
-    return r;
+    return u;
 }
 
 //  Edge-DC
