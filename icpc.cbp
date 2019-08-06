@@ -35,9 +35,9 @@
 					<Add option="-DONLINE_JUDGE" />
 				</Compiler>
 				<Linker>
-					<Add option="-O2" />
 					<Add option="-s" />
 					<Add option="-m64" />
+					<Add option="-O2" />
 				</Linker>
 			</Target>
 		</Build>
@@ -235,6 +235,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Solved/CF1192B.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Templates/DataStructures/block.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/dynamic_diameter.h" />
@@ -256,7 +260,7 @@
 		<Unit filename="Templates/String/string_automata_arr.h" />
 		<Unit filename="Templates/String/string_automata_ptr.h" />
 		<Unit filename="Templates/String/suffix_array.h" />
-		<Unit filename="Unsolved/CF1192B.cpp">
+		<Unit filename="Unsolved/Gym101981B.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>

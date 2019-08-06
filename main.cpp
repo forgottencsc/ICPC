@@ -163,6 +163,7 @@ int main(void) {
             ans = v;
         printf("%lld\n", (l)ans);
     }
+    cout << cnt << endl;
 
     return 0;
 }
