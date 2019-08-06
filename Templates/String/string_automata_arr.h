@@ -107,6 +107,6 @@ int extend(int p, int i) {
         int q = gn(l[p] + 2); g[p][o] = q;
         if (p != 1) f[q] = g[gf(f[p], i)][o];
     }
-    p = g[p][o]; w[p]++;
+    p = g[p][o];
     return p;
 }

@@ -62,6 +62,23 @@ ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
 	else d = a, u = 1, v = 0; return d;
 }
 
+//	Try to reduce ax = b(mod p) to x = b'(mod p')
+//  Solve linear congurence equation
+bool lce(ll& a, ll& b, ll& p) {
+	ll x, k, d = exgcd(a, p, x, k);
+	if (b % d == 0) a = 1, b = mod(x * b / d, p /= d);
+	return a == 1;
+}
+
+ll inv(ll x, ll p) { ll b; lce(x %= p, b, p); return b; }
+
+//  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
+bool crt(ll& b1, ll& m1, ll b2, ll m2) {
+	ll a = m1, b = b2 - b1, p = m2;
+	if (!lce(a, b, p)) return false;
+	else { b1 += b * m1; m1 *= p; return true; }
+}
+
 //  a^b(mod p) = a^(b%phi(p)+phi(p))
 ll qpm(ll a, ll b, ll p) {
 	ll r = 1;
@@ -85,23 +102,6 @@ ll msqrt(ll n, ll p) {
         t = (t * c) % p; m = i;
     }
     return min(r, p - r); //    r^2=(p-r)^2=n
-}
-
-//	Try to reduce ax = b(mod p) to x = b'(mod p')
-//  Solve linear congurence equation
-bool lce(ll& a, ll& b, ll& p) {
-	ll x, k, d = exgcd(a, p, x, k);
-	if (b % d == 0) a = 1, b = mod(x * b / d, p /= d);
-	return a == 1;
-}
-
-ll inv(ll x, ll p) { ll b; lce(x %= p, b, p); return b; }
-
-//  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
-bool crt(ll& b1, ll& m1, ll b2, ll m2) {
-	ll a = m1, b = b2 - b1, p = m2;
-	if (!lce(a, b, p)) return false;
-	else { b1 += b * m1; m1 *= p; return true; }
 }
 
 //  Solve quadratic congurence equation
@@ -128,22 +128,61 @@ ll lucas(ll n, ll k, ll p) {
 }
 
 //	Solve x from a^x=b(mod p)
-struct puu { ll k, v; };
-bool operator<(puu p1, puu p2) { return p1.k < p2.k; }
-bool operator<(puu p, ll k) { return p.k < k; }
-ll bsgs(ll a, ll b, ll p) {
-	ll m = ceil(sqrt(p)), gmi = qpm(a, m * (p - 2), p);
-	vector<puu> v(m); v[0] = { 1, 0 };
-	for (ll i = 1; i != m; ++i)
-		v[i] = { v[i - 1].k * a % p, i };
-	sort(v.begin(), v.end());
-	for (int i = 0; i != m; ++i) {
-		auto it = lower_bound(v.begin(), v.end(), b);
-		if (it != v.end() && it->k == b)
-			return i * m + it->v;
-		else b = b * gmi % p;
-	}
-	return -1;
+struct bsgs_t {
+    const size_t S = 1 << 19;
+    const size_t msk = S - 1;
+    ll a, p, m, w;
+    int c, h[S], g[S], k[S], v[S];
+
+    int fin(int x) {
+        for (int i = h[x & msk]; ~i; i = g[i])
+            if (k[i] == x) return v[i];
+        return -1;
+    }
+
+    void ins(int x, int e) {
+        g[c] = h[x & msk]; k[c] = x;
+        v[c] = e; h[x & msk] = c++;
+    }
+
+    void init(ll a_, ll p_) {
+        c = 0; a = a_; p = p_; m = ceil(sqrt(p));
+        memset(h, 0xff, sizeof(h));
+        w = 1;
+        for (int i = 0; i != m; ++i) {
+            if (fin(w) == -1) ins(w, i);
+            w = w * a % p;
+        }
+        w = qpm(w, p - 2, p);
+    }
+
+    int solve(ll b) {
+        for (int i = 0; i != m; ++i) {
+            int r = fin(b);
+            if (r != -1) return i * m + r;
+            b = b * w % p;
+        }
+        return -1;
+    }
+};
+
+ll mlog(ll a, ll g, ll p) {
+    vector<pf> pfs = pfd(p - 1);
+    ll x = 0, b = 1;
+    for (pf f : pfs) {
+        ll q = qpm(f.p, f.c, p), w = f.p, t = a, r = 0;
+        ll h = qpm(g, (p - 1) / w, p);
+        bsgs.init(h, p, f.p);
+        for (int i = 0; i != f.c; ++i) {
+            ll y = qpm(t, (p - 1) / w, p);
+            ll z = bsgs.solve(y);
+            t = mul(t, qpm(qpm(g, w / f.p * z, p), p - 2, p), p);
+            r += (w / f.p) * z;
+            w *= f.p;
+        }
+        crt(x, b, r, q);
+    }
+    return x;
 }
 
 //  Find a primitive root of p. O(p^(1/4))
