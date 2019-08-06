@@ -70,10 +70,11 @@ ll qpm(ll a, ll b, ll p) {
 	return r % p;
 }
 
-// Tonelli-Shanks algorithm. O(log^2p)
+// Tonelli-Shanks algorithm. O(log^2(p)) 1s~5e3
 ll msqrt(ll n, ll p) {
     ll q = p - 1, s = 0, z = 2;
-    while (~q & 1) q >>= 1, s++;
+    //while (~q & 1) q >>= 1, s++;
+    q >>= (s = __builtin_ctzll(q));
     if (s == 1) return qpm(n, (p + 1) / 4, p);
     while(qpm(z, (p - 1) / 2, p) == 1) ++z;
     ll c = qpm(z, q, p), t = qpm(n, q, p),

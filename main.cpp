@@ -2,46 +2,48 @@
 #define N 100001
 using namespace std;
 
-struct edge { int v, w; };
-vector<edge> g0[N];
+typedef long long ll;
 
-vector<edge> g[N]; int n;
-
-void dfs_rec(int u, int f) {
-    int p = u, c = 0;
-    for (edge e : g0[u]) {
-        if (e.v == f) continue;
-        dfs_rec(e.v, u); c++;
-        g[p].push_back({ e.v, e.w });
-        g[e.v].push_back({ p, e.w });
-        if (c + 2 >= g0[u].size()) continue;
-        int q = ++n; g[q].clear();
-        g[p].push_back({ q, 0 });
-        g[q].push_back({ p, 0 });
-        p = q;
-    }
+ll qpm(ll a, ll b, ll p) {
+	ll r = 1;
+	do if (b & 1) r = r * a % p;
+    while (a = a * a % p, b >>= 1);
+	return r % p;
 }
 
+ll msqrt(ll n, ll p) {
+    ll q = p - 1, s = 0, z = 2;
+    //while (~q & 1) q >>= 1, s++;
+    q >>= (s = __builtin_ctzll(q));
+    if (s == 1) return qpm(n, (p + 1) / 4, p);
+    while(qpm(z, (p - 1) / 2, p) == 1) ++z;
+    ll c = qpm(z, q, p), t = qpm(n, q, p),
+       r = qpm(n, (q + 1) / 2, p), m = s;
+    while(t % p != 1) {
+        ll i = 1; while(qpm(t, 1ll << i, p) != 1) ++i;
+        ll b = qpm(c, 1ll << (m - i - 1), p);
+        r = r * b % p; c = (b * b) % p;
+        t = (t * c) % p; m = i;
+    }
+    return min(r, p - r); //    r^2=(p-r)^2=n
+}
+
+
 int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     freopen("1.in", "r", stdin);
     #endif // ONLINE_JUDGE
-
-    cin >> n;
-    for (int i = 0; i != n - 1; ++i) {
-        int u, v;
-        cin >> u >> v;
-        g0[u].push_back({ v, 0 });
-        g0[v].push_back({ u, 0 });
+    ll p = 998244353; cout << boolalpha;
+    int cnt = 0;
+    for (int x = 1; x != min(p, 10001ll); ++x) {
+        ll i = x + 5e8;
+        if (qpm(i, (p-1)/2, p) != 1)
+            continue;
+        cnt++;
+        ll r = msqrt(i, p);
+        cout << i << ": " << (r * r % p == i) << endl;
     }
-
-    dfs_rec(1, 0);
-    for (int i = 1; i <= n; ++i) {
-        for (edge e : g[i])
-            cout << e.v << ' ';
-        cout << endl;
-    }
+    cout << cnt << endl;
 
     return 0;
 }
