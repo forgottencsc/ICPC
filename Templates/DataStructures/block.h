@@ -1,3 +1,4 @@
+//  blocks
 int bi[N], bl[M], br[M], bs, bc;
 void block_init() {
     bs = sqrt(n); bc = 1; bl[1] = 1;
