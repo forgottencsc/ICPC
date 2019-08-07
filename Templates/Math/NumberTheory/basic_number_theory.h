@@ -18,7 +18,7 @@ ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 //	O(n) prime generator
 #define W 1000001
 bool ip[W]; vector<ll> ps;
-void gp() {
+void sieve() {
 	ps.reserve(W * 1.3 / log(W));
 	memset(ip, 1, sizeof(ip)); ip[1] = 0;
 	for (int i = 2; i != W; ++i) {
@@ -165,26 +165,36 @@ struct bsgs_t {
         }
         return -1;
     }
-};
+} bsgs;
 
+//  Pohlig-Hellman algorithm, O(\sum{sqrt(p_i)c_i})
+//  Calculate log_g(a).
 ll mlog(ll a, ll g, ll p) {
     vector<pf> pfs = pfd(p - 1);
     ll x = 0, b = 1;
     for (pf f : pfs) {
-        ll q = qpm(f.p, f.c, p), w = f.p, t = a, r = 0;
-        ll h = qpm(g, (p - 1) / w, p);
+        ll q = qpm(f.p, f.c, p), w = 1, t = a, r = 0;
+        ll h = qpm(g, (p - 1) / f.p, p);
         bsgs.init(h, p, f.p);
         for (int i = 0; i != f.c; ++i) {
-            ll y = qpm(t, (p - 1) / w, p);
-            ll z = bsgs.solve(y);
-            t = mul(t, qpm(qpm(g, w / f.p * z, p), p - 2, p), p);
-            r += (w / f.p) * z;
-            w *= f.p;
+            ll z = bsgs.solve(qpm(t, (p - 1) / (w * f.p), p));
+            t = mul(t, qpm(qpm(g, w * z, p), p - 2, p), p);
+            r += w * z; w *= f.p;
         }
         crt(x, b, r, q);
     }
     return x;
 }
+
+ll mlog2(ll a, ll b, ll p) {
+    ll g = primitive_root(p);
+    ll u = mlog(a, g, p), v = mlog(b, g, p), m = p - 1;
+    if (!lce(u, v, m))
+        return -1;
+    else
+        return v;
+}
+
 
 //  Find a primitive root of p. O(p^(1/4))
 ll primitive_root(ll p) {
@@ -199,7 +209,7 @@ ll primitive_root(ll p) {
     while(1) {
         bool fail = 0;
         for (int d : ds)
-            if (qpm(g, (p-1)/d, p) == 1)
+            if (qpm(g, (p - 1) / d, p) == 1)
                 fail = 1;
         if (!fail) return g; else g++;
     }

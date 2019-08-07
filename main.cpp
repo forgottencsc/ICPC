@@ -1,169 +1,105 @@
 #include <bits/stdc++.h>
-#define W 101
+#define N 100001
 using namespace std;
-typedef __int128 ll;
-typedef long long l;
 
-bool ip[W]; vector<ll> ps;
-void gp() {
-	ps.reserve(W * 1.3 / log(W));
-	memset(ip, 1, sizeof(ip)); ip[1] = 0;
-	for (int i = 2; i != W; ++i) {
-		if (ip[i]) ps.push_back(i);
-		for (int p : ps) {
-			if (i * p >= W) break;
-			ip[i * p] = 0;
-			if (i % p == 0) break;
-		}
-	}
+struct edge { int v, w; };
+vector<edge> g0[N]; int n0;
+vector<int> g[N]; int n; bool flg[N];
+int eu[N], ev[N], ex[N], ew[N], ec; bool ef[N];
+bool vis[N]; int dep[N], msz[N], sz[N];
+
+int adde(int u, int v, int w, int f) {
+    int i = ++ec;
+    eu[i] = u; ev[i] = v; ex[i] = u ^ v;
+    ew[i] = w; ef[i] = f; vis[i] = 0;
+    g[u].push_back(i);
+    g[v].push_back(i);
+    //cout << u << ' ' << v << ' ' << w << endl;
+    return i;
 }
 
-struct pf { ll p, c; };
-vector<pf> pfd(ll n) {
-	vector<pf> res;
-	for (ll p : ps) {
-		if (p * p > n) break;
-		if (n % p) continue;
-		res.push_back({ p, 0 });
-		do res.back().c++;
-		while ((n /= p) % p == 0);
-	}
-	if (n != 1) res.push_back({ n, 1 });
-	return res;
-}
-
-ll mul(ll a, ll b, ll p) { return (__int128)a * (__int128)b % p; }
-
-ll qpm(ll a, ll b, ll p) {
-    ll r = 1;
-    do if (b & 1) r = mul(r, a, p);
-    while (a = mul(a, a, p), b >>= 1);
-    return r;
-}
-
-struct bsgs_t {
-    static const ll S = 1 << 19;
-    ll a, p, m, w, s, msk;
-    ll k[S], v[S];
-    int c, h[S], g[S];
-
-    ll fin(ll x) {
-        for (int i = h[x & msk]; ~i; i = g[i])
-            if (k[i] == x) return v[i];
-        return -1;
-    }
-
-    void ins(ll x, ll e) {
-        g[c] = h[x & msk]; k[c] = x;
-        v[c] = e; h[x & msk] = c++;
-    }
-
-    void init(ll a_, ll p_, ll ord = 0) {
-        c = 0; a = a_; p = p_;
-        m = ceil(sqrt(ord ? (l)ord : (l)p));
-        for (s = 1; s < min(1ll<<19, (l)m<<4); s <<= 1);
-        memset(h, 0xff, s << 2); msk = s - 1;
-        w = 1;
-        for (int i = 0; i != m; ++i) {
-            if (fin(w) == -1) ins(w, i);
-            w = mul(w, a, p);
-        }
-        w = qpm(w, p - 2, p);
-    }
-
-    ll solve(ll b) {
-        ll ret = -1;
-        for (int i = 0; i != m; ++i) {
-            int r = fin(b);
-            if (r != -1) { ret = i * m + r; break; }
-            b = mul(b, w, p);
-        }
-        return ret;
-    }
-} bsgs;
-
-ll primitive_root(ll p) {
-    vector<ll> ds; ll n = p - 1;
-    for (ll d = 2; d * d <= n; ++d) {
-        if (n % d) continue;
-        ds.push_back(d);
-        while (n % d == 0) n /= d;
-    }
-    if (n != 1) ds.push_back(n);
-    int g = 1;
-    while(1) {
-        bool fail = 0;
-        for (int d : ds)
-            if (qpm(g, (p-1)/d, p) == 1)
-                fail = 1;
-        if (!fail) return g; else g++;
+void dfs_rec(int u, int f) {
+    int p = u, c = 0;
+    for (edge e : g0[u]) {
+        int v = e.v;
+        if (v == f) continue;
+        adde(p, v, e.w, 0);
+        dfs_rec(v, u);
+        if (c + 2 + !!f >= g0[u].size()) continue;
+        int q = ++n; ++c; flg[q] = 1;
+        adde(p, q, 0, 1);
+        p = q;
     }
 }
 
-ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
-
-ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
-	if (b) d = exgcd(b, a % b, v, u), v -= (a / b) * u;
-	else d = a, u = 1, v = 0; return d;
-}
-
-bool lce(ll& a, ll& b, ll& p) {
-	ll x, k, d = exgcd(a, p, x, k);
-	if (b % d == 0) a = 1, b = mod(x * b / d, p /= d);
-	return a == 1;
-}
-
-bool crt(ll& b1, ll& m1, ll b2, ll m2) {
-	ll a = m1, b = b2 - b1, p = m2;
-	if (!lce(a, b, p)) return false;
-	else { b1 += b * m1; m1 *= p; return true; }
-}
-
-//  Calculate log_g(a)
-ll mlog(ll a, ll g, ll p) {
-    vector<pf> pfs = pfd(p - 1);
-    ll x = 0, b = 1;
-    for (pf f : pfs) {
-        ll q = qpm(f.p, f.c, p), w = f.p, t = a, r = 0;
-        ll h = qpm(g, (p - 1) / w, p);
-        bsgs.init(h, p, f.p);
-        for (int i = 0; i != f.c; ++i) {
-            ll y = qpm(t, (p - 1) / w, p);
-            ll z = bsgs.solve(y);
-            t = mul(t, qpm(qpm(g, w / f.p * z, p), p - 2, p), p);
-            r += (w / f.p) * z;
-            w *= f.p;
-        }
-        crt(x, b, r, q);
+int dfs_sz(int i, int f, int s) {
+    int res = 0, u = ex[i] ^ f;
+    dep[u] = dep[f] + 1;
+    sz[i] = 1; msz[i] = 0;
+    for (int j : g[u]) {
+        if (j == i || vis[j]) continue;
+        int r = dfs_sz(j, u, s);
+        sz[i] += sz[j];
+        if (!res || msz[r] < msz[res]) res = r;
     }
-    return x;
+    msz[i] = max(sz[i], s - sz[i]);
+    if (!res || msz[i] < msz[res] && !vis[i]) res = i;
+    return res;
 }
 
-//mt19937_64 mt(1234);
+void dfs_cnt(int u, int f, int d, int* c) {
+    if (!flg[u]) c[d]++;
+    for (int i : g[u])
+        if (!vis[i] && (ex[i] ^ u) != f)
+            dfs_cnt(ex[i] ^ u, u, (d + ew[i]) % 3, c);
+}
+
+typedef long long ll;
+ll cal(int i) {
+    int c1[3] = { 0 };
+    int c2[3] = { 0 };
+    dfs_cnt(eu[i], ev[i], 0, c1);
+    dfs_cnt(ev[i], eu[i], 0, c2);
+    ll res = 0;
+    for (int d = 0; d != 3; ++d)
+        res += 1ll * c1[d] * c2[(3 - (ew[i] + d) % 3) % 3];
+    return res;
+}
+
+ll edc(int i, int f, int s) {
+    i = dfs_sz(i, f, s);
+    if (vis[i]) return 0;
+    else vis[i] = 1;
+    int u = eu[i], v = ev[i];
+    ll res = cal(i);
+    res += edc(i, u, dep[u] > dep[v] ? s - sz[i] : sz[i]);
+    res += edc(i, v, dep[v] > dep[u] ? s - sz[i] : sz[i]);
+    return res;
+}
+
+ll edc() {
+    ec = 0; dfs_rec(1, 0);
+    int i = adde(0, 1, 0, 1);
+    vis[i] = 1;
+    return edc(i, 0, n);
+}
 
 int main(void) {
-//    ios::sync_with_stdio(0); cin.tie(0);
+    ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
-    freopen("1.in", "r", stdin);
-    //ifstream cin("1.in");
+    ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    gp();
-
-    int T; scanf("%d", &T);
-    while(T--) {
-        l A, B, P;
-        ll a, b, p; scanf("%lld%lld%lld", &P, &A, &B);
-        a = A; b = B; p = P;
-        ll g = primitive_root(p);
-        ll u = mlog(a, g, p), v = mlog(b, g, p), m = p - 1;
-        ll ans = 0;
-        if (!lce(u, v, m))
-            ans = -1;
-        else
-            ans = v;
-        printf("%lld\n", (l)ans);
+    cin >> n0; n = n0;
+    for (int i = 1; i <= n - 1; ++i) {
+        int u, v, w; cin >> u >> v >> w;
+        g0[u].push_back({ v, w });
+        g0[v].push_back({ u, w });
     }
-    cout << cnt << endl;
 
+    ll res = edc();
+
+    ll u = res * 2 + n0, v = n0 * n0, d = gcd(u, v);
+    u /= d; v /= d;
+    cout << u << '/' << v << endl;
     return 0;
 }
