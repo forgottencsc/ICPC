@@ -1,157 +1,183 @@
 #include <bits/stdc++.h>
-#define N 300001
+#define M(x) (((x) + P) % P)
+#define N 1<<18
 using namespace std;
-
-typedef long long dbl;
 typedef long long ll;
-//const dbl pi = acos(-1), eps = 1e-8;
-struct vec { dbl x, y; };
-vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
-vec operator-(vec v1, vec v2) { return { v1.x - v2.x, v1.y - v2.y }; }
-dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
-dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
-vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
-bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
-dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
-//dbl len(vec v) { return hypot(v.x, v.y); }
-//dbl arg(vec v) { return atan2(v.y, v.x); }
 
-vector<vec> convex_hull(vector<vec>& ps) {
-    if (ps.size() <= 3) return ps;
-    swap(ps[0], *min_element(ps.begin(), ps.end()));
-    sort(ps.begin() + 1, ps.end(), [&](vec v1, vec v2) {
-        v1 = v1 - ps[0]; v2 = v2 - ps[0];
-        return (v1 ^ v2) == 0 ? v1 * v1 < v2 * v2 : (v1 ^ v2) > 0;
-    });
-    vector<vec> res = { ps[0], ps[1] };
-    int n = res.size();
-    for (int i = 2; i != ps.size(); ++i) {
-        while (res.size() >= 2 && crx(res.end()[-2],res.back(),ps[i]) <= 0) res.pop_back();
-        res.push_back(ps[i]);
+ll P;
+
+ll s1[N], s2[N], s3[N], s4[N];
+
+void push_up(int p) {
+    s1[p] = M(s1[p << 1] + s1[p << 1 | 1]);
+    s2[p] = M(s2[p << 1] + s2[p << 1 | 1]);
+    s3[p] = M(s3[p << 1] + s3[p << 1 | 1]);
+    s4[p] = M(s4[p << 1] + s4[p << 1 | 1]);
+}
+
+void modify(int x, int v, int p, int lb, int rb) {
+    if (lb + 1 == rb) {
+        s1[p] = M(M(s1[p] + v));
+        s2[p] = M(s1[p] * s1[p]);
+        s3[p] = M(s1[p] * s2[p]);
+        s4[p] = M(s2[p] * s2[p]);
     }
-    return res;
-}
-
-vector<vec> minkovski_sum(const vector<vec>& v1, const vector<vec>& v2) {
-    const int n1 = v1.size(), n2 = v2.size();
-    if (!n1) return v2;
-    if (!n2) return v1;
-    vector<vec> d1(n1), d2(n2);
-    for (int i = 0; i != n1 - 1; ++i) d1[i] = v1[i + 1] - v1[i];
-    d1[n1 - 1] = v1[0] - v1[n1 - 1];
-    for (int i = 0; i != n2 - 1; ++i) d2[i] = v2[i + 1] - v2[i];
-    d2[n2 - 1] = v2[0] - v2[n2 - 1];
-    int p = 0, q = 0; res.push_back(v1[0] + v2[0]);
-    while (p != n1 && q != n2) {
-        if ((d1[p] ^ d2[q]) > 0) res.push_back(res.back() + d1[p++]);
-        else res.push_back(res.back() + d2[q++]);
-    }
-    for (; p != n1; ++p) res.push_back(res.back() + d1[p]);
-    for (; q != n2; ++q) res.push_back(res.back() + d2[q]);
-    res.pop_back();
-    return res;
-}
-
-struct edge { int v, a, b; };
-vector<edge> g0[N];
-vector<int> g[N]; int nc; bool flg[N];
-int eu[N], ev[N], ex[N], ea[N], eb[N], ec; bool ef[N];
-bool vis[N]; int dep[N], msz[N], sz[N];
-
-int adde(int u, int v, int a, int b, int f) {
-    int i = ++ec;
-    eu[i] = u; ev[i] = v; ex[i] = u ^ v;
-    ea[i] = a; eb[i] = b; ef[i] = f; vis[i] = 0;
-    g[u].push_back(i);
-    g[v].push_back(i);
-    //cout << u << ' ' << v << ' ' << a << ' ' << b << endl;
-    return i;
-}
-
-void dfs_rec(int u, int f) {
-    int p = u, c = 0;
-    for (edge e : g0[u]) {
-        int v = e.v; if (v == f) continue;
-        adde(p, v, e.a, e.b, 0); dfs_rec(v, u);
-        if (c + 2 + !!f >= g0[u].size()) continue;
-        int q = ++nc; ++c; flg[q] = 1;
-        adde(p, q, 0, 0, 1); p = q;
+    else {
+        int mid = (lb + rb) >> 1;
+        if (x < mid) modify(x, v, p << 1, lb, mid);
+        else modify(x, v, p << 1 | 1, mid, rb);
+        push_up(p);
     }
 }
 
-int dfs_sz(int i, int f, int s) {
-    int res = 0, u = ex[i] ^ f;
-    dep[u] = dep[f] + 1; sz[i] = 1; msz[i] = 0;
-    for (int j : g[u]) {
-        if (j == i || vis[j]) continue;
-        int r = dfs_sz(j, u, s); sz[i] += sz[j];
-        if (!res || msz[r] < msz[res]) res = r;
+ll r1, r2, r3, r4;
+void query(int l, int r, int p, int lb, int rb){
+    if (l <= lb && rb <= r) {
+        r1 = M(r1 + s1[p]);
+        r2 = M(r2 + s2[p]);
+        r3 = M(r3 + s3[p]);
+        r4 = M(r4 + s4[p]);
     }
-    msz[i] = max(sz[i], s - sz[i]);
-    if (!res || msz[i] < msz[res] && !vis[i]) res = i;
-    return res;
+    else {
+        int mid = (lb + rb) >> 1;
+        if (l < mid) query(l, r, p << 1, lb, mid);
+        if (r > mid) query(l, r, p << 1 | 1, mid, rb);
+    }
 }
 
-void dfs_cnt(int u, int f, ll a, ll b, vector<vec>& c) {
-    if (!flg[u]) c.push_back({ a, b });
-    for (int i : g[u])
-        if (!vis[i] && (ex[i] ^ u) != f)
-            dfs_cnt(ex[i] ^ u, u, a + ea[i], b + eb[i], c);
+int a[N];
+void build(int p, int lb, int rb) {
+    if (lb + 1 == rb) {
+        s1[p] = M(M(a[lb]));
+        s2[p] = M(s1[p] * s1[p]);
+        s3[p] = M(s1[p] * s2[p]);
+        s4[p] = M(s2[p] * s2[p]);
+    }
+    else {
+        int mid = (lb + rb) >> 1;
+        build(p << 1, lb, mid);
+        build(p << 1 | 1, mid, rb);
+        push_up(p);
+    }
 }
 
+ll i2, i6, i24;
+ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 
-typedef long long ll;
-void cal(int i, vector<vec>& res) {
-    vector<vec> c1, c2;
-    dfs_cnt(eu[i], ev[i], ea[i], eb[i], c1);
-    dfs_cnt(ev[i], eu[i], 0, 0, c2);
-    c1 = convex_hull(c1); c2 = convex_hull(c2);
-    minkovski_sum(res, c1, c2);
-}
-
-void edc(int i, int f, int s, vector<vec>& res) {
-    i = dfs_sz(i, f, s);
-    if (vis[i]) return; else vis[i] = 1;
-    int u = eu[i], v = ev[i]; cal(i, res);
-    edc(i, u, dep[u] > dep[v] ? s - sz[i] : sz[i], res);
-    edc(i, v, dep[v] > dep[u] ? s - sz[i] : sz[i], res);
-}
-
-vector<vec> edc(int n) {
-    ec = 0; nc = n; dfs_rec(1, 0);
-    int i = adde(0, 1, 0, 0, 1);
-    vis[i] = 1;
-    vector<vec> res;
-    edc(i, 0, n, res);
-    res.push_back({ 0, 0 });
-    res = convex_hull(res);
-    return res;
-}
-
-inline ll cal(vec v, ll t) {
-    return v.x * t + v.y;
-}
-
-int main(void) {
+int main(void){
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    int n, m; cin >> n >> m;
-    for (int i = 1; i <= n - 1; ++i) {
-        int u, v, a, b;
-        cin >> u >> v >> a >> b;
-        g0[u].push_back({ v, a, b });
-        g0[v].push_back({ u, a, b });
+    int n, q; cin >> n >> q >> P;
+    i2 = inv(2);
+    i6 = inv(6);
+    i24 = inv(24);
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    build(1, 1, n + 1);
+    while(q--) {
+        char b[2]; cin >> b;
+        if (b[0] == 'C') {
+            int l, r, k; cin >> l >> r >> k;
+            r1 = r2 = r3 = r4 = 0;
+            query(l, r + 1, 1, 1, n + 1);
+            ll t[5] = {
+                1,
+                r1,
+                M(M(M(r1 * r1) - r2) * i2),
+                M(M(M(M(M(r1 * r1) * r1) - M(3 * M(r1 * r2))) + M(2 * r3)) * i6),
+                M(M(M(M(M(r1*r1)*M(r1*r1))-M(M(6*r2)*M(r1*r1)))+M(3*M(r2*r2))+M(M(8*M(r3*r1))-M(6*r4)))*i24)
+            };
+            for (int i = 0; i <= k; ++i)
+                cout << t[i] << " \n"[i == k];
+        }
+        else {
+            int x, v;
+            cin >> x >> v;
+            modify(x, v, 1, 1, n + 1);
+        }
     }
-
-    vector<vec> r = edc(n);
-    int p = r.size() - 1;
-    for (int i = 0; i != m; ++i) {
-        while (p && cal(r[p], i) < cal(r[p - 1], i)) --p;
-        ll ans = cal(r[p], i);
-        cout << ans << endl;
-    }
-
+    cout.flush();
     return 0;
 }
+
+
+//#include <bits/stdc++.h>
+//#define N 200005
+//using namespace std;
+//
+//int g[N][26], f[N], w[N], nc;
+//int gn() {
+//    int p = nc++; f[p] = w[p] = 0;
+//    memset(g[p], 0, sizeof(g[p]));
+//    return p;
+//}
+//
+//void clr() { nc = 0; gn(); }
+//
+//void ins(const string& s) {
+//    int p = 0;
+//    for (char ch : s) {
+//        int o = ch - 'a';
+//        if (!g[p][o]) g[p][o] = gn();
+//        p = g[p][o];
+//    }
+//    w[p]++;
+//}
+//
+//void build() {
+//    queue<int> q;
+//    for (int o = 0; o != 26; ++o)
+//        if (g[0][o]) q.push(g[0][o]);
+//    while (!q.empty()) {
+//        int u = q.front(); q.pop();
+//        w[u] += w[f[u]];
+//        for (int o = 0; o != 26; ++o) {
+//            int& v = g[u][o];
+//            if (!v) v = g[f[u]][o];
+//            else f[v] = g[f[u]][o], q.push(v);
+//        }
+//    }
+//}
+//
+//char t[N]; int ans1[N], ans2[N];
+//void match(int* ans) {
+//    int p = 0;
+//    for (int i = 0; t[i]; ++i) {
+//        int o = t[i] - 'a';
+//        p = g[p][o];
+//        ans[i] += w[p];
+//    }
+//}
+//
+//int main() {
+//    ios::sync_with_stdio(0);
+//    #ifndef ONLINE_JUDGE
+//    ifstream cin("1.in");
+//    #endif // ONLINE_JUDGE
+//    cin >> t; int m = strlen(t);
+//    int n; cin >> n;
+//    vector<string> sv(n);
+//    for (int i = 0; i != n; ++i)
+//        cin >> sv[i];
+//    clr();
+//    for (int i = 0; i != n; ++i)
+//        ins(sv[i]);
+//    build();
+//    match(ans1);
+//    clr();
+//    reverse(t, t + m);
+//    for (int i = 0; i != n; ++i) {
+//        reverse(sv[i].begin(), sv[i].end());
+//        ins(sv[i]);
+//    }
+//    build();
+//    match(ans2);
+//    typedef long long ll;
+//    ll ans = 0;
+//    for (int i = 0; i != m - 1; ++i)
+//        ans += 1ll * ans1[i] * ans2[m - i - 2];
+//    cout << ans << endl;
+//    return 0;
+//}
