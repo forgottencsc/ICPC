@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1565184274 source:d:\cosecant\projects\icpc\main.cpp
+1565342277 source:d:\cosecant\projects\icpc\main.cpp
 	<bits/stdc++.h>
 
 1557167711 source:d:\cosecant\projects\icpc\problems\throughput\gen.cpp
@@ -129,5 +129,14 @@
 	<bits/stdc++.h>
 
 1564935659 source:d:\cosecant\projects\icpc\solved\cf1192b.cpp
+	<bits/stdc++.h>
+
+1565358813 source:d:\cosecant\projects\icpc\problems\kthpos\tle1.cpp
+	<bits/stdc++.h>
+
+1565358990 source:d:\cosecant\projects\icpc\problems\kthpos\gen.cpp
+	"../generator.h"
+
+1565358805 source:d:\cosecant\projects\icpc\problems\kthpos\kthpos.cpp
 	<bits/stdc++.h>
 
