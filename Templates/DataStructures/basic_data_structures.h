@@ -1,6 +1,81 @@
-#include <bits/stdc++.h>
-#define N 100001
-using namespace std;
+//  blocks
+int bi[N], bl[M], br[M], bs, bc;
+void block_init() {
+    bs = sqrt(n); bc = 1; bl[1] = 1;
+    for (int i = 1; i <= n; ++i) {
+        if (i - bl[bc] == bs) {
+            br[bc++] = i - 1;
+            bl[bc] = i;
+        }
+        bi[i] = bc;
+    }
+    br[bc] = n;
+}
+
+//  Union-Find Set, Rollback supported, O(logn)
+namespace ufs {
+
+int f[N], s[N];
+int x[N], y[N], c;
+
+void clr(int n) {
+    fill(f + 1, f + n + 1, 0);
+    fill(s + 1, s + n + 1, 1);
+}
+
+int find(int x) {
+    while (f[x]) x = f[x];
+    return x;
+}
+
+bool join(int u, int v) {
+    u = find(u); v = find(v);
+    if (u == v) return false;
+    if (s[u] > s[v]) swap(u, v);
+    ++c; x[c] = u; y[c] = v;
+    s[v] += s[u]; f[u] = v;
+    return true;
+}
+
+void rollback(int w) {
+    for (; c != w; --c)
+        f[x[c]] = 0, s[y[c]] -= s[x[c]];
+}
+
+}
+
+//  Doubling LCA
+ll mp[N][18], dis[N]; int dep[N];
+void lca_dfs(int u, int f, ll w)  {
+    dis[u] = w; mp[u][0] = f; dep[u] = dep[f] + 1;
+    for (edge e : g[u])
+        if (e.v != f) lca_dfs(e.v, u, w + e.w);
+}
+
+void lca_init() {
+    lca_dfs(1);
+    for (int j = 1; (1 << j) < n; ++j) {
+        for (int i = 1; i <= n; ++i)\
+            mp[i][j] = mp[mp[i][j - 1]][j - 1];
+    }
+}
+
+int lca(int u, int v) {
+    if (dep[u] < dep[v]) swap(u, v);
+    for (int i = 18; dep[u] != dep[v]; --i)
+        if ((1 << i) & (dep[u] - dep[v]))
+            u = mp[u][i];
+    if (u == v) return u;
+    for (int i = 18; i >= 0; --i)
+        if (mp[u][i] != mp[v][i])
+            u = mp[u][i], v = mp[v][i];
+    return mp[u][0];
+}
+
+ll dis(int u, int v) {
+    int w = lca(u, v);
+    return dis[u] + dis[v] - 2 * dis[w];
+}
 
 //  Vertex-DC
 vector<int> g[N];
