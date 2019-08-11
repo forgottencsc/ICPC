@@ -3,11 +3,10 @@
 using namespace std;
 
 //  Strong Connected Components
-int n, m;
 vector<int> g[N];
 int dfn[N], low[N], bel[N], dfc, scc;
 bool inst[N]; int scs[N], *sct = scs;
-void scc_clr() { fill(dfn + 1, dfn + n + 1, 0); }
+void scc_clr(int n) { fill(dfn + 1, dfn + n + 1, 0); }
 int dfs_scc(int u) {
     *sct++ = u; inst[u] = 1;
     dfn[u] = low[u] = ++dfc;
@@ -22,11 +21,10 @@ int dfs_scc(int u) {
 }
 
 //  Biconnected Components
-int n, m;
 vector<int> g[N];
 int dfn[N], low[N], bel[N], dfc, bcc;
 int bcs[N], *bct = bcs;
-void bcc_clr() { fill(dfn + 1, dfn + n + 1, 0); }
+void bcc_clr(int n) { fill(dfn + 1, dfn + n + 1, 0); }
 int dfs_bcc(int u, int f) {
     *bct++ = u; dfn[u] = low[u] = ++dfc;
     for (int v : g[u]) {
@@ -40,6 +38,26 @@ int dfs_bcc(int u, int f) {
     return low[u];
 }
 
+//  Cut vertex; Usage: if (!dfn[i]) dfs_cvb(i, i);
+vector<int> g[N];
+int dfn[N], low[N], dfc; bool cv[N];
+void cvb_clr(int n) { fill(dfn + 1, dfn + n + 1, 0); }
+int dfs_cvb(int u, int r) {
+    dfn[u] = low[u] = ++dfc;
+    int cnt = 0;
+    for (int v : g[u]) {
+        if (!dfn[v]) {
+            low[u] = min(low[u], dfs_cvb(v, r));
+            if (low[v] == dfn[u] && u != r) cv[u] = 1;
+            if (u == r) ++cnt;
+        }
+        else low[u] = min(low[u], dfn[v]);
+    }
+    if (u == r && cnt >= 2) cv[u] = 1;
+    return low[u];
+}
+
+//  Eulerian path in directed graph
 int n, m;
 vector<int> g[N];
 int deg[N]; // deg[i] == out deg - in deg of vertex i
@@ -67,6 +85,7 @@ vector<int> eulerian_path() {
     return res;
 }
 
+//  Eulerian path in undirect graph
 struct edge { int v, p; };
 vector<edge> g[N];
 

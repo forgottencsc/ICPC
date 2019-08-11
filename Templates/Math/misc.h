@@ -111,7 +111,7 @@ void quadr(dbl a0, dbl a1, dbl a2, dbl a3, dbl a4,
 }
 
 //  Solve polynomial equations
-const dbl eps = 1e-10;
+const dbl eps = 1e-8;
 int dc(dbl d) { return d < -eps ? -1 : d > eps ? 1 : 0; }
 
 dbl val(const vector<dbl>& p, dbl x) {
@@ -161,6 +161,34 @@ template<class F> dbl sps1(const F& f, dbl l, dbl r, dbl eps, dbl s) {
 
 template<class F> dbl spsint(const F& f, dbl l, dbl r, dbl eps) {
 	return sps1(f, l, r, eps, sps0(f, l, r));
+}
+
+vector<ll> BM(const vector<ll>& x) {
+    vector<ll> ls, cur;
+    int pn = 0, lf, ld;
+    for(int i = 0;i != x.size(); ++i) {
+        ll t = M(-x[i]);
+        for(int j = 0; j != cur.size(); ++j)
+            t = M(t + x[i - j - 1] * cur[j]);
+        if(!t) continue;
+        if(cur.empty()) {
+            cur.resize(i + 1);
+            lf = i; ld = t;
+            continue;
+        }
+        ll k = M(M(-t) * inv(ld));
+        vector<ll> c(i - lf - 1); c.push_back(M(-k));
+        for(int j = 0; j != ls.size(); ++j)
+            c.push_back(M(ls[j] * k));
+        if(c.size() < cur.size())
+            c.resize(cur.size());
+        for(int j = 0;j != cur.size(); ++j)
+            c[j]=M(c[j]+cur[j]);
+        if(i-lf+ls.size()>=cur.size())
+            ls = cur,lf = i, ld = t;
+        cur = move(c);
+    }
+    return cur;
 }
 
 //	FFT/NTT/FWT

@@ -79,7 +79,14 @@ bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	else { b1 += b * m1; m1 *= p; return true; }
 }
 
-//  a^b(mod p) = a^(b%phi(p)+phi(p))
+typedef unsigned long long ull;
+typedef long double ld;
+ull mul(ull a, ull b, ull p) {
+	ll res = a * b - p * (ull)((ld)a * (ld)b / (ld)M);
+	return res + p * (res < 0) - p * (ret >= (ll)p);
+}
+
+//  a^b(mod p) = a^(b%phi(p)+(b>=phi(p)?phi(p):0))
 ll qpm(ll a, ll b, ll p) {
 	ll r = 1;
 	do if (b & 1) r = r * a % p;
@@ -128,10 +135,11 @@ ll lucas(ll n, ll k, ll p) {
 	return ans;
 }
 
-//	Solve x from a^x=b(mod p)
+//	Solve a^x=b(mod p), O(sqrt(p))
+//  Usage: bsgs.init(a, p); bsgs.solve(b);
 struct bsgs_t {
-    const size_t S = 1 << 19;
-    const size_t msk = S - 1;
+    const int S = 1 << 19;
+    const int msk = S - 1;
     ll a, p, m, w;
     int c, h[S], g[S], k[S], v[S];
 
@@ -147,9 +155,9 @@ struct bsgs_t {
     }
 
     void init(ll a_, ll p_) {
-        c = 0; a = a_; p = p_; m = ceil(sqrt(p));
+        c = 0; a = a_; p = p_; w = 1;
+        m = ceil(sqrt(p));
         memset(h, 0xff, sizeof(h));
-        w = 1;
         for (int i = 0; i != m; ++i) {
             if (fin(w) == -1) ins(w, i);
             w = w * a % p;
@@ -167,9 +175,9 @@ struct bsgs_t {
     }
 } bsgs;
 
-//  Pohlig-Hellman algorithm, O(\sum{sqrt(p_i)c_i})
-//  Calculate log_g(a).
-ll mlog(ll a, ll g, ll p) {
+//  Pohlig-Hellman algorithm
+//  Solve g^x=a, O(sqrt(p)c)
+ll mlog(ll g, ll a, ll p) {
     vector<pf> pfs = pfd(p - 1);
     ll x = 0, b = 1;
     for (pf f : pfs) {
@@ -186,17 +194,18 @@ ll mlog(ll a, ll g, ll p) {
     return x;
 }
 
+//  Solve a^x=b(mod p)
 ll mlog2(ll a, ll b, ll p) {
     ll g = primitive_root(p);
-    ll u = mlog(a, g, p), v = mlog(b, g, p), m = p - 1;
+    ll u = mlog(g, a, p), v = mlog(g, b, p), m = p - 1;
     if (!lce(u, v, m))
         return -1;
     else
         return v;
 }
 
-
-//  Find a primitive root of p. O(p^(1/4))
+//  Find a primitive root of modulo p. O(p^(1/4))
+//  Use Pollard's rho algorithm when p is huge.
 ll primitive_root(ll p) {
     vector<ll> ds; ll n = p - 1;
     for (ll d = 2; d * d <= n; ++d) {
