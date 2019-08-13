@@ -123,7 +123,7 @@ struct PrimalDual {
 //  Hopcroft-Karp Algorithm
 vector<int> g[N]; int n1, n2;
 int lnk[N], dis[N], dm; bool vis[N];
-void init(int n, int m) {
+void clr_hk(int n, int m) {
     n1 = n; n2 = m;
     for (int i = 1; i <= n1 + n2; ++i)
         g[i].clear();
