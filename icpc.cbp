@@ -256,7 +256,7 @@
 		</Unit>
 		<Unit filename="Templates/DataStructures/basic_data_structures.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
-		<Unit filename="Templates/GraphTheory/basics.h" />
+		<Unit filename="Templates/GraphTheory/basic_graph_algorithms.h" />
 		<Unit filename="Templates/GraphTheory/flows_matchings.h" />
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
 		<Unit filename="Templates/Math/Geometry/basic_geometry.h" />
@@ -268,7 +268,7 @@
 		<Unit filename="Templates/Math/misc.h" />
 		<Unit filename="Templates/Math/polynomial.h" />
 		<Unit filename="Templates/Math/precision.h" />
-		<Unit filename="Templates/String/kmp.h" />
+		<Unit filename="Templates/String/basic_string_algorithms.h" />
 		<Unit filename="Templates/String/string_automata_arr.h" />
 		<Unit filename="Templates/String/string_automata_ptr.h" />
 		<Unit filename="Templates/String/suffix_array.h" />
