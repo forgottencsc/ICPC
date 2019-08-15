@@ -8,6 +8,7 @@ void solve_bf(istream& cin, ostream& cout) {
         int n, q;
         string s;
         cin >> n >> q >> s;
+        if (n > 500) break;
         map<string, vector<int>> m;
         for (int i = 0; i != n; ++i)
             for (int j = i + 1; j <= n; ++j)

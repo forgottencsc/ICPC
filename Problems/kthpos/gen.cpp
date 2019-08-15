@@ -2,8 +2,11 @@
 
 struct query { int l, r, k; };
 
-void gen(ostream& cout, const string& s, const vector<query>& q) {
+void gen(ostream& cout, string s, const vector<query>& q) {
     cout << s.size() << ' ' << q.size() << endl;
+    int n = s.size() / 200;
+    for (int i = 0; i != n; ++i)
+        s[s.size() - (n - i)] = igr('a', 'z');
     cout << s << endl;
     for (const query& w : q) {
         cout << w.l << ' ' << w.r << ' ' << w.k << endl;
@@ -33,7 +36,7 @@ void gen2(ostream& os, int n, int q) {
     vector<query> qs;
     uniform_int_distribution<int> ul(1, n);
     while(q--) {
-        int len = max((n / ul(mt)), 2);
+        int len = max((n / cbrt(ul(mt))), 2.);
         uniform_int_distribution<int> up(1, n - len + 1);
         int pos = up(mt);
         len = min(len, n - pos + 1);
@@ -81,12 +84,14 @@ void solve(istream& cin, ostream& cout);
 int main(void) {
     ofstream o("1.in");
 
-    o << 10 << endl;
-    gen(o, "aaabaa", {
-        { 4, 4, 3 },
+    o << 16 << endl;
+    gen(o, "aaabaabaaaab", {
+        { 3, 3, 4 },
         { 2, 3, 2 },
+        { 7, 8, 3 },
         { 3, 4, 2 },
-        { 1, 4, 1 }
+        { 1, 4, 2 },
+        { 8, 12, 1 }
     });
     gen(o, "a", {
         { 1, 1, 1 }
@@ -103,24 +108,33 @@ int main(void) {
     gen1(o, m, m);
     gen2(o, m, m);
     gen3(o, m, m);
+    gen3(o, m, m);
+    gen3(o, m, m);
+    gen3(o, m, m);
+    gen3(o, m, m);
+    gen3(o, m, m);
+    gen3(o, m, m);
     m = 100000;
     gen1(o, m, m);
-    gen2(o, m, m);
     gen3(o, m, m);
     gen4(o, m, m);
+    gen2(o, m, m);
     o.close();
-    string fo = "1.out", fc = "1.chk";
-//    {
-//        ifstream in("1.in");
-//        ofstream out(fc);
-//        solve_bf(in, out);
-//    }
+
+    string fo = "1.out";
     {
         ifstream in("1.in");
         ofstream out(fo);
         solve(in, out);
     }
-    //system("fc 1.out 1.chk");
+
+//    string fc = "1.chk";
+//    {
+//        ifstream in("1.in");
+//        ofstream out(fc);
+//        solve_bf(in, out);
+//    }
+//    system("fc 1.out 1.chk");
 //    m = 100000;
 //    gen1(o, m, m);
 //    gen2(o, m, m);
