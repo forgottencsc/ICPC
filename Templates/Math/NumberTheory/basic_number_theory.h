@@ -66,24 +66,20 @@ ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
 //  Solve linear congurence equation
 bool lce(ll& a, ll& b, ll& p) {
 	ll x, k, d = exgcd(a, p, x, k);
-	if (b % d == 0) a = 1, b = mod(x * b / d, p /= d);
+	if (b % d == 0) {
+        a = 1; p /= d;
+        b = ((x * b / d) % p + p) % p;
+	}
 	return a == 1;
 }
 
-ll inv(ll x, ll p) { ll b; lce(x %= p, b, p); return b; }
+ll inv(ll x, ll m) { ll b = 1; lce(x %= m, b, m); return b; }
 
 //  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
 bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	ll a = m1, b = b2 - b1, p = m2;
 	if (!lce(a, b, p)) return false;
 	else { b1 += b * m1; m1 *= p; return true; }
-}
-
-typedef unsigned long long ull;
-typedef long double ld;
-ull mul(ull a, ull b, ull p) {
-	ll res = a * b - p * (ull)((ld)a * (ld)b / (ld)M);
-	return res + p * (res < 0) - p * (ret >= (ll)p);
 }
 
 //  a^b(mod p) = a^(b%phi(p)+(b>=phi(p)?phi(p):0))
@@ -94,36 +90,9 @@ ll qpm(ll a, ll b, ll p) {
 	return r % p;
 }
 
-// Tonelli-Shanks algorithm. O(log^2(p)) 1s~5e3
-ll msqrt(ll n, ll p) {
-    ll q = p - 1, s = 0, z = 2;
-    //while (~q & 1) q >>= 1, s++;
-    q >>= (s = __builtin_ctzll(q));
-    if (s == 1) return qpm(n, (p + 1) / 4, p);
-    while(qpm(z, (p - 1) / 2, p) == 1) ++z;
-    ll c = qpm(z, q, p), t = qpm(n, q, p),
-       r = qpm(n, (q + 1) / 2, p), m = s;
-    while(t % p != 1) {
-        ll i = 1; while(qpm(t, 1ll << i, p) != 1) ++i;
-        ll b = qpm(c, 1ll << (m - i - 1), p);
-        r = r * b % p; c = (b * b) % p;
-        t = (t * c) % p; m = i;
-    }
-    return min(r, p - r); //    r^2=(p-r)^2=n
-}
-
-//  Solve quadratic congurence equation
-bool qce(ll a, ll b, ll c, ll p, ll& x1, ll& x2) {
-    if (qpm(mod(b*b-4*a*c, p), (p-1)/2, p) != 1) return false;
-    ll r1 = msqrt(mod(b*b-4*a*c, p), p), r2 = p - r1;
-    ll a1 = 2 * a % p, a2 = 2 * a % p;
-    x1 = (r1 + p - b) % p; x2 = (r2 + p - b) % p;
-    lce(a1, x1, p); lce(a2, x2, p);
-    return true;
-}
-
 //	Basic Lucas Theorem
-ll lucas(ll n, ll k, ll p) {
+//  assert(isprime(p))
+ll mbinom(ll n, ll k, ll p) {
 	static ll f[N];
 	for (int i = f[0] = 1; i != p; ++i) f[i] = f[i - 1] * i % p;
 	ll ans = 1;
@@ -134,6 +103,36 @@ ll lucas(ll n, ll k, ll p) {
 	} while (n);
 	return ans;
 }
+
+//  Extend Lucas Theorem
+ll mfac(ll n, ll p, ll q) {
+    if (!n) return 1;
+    static map<ll, vector<ll>> m;
+    vector<ll>& v = m[p]; if (v.empty()) v.push_back(1);
+    for (int i = v.size(); i <= q; ++i)
+        v.push_back(v.back() * (i % p ? i : 1) % q);
+    return qpm(v[q], n / q, q) * v[n % q] % q * mfac(n / p, p, q) % q;
+}
+
+ll mbinom(ll n, ll k, ll p, ll q) {
+    ll c = 0;
+    for (ll i = n; i; i /= p) c += i / p;
+    for (ll i = k; i; i /= p) c -= i / p;
+    for (ll i = n - k; i; i /= p) c -= i / p;
+    return mfac(n, p, q) * inv(mfac(k, p, q), q) % q
+    * inv(mfac(n - k, p, q), q) % q * qpm(p, c, q) % q;
+}
+
+ll mbinom(ll n, ll k, ll m) {
+    ll b = 0, w = 1; vector<pf> ps = pfd(m);
+    for (pf pp : ps) {
+        ll p = pp.p, q = 1;
+        while(pp.c--) q *= pp.p;
+        crt(b, w, mbinom(n, k, p, q), q);
+    }
+    return b;
+}
+
 
 //	Solve a^x=b(mod p), O(sqrt(p))
 //  Usage: bsgs.init(a, p); bsgs.solve(b);
@@ -175,33 +174,33 @@ struct bsgs_t {
     }
 } bsgs;
 
-//  Pohlig-Hellman algorithm
-//  Solve g^x=a, O(sqrt(p)c)
-ll mlog(ll g, ll a, ll p) {
-    vector<pf> pfs = pfd(p - 1);
-    ll x = 0, b = 1;
-    for (pf f : pfs) {
-        ll q = qpm(f.p, f.c, p), w = 1, t = a, r = 0;
-        ll h = qpm(g, (p - 1) / f.p, p);
-        bsgs.init(h, p, f.p);
-        for (int i = 0; i != f.c; ++i) {
-            ll z = bsgs.solve(qpm(t, (p - 1) / (w * f.p), p));
-            t = mul(t, qpm(qpm(g, w * z, p), p - 2, p), p);
-            r += w * z; w *= f.p;
-        }
-        crt(x, b, r, q);
+// Tonelli-Shanks algorithm. O(log^2(p)) 1s~5e3
+ll msqrt(ll n, ll p) {
+    if (!n) return 0;
+    ll q = p - 1, s = 0, z = 2;
+    //while (~q & 1) q >>= 1, s++;
+    q >>= (s = __builtin_ctzll(q));
+    if (s == 1) return qpm(n, (p + 1) / 4, p);
+    while(qpm(z, (p - 1) / 2, p) == 1) ++z;
+    ll c = qpm(z, q, p), t = qpm(n, q, p),
+       r = qpm(n, (q + 1) / 2, p), m = s;
+    while(t % p != 1) {
+        ll i = 1; while(qpm(t, 1ll << i, p) != 1) ++i;
+        ll b = qpm(c, 1ll << (m - i - 1), p);
+        r = r * b % p; c = (b * b) % p;
+        t = (t * c) % p; m = i;
     }
-    return x;
+    return min(r, p - r); //    r^2=(p-r)^2=n
 }
 
-//  Solve a^x=b(mod p)
-ll mlog2(ll a, ll b, ll p) {
-    ll g = primitive_root(p);
-    ll u = mlog(g, a, p), v = mlog(g, b, p), m = p - 1;
-    if (!lce(u, v, m))
-        return -1;
-    else
-        return v;
+//  Solve quadratic congurence equation
+//  assert(a && isprime(p) && p > 2);
+bool qce(ll a, ll b, ll c, ll p, ll& x1, ll& x2) {
+    ll d = ((b * b - 4 * a * c) % p + p) % p;
+    if (qpm(d, (p - 1) / 2, p) == p - 1) return false;
+    d = msqrt(d, p); a = inv(2 * a % p, p);
+    x1 = (p - b + d) * a % p; x2 = (2 * p - b - d) * a % p;
+    return true;
 }
 
 //  Find a primitive root of modulo p. O(p^(1/4))
@@ -222,4 +221,33 @@ ll primitive_root(ll p) {
                 fail = 1;
         if (!fail) return g; else g++;
     }
+}
+
+//  Pohlig-Hellman algorithm
+//  Solve g^x=a, O(sqrt(p)c)
+ll mlog0(ll g, ll a, ll p) {
+    vector<pf> pfs = pfd(p - 1);
+    ll x = 0, b = 1;
+    for (pf f : pfs) {
+        ll q = qpm(f.p, f.c, p), w = 1, t = a, r = 0;
+        ll h = qpm(g, (p - 1) / f.p, p);
+        bsgs.init(h, p, f.p);
+        for (int i = 0; i != f.c; ++i) {
+            ll z = bsgs.solve(qpm(t, (p - 1) / (w * f.p), p));
+            t = mul(t, qpm(qpm(g, w * z, p), p - 2, p), p);
+            r += w * z; w *= f.p;
+        }
+        crt(x, b, r, q);
+    }
+    return x;
+}
+
+//  Solve a^x=b(mod p)
+ll mlog(ll a, ll b, ll p) {
+    ll g = primitive_root(p);
+    ll u = mlog0(g, a, p), v = mlog0(g, b, p), m = p - 1;
+    if (!lce(u, v, m))
+        return -1;
+    else
+        return v;
 }

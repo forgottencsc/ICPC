@@ -151,8 +151,8 @@ int vdc(int u, int s) {
 
 //  Edge-DC
 struct edge { int v, w; };
-vector<edge> g0[N]; int n0;
-vector<int> g[N]; int n; bool flg[N];
+vector<edge> g0[N];
+vector<int> g[N]; int nc; bool flg[N];
 int eu[N], ev[N], ex[N], ew[N], ec; bool ef[N];
 bool vis[N]; int dep[N], msz[N], sz[N];
 
@@ -172,7 +172,7 @@ void dfs_rec(int u, int f) {
         int v = e.v; if (v == f) continue;
         adde(p, v, e.w, 0); dfs_rec(v, u);
         if (c + 2 + !!f >= g0[u].size()) continue;
-        int q = ++n; ++c; flg[q] = 1;
+        int q = ++nc; ++c; flg[q] = 1;
         adde(p, q, 0, 1); p = q;
     }
 }
@@ -197,17 +197,6 @@ void dfs_cnt(int u, int f, int d, int* c) {
             dfs_cnt(ex[i] ^ u, u, (d + ew[i]) % 3, c);
 }
 
-typedef long long ll;
-ll cal(int i) {
-    int c1[3] = { 0 }, c2[3] = { 0 };
-    dfs_cnt(eu[i], ev[i], 0, c1);
-    dfs_cnt(ev[i], eu[i], 0, c2);
-    ll res = 0;
-    for (int d = 0; d != 3; ++d)
-        res += 1ll * c1[d] * c2[(3 - (ew[i] + d) % 3) % 3];
-    return res;
-}
-
 ll edc(int i, int f, int s) {
     i = dfs_sz(i, f, s);
     if (vis[i]) return 0; else vis[i] = 1;
@@ -217,9 +206,9 @@ ll edc(int i, int f, int s) {
     return res;
 }
 
-ll edc() {
-    ec = 0; dfs_rec(1, 0);
+ll edc(int n) {
+    ec = 0; nc = n; dfs_rec(1, 0);
     int i = adde(0, 1, 0, 1);
     vis[i] = 1;
-    return edc(i, 0, n);
+    return edc(i, 0, nc);
 }

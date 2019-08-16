@@ -5,6 +5,13 @@ using namespace std;
 typedef long long ll;
 typedef __int128 lll;
 
+typedef unsigned long long ull;
+typedef long double ld;
+ull mul(ull a, ull b, ull p) {
+	ll res = a * b - p * (ull)((ld)a * (ld)b / (ld)M);
+	return res + p * (res < 0) - p * (ret >= (ll)p);
+}
+
 ll mul(ll a, ll b, ll p) { return (lll)a * b % p; }
 
 ll qpm(ll a, ll b, ll p) {
