@@ -1,23 +1,22 @@
 #include <bits/stdc++.h>
 #define N (1<<18)
-typedef __int128 ll;
+typedef long long ll;
 
 using namespace std;
 
-ostream& operator<<(ostream& os, ll l) {
-    string s; bool flg = 0;
-    if (l < 0) flg = 1, l = -l;
-    while (l) { s += (char)(l % 10 + '0'); l /= 10; }
-    if (s.empty()) s = '0';
-    reverse(s.begin(), s.end());
-    if (flg) s = '-' + s;
-    return os << s;
-}
+//ostream& operator<<(ostream& os, ll l) {
+//    string s; bool flg = 0;
+//    if (l < 0) flg = 1, l = -l;
+//    while (l) { s += (char)(l % 10 + '0'); l /= 10; }
+//    if (s.empty()) s = '0';
+//    reverse(s.begin(), s.end());
+//    if (flg) s = '-' + s;
+//    return os << s;
+//}
 
-typedef double dbl;
 bool pell_root(ll d, ll& x, ll& y) {
     static ll a[20000];
-    dbl s = sqrt((double)d); ll m = s;
+    double s = sqrt(d); ll m = s;
     if (m * m == d) return false;
     ll l = 0, b = m, c = 1; a[l++] = m;
     do {
@@ -38,8 +37,11 @@ int main() {
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
     cout << boolalpha;
-    ll x, y, d = 114514;
-    cout << pell_root(d, x, y) << endl;
-    cout << x << ' ' << y << ' ' << x * x - d * y * y << endl;
+    ll x, y;
+    for (int d = 355; d != 600; ++d) {
+
+        if (pell_root(d, x, y))
+            cout << x << ' ' << y << ' ' << x * x - d * y * y << endl;
+    }
     return 0;
 }

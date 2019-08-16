@@ -251,3 +251,21 @@ ll mlog(ll a, ll b, ll p) {
     else
         return v;
 }
+
+bool pell_root(ll d, ll& x, ll& y) {
+    static ll a[20000];
+    double s = sqrt(d); ll m = s;
+    if (m * m == d) return false;
+    ll l = 0, b = m, c = 1; a[l++] = m;
+    do {
+        c = (d - b * b) / c;
+        a[l++] = floor((s + b) / c);
+        b = a[l - 1] * c - b;
+    } while (a[l - 1] != 2 * a[0]);
+    ll p = 1, q = 0;
+    for (int i = l - 2; i >= 0; --i)
+        swap(p, q), p += q * a[i];
+    if (l % 2) x = p, y = q;
+    else x = 2 * p * p + 1, y = 2 * p * q;
+    return true;
+}
