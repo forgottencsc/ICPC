@@ -252,7 +252,9 @@ ll mlog(ll a, ll b, ll p) {
         return v;
 }
 
-bool pell_root(ll d, ll& x, ll& y) {
+//  Find smallest (x0, y0) satisfies x^2-dy^2=1
+//  x'=x*x0+d*y*y0; y'=x*y0+y*x0
+bool pell_roots(ll d, ll& x, ll& y) {
     static ll a[20000];
     double s = sqrt(d); ll m = s;
     if (m * m == d) return false;
