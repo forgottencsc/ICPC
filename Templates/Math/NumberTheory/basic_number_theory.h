@@ -31,17 +31,16 @@ void sieve() {
 	}
 }
 
-struct pf { ll p, c; };
-vector<pf> pfd(ll n) {
-	vector<pf> res;
+vector<pair<ll, ll>> pfd(ll n) {
+	vector<pair<ll, ll>> res;
 	for (ll p : ps) {
 		if (p * p > n) break;
 		if (n % p) continue;
-		res.push_back({ p, 0 });
-		do res.back().c++;
+		res.emplace_back(p, 0);
+		do res.back().second++;
 		while ((n /= p) % p == 0);
 	}
-	if (n != 1) res.push_back({ n, 1 });
+	if (n != 1) res.emplace_back(n, 1);
 	return res;
 }
 
@@ -73,8 +72,6 @@ bool lce(ll& a, ll& b, ll& p) {
 	return a == 1;
 }
 
-ll inv(ll x, ll m) { ll b = 1; lce(x %= m, b, m); return b; }
-
 //  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
 bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	ll a = m1, b = b2 - b1, p = m2;
@@ -82,26 +79,14 @@ bool crt(ll& b1, ll& m1, ll b2, ll m2) {
 	else { b1 += b * m1; m1 *= p; return true; }
 }
 
+ll inv(ll x, ll m) { ll b = 1; lce(x %= m, b, m); return b; }
+
 //  a^b(mod p) = a^(b%phi(p)+(b>=phi(p)?phi(p):0))
 ll qpm(ll a, ll b, ll p) {
 	ll r = 1;
 	do if (b & 1) r = r * a % p;
     while (a = a * a % p, b >>= 1);
 	return r % p;
-}
-
-//	Basic Lucas Theorem
-//  assert(isprime(p))
-ll mbinom(ll n, ll k, ll p) {
-	static ll f[N];
-	for (int i = f[0] = 1; i != p; ++i) f[i] = f[i - 1] * i % p;
-	ll ans = 1;
-	do {
-		if (n % p < k % p) return 0;
-		ans = ans * (f[n % p] * inv(f[k % p] * f[(n - k) % p], p) % p) % p;
-		n /= p; k /= p;
-	} while (n);
-	return ans;
 }
 
 //  Extend Lucas Theorem
@@ -124,13 +109,28 @@ ll mbinom(ll n, ll k, ll p, ll q) {
 }
 
 ll mbinom(ll n, ll k, ll m) {
-    ll b = 0, w = 1; vector<pf> ps = pfd(m);
-    for (pf pp : ps) {
-        ll p = pp.p, q = 1;
-        while(pp.c--) q *= pp.p;
+    vector<pair<ll, ll>> ps = { { m, 1 } };
+    ll b = 0, w = 1;
+    for (pair<ll, ll> pp : ps) {
+        ll p = pp.first, q = 1;
+        while(pp.second--) q *= p;
         crt(b, w, mbinom(n, k, p, q), q);
     }
     return b;
+}
+
+//	Basic Lucas Theorem
+//  assert(isprime(p))
+ll mbinom(ll n, ll k, ll p) {
+	static ll f[N];
+	for (int i = f[0] = 1; i != p; ++i) f[i] = f[i - 1] * i % p;
+	ll ans = 1;
+	do {
+		if (n % p < k % p) return 0;
+		ans = ans * (f[n % p] * inv(f[k % p] * f[(n - k) % p], p) % p) % p;
+		n /= p; k /= p;
+	} while (n);
+	return ans;
 }
 
 
