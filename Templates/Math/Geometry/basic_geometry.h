@@ -2,6 +2,7 @@
 using namespace std;
 typedef double dbl;
 const dbl pi = acos(-1), eps = 1e-8;
+int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
 vec operator-(vec v1, vec v2) { return { v1.x - v2.x, v1.y - v2.y }; }
@@ -9,40 +10,87 @@ dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
 dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
 vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
 bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
+dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
 dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
 dbl len(vec v) { return hypot(v.x, v.y); }
-dbl arg(vec v) { return atan2(v.y, v.x); }
-
-vector<vec> convex_hull(vector<vec>& ps) {
-    swap(pv[0], *min_element(pv.begin(), pv.end()));
-    sort(pv.begin() + 1, pv.end(), [&](vec v1, vec v2) {
-        v1 = v1 - pv[0]; v2 = v2 - pv[0];
-        return (v1 ^ v2) == 0 ? v1 * v1 < v2 * v2 : (v1 ^ v2) > 0;
-    });
-    vector<vec> res = { ps[0], ps[1] };
-    for (int i = 2; i != ps.size(); ++i) {
-        while (res.size() >= 2 &&
-               crx(res.end()[-2],res.back(),ps[i]) <= 0)
-                res.pop_back();
-        res.push_back(ps[i]);
-    }
-    return res;
+dbl arg(vec v) { dbl r = atan2(v.y, v.x); return r<0?2*pi+r:r; }
+struct line { vec p, v; };
+vec unif(vec v) { return (1./len(v))*v; }
+vec univ(dbl f) { return { cos(f), sin(f) }; }
+vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
+vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
+vec litsc(line l1, line l2) { return l2.p+((l1.p^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
+dbl lpdis(line l vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
+struct seg { vec p1, p2; };
+dbl spdis(seg s, vec p) {
+    if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
+    if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
+    return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
 }
 
-vector<vec> minkovski_sum(const vector<vec>& v1, const vector<vec>& v2) {
-    const int n1 = v1.size(), n2 = v2.size();
-    if (!n1) return v2; if (!n2) return v1;
-    vector<vec> d1(n1), d2(n2);
-    for (int i = 0; i != n1; ++i) d1[i] = v1[(i + 1) % n1] - v1[i];
-    for (int i = 0; i != n2; ++i) d2[i] = v2[(i + 1) % n2] - v2[i];
-    d2[n2 - 1] = v2[0] - v2[n2 - 1];
-    int p = 0, q = 0; res.push_back(v1[0] + v2[0]);
-    while (p != n1 && q != n2) {
-        if ((d1[p] ^ d2[q]) > 0) res.push_back(res.back() + d1[p++]);
-        else res.push_back(res.back() + d2[q++]);
+int sitsc(seg s1, seg s2) {
+    vec p1 = s1.p1, p2 = s2.p2, q1 = s2.p1, q2 = s2.p2;
+    if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
+    if (max(p1.y,p2.y)<min(q1.y,q2.y)||min(p1.y,p2.y)>max(q1.y,q2.y)) return 0;
+    dbl x=crx(p2,p1,q1),y=crx(p2,p1,q2);
+    dbl z=crx(q2,q1,p1),w=crx(q2,q1,p2);
+    if (sgn(x)==0&&sgn(y)==0) return 3;
+    if (sgn(x)*sgn(y)<0&&sgn(z)*sgn(w)<0) return 1;
+    if (sgn(x)*sgn(y)<=0&&sgn(z)*sgn(w)<=0) return 2;
+    return 0;
+}
+
+int convex_hull(vec* pv, int n, vec* cv) {
+    sort(pv + 1, pv + n + 1);
+    int m = 0;
+    for (int i = 1; i <= n; ++i) {
+        while (m>1 && crx(cv[m-1], cv[m], pv[i]) < -eps) m--;
+        cv[++m] = pv[i];
     }
-    for (; p != n1; ++p) res.push_back(res.back() + d1[p]);
-    for (; q != n2; ++q) res.push_back(res.back() + d2[q]);
-    res.pop_back();
-    return res;
+    int k = m;
+    for (int i = n - 1; i; --i) {
+        while (m>k && crx(cv[m-1], cv[m], pv[i]) < -eps) m--;
+        cv[++m] = pv[i];
+    }
+    return m>1?m-1:m;
+}
+
+bool judge(line l0, line l1, line l2) { return dc((litsc(l1, l2)-l0.p)^l0.v)==1; }
+int halfplane_intersection(line* lv, int n, vec* pv) {
+    static pair<pair<dbl,dbl>, int> a[N];
+    for (int i = 1; i <= n; ++i) {
+        dbl f = arg(lv[i].v);
+        a[i] = { { f, lv[i].p * univ(f-pi/2) }, i };
+    }
+    sort(a + 1, a + n + 1);
+    static int b[N], q[N]; int w = 0, l = 1, r = 0;
+    for (int i = 1; i <= n; ++i)
+        if (i == 1 || dc(a[i].first.first-a[i-1].first.first))
+            b[++w] = a[i].second;
+
+    for (int i = 1; i <= w; ++i) {
+        while (l<r&&judge(lv[b[i]],lv[q[r]],lv[q[r-1]]))--r;
+        while (l<r&&judge(lv[b[i]],lv[q[l]],lv[q[l+1]]))++l;
+        q[++r]=b[i];
+    }
+    while(l<r&&judge(lv[q[l]],lv[q[r]],lv[q[r-1]]))--r;
+    while(l<r&&judge(lv[q[r]],lv[q[l]],lv[q[l+1]]))++l;
+    int m = 0; q[r+1]=q[l];
+    for (int i = l; i <= r; ++i)
+        pv[++m]=litsc(lv[q[i]],lv[q[i+1]]);
+    return m;
+}
+
+int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
+    static vec dv1[N], dv2[N], dv;
+    for (int i = 1; i <= n1; ++i) dv1[i] = cv1[i + 1] - cv1[i];
+    for (int i = 1; i <= n2; ++i) dv2[i] = cv2[i + 1] - cv2[i];
+    int m = 0, p = 1, q = 1; cv[++m] = cv1[1] + cv2[1];
+    while (p<=n1 || q<=n2) {
+        if (p<=n1&&q<=n2) dv=dc(dv1[p]^dv2[q])==-1?dv1[p++]:dv2[q++];
+        else if(p<=n1) dv=dv1[p++]; else dv=dv2[q++];
+        while (m>1&&!dc((cv[m]-cv[m-1])^dv)) --m;
+        cv[m+1]=cv[m]+dv;m++;
+    }
+    return m>1?m-1:m;
 }

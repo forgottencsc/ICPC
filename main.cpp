@@ -1,110 +1,101 @@
 #include <bits/stdc++.h>
+#define N 1001
 using namespace std;
 
 typedef long long ll;
 
-#define W 1000001
-bool ip[W]; vector<ll> ps;
-void sieve() {
-	ps.reserve(W * 1.3 / log(W));
-	memset(ip, 1, sizeof(ip)); ip[1] = 0;
-	for (int i = 2; i != W; ++i) {
-		if (ip[i]) ps.push_back(i);
-		for (int p : ps) {
-			if (i * p >= W) break;
-			ip[i * p] = 0;
-			if (i % p == 0) break;
-		}
-	}
+typedef double dbl;
+const dbl pi = acos(-1), eps = 1e-10;
+int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
+struct vec { dbl x, y; };
+vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
+vec operator-(vec v1, vec v2) { return { v1.x - v2.x, v1.y - v2.y }; }
+dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
+dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
+vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
+bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
+dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
+dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
+dbl len(vec v) { return hypot(v.x, v.y); }
+dbl arg(vec v) { dbl r = atan2(v.y, v.x); return r<0?2*pi+r:r; }
+struct line { vec p, v; };
+vec unif(vec v) { return (1./len(v))*v; }
+vec univ(dbl f) { return { cos(f), sin(f) }; }
+vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
+vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
+vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
+dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
+struct seg { vec p1, p2; };
+dbl spdis(seg s, vec p) {
+    if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
+    if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
+    return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
 }
 
-vector<pair<ll, ll>> pfd(ll n) {
-	vector<pair<ll, ll>> res;
-	for (ll p : ps) {
-		if (p * p > n) break;
-		if (n % p) continue;
-		res.emplace_back(p, 0);
-		do res.back().second++;
-		while ((n /= p) % p == 0);
-	}
-	if (n != 1) res.emplace_back(n, 1);
-	return res;
+int sitsc(seg s1, seg s2) {
+    vec p1 = s1.p1, p2 = s2.p2, q1 = s2.p1, q2 = s2.p2;
+    if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
+    if (max(p1.y,p2.y)<min(q1.y,q2.y)||min(p1.y,p2.y)>max(q1.y,q2.y)) return 0;
+    dbl x=crx(p2,p1,q1),y=crx(p2,p1,q2);
+    dbl z=crx(q2,q1,p1),w=crx(q2,q1,p2);
+    if (dc(x)==0&&dc(y)==0) return 3;
+    if (dc(x)*dc(y)<0&&dc(z)*dc(w)<0) return 1;
+    if (dc(x)*dc(y)<=0&&dc(z)*dc(w)<=0) return 2;
+    return 0;
 }
 
-ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
-
-//	Extended Euclidean Algorithm
-ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
-	if (b) d = exgcd(b, a % b, v, u), v -= (a / b) * u;
-	else d = a, u = 1, v = 0; return d;
-}
-
-//	Try to reduce ax = b(mod p) to x = b'(mod p')
-//  Solve linear congurence equation
-bool lce(ll& a, ll& b, ll& p) {
-	ll x, k, d = exgcd(a, p, x, k);
-	if (b % d == 0) {
-        a = 1; p /= d;
-        b = ((x * b / d) % p + p) % p;
-	}
-	return a == 1;
-}
-
-//  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
-bool crt(ll& b1, ll& m1, ll b2, ll m2) {
-	ll a = m1, b = b2 - b1, p = m2;
-	if (!lce(a, b, p)) return false;
-	else { b1 += b * m1; m1 *= p; return true; }
-}
-
-ll inv(ll x, ll m) { ll b = 1; lce(x %= m, b, m); return b; }
-
-//  a^b(mod p) = a^(b%phi(p)+(b>=phi(p)?phi(p):0))
-ll qpm(ll a, ll b, ll p) {
-	ll r = 1;
-	do if (b & 1) r = r * a % p;
-    while (a = a * a % p, b >>= 1);
-	return r % p;
-}
-
-//  Extend Lucas Theorem
-ll mfac(ll n, ll p, ll q) {
-    if (!n) return 1;
-    static map<ll, vector<ll>> m;
-    vector<ll>& v = m[p]; if (v.empty()) v.push_back(1);
-    for (int i = v.size(); i <= q; ++i)
-        v.push_back(v.back() * (i % p ? i : 1) % q);
-    return qpm(v[q], n / q, q) * v[n % q] % q * mfac(n / p, p, q) % q;
-}
-
-ll mbinom(ll n, ll k, ll p, ll q) {
-    ll c = 0;
-    for (ll i = n; i; i /= p) c += i / p;
-    for (ll i = k; i; i /= p) c -= i / p;
-    for (ll i = n - k; i; i /= p) c -= i / p;
-    return mfac(n, p, q) * inv(mfac(k, p, q), q) % q
-    * inv(mfac(n - k, p, q), q) % q * qpm(p, c, q) % q;
-}
-
-ll mbinom(ll n, ll k, ll m) {
-    vector<pair<ll, ll>> ps = pfd(m);
-    ll b = 0, w = 1;
-    for (pair<ll, ll> pp : ps) {
-        ll p = pp.first, q = 1;
-        while(pp.second--) q *= p;
-        crt(b, w, mbinom(n, k, p, q), q);
+bool judge(line l0, line l1, line l2) { return dc((litsc(l1, l2)-l0.p)^l0.v)==1; }
+int halfplane_intersection(line* lv, int n, vec* pv) {
+    static pair<pair<dbl,dbl>, int> a[N];
+    for (int i = 1; i <= n; ++i) {
+        dbl f = arg(lv[i].v);
+        a[i] = { { f, lv[i].p * univ(f-pi/2) }, i };
     }
-    return b;
+    sort(a + 1, a + n + 1);
+    static int b[N], q[N]; int w = 0, l = 1, r = 0;
+    for (int i = 1; i <= n; ++i)
+        if (i == 1 || dc(a[i].first.first-a[i-1].first.first))
+            b[++w] = a[i].second;
+
+    for (int i = 1; i <= w; ++i) {
+        while (l<r&&judge(lv[b[i]],lv[q[r]],lv[q[r-1]]))--r;
+        while (l<r&&judge(lv[b[i]],lv[q[l]],lv[q[l+1]]))++l;
+        q[++r]=b[i];
+    }
+    while(l<r&&judge(lv[q[l]],lv[q[r]],lv[q[r-1]]))--r;
+    while(l<r&&judge(lv[q[r]],lv[q[l]],lv[q[l+1]]))++l;
+    int m = 0; q[r+1]=q[l];
+    for (int i = l; i <= r; ++i)
+        pv[++m]=litsc(lv[q[i]],lv[q[i+1]]);
+    return m;
 }
+
+dbl area(vec* pv, int n) {
+    dbl sum = pv[n] ^ pv[1];
+    for (int i = 1; i <= n - 1; ++i)
+        sum += (pv[i] ^ pv[i + 1]);
+    return sum / 2;
+}
+
+vec pv[N];
+line lv[N];
 
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    sieve();
-    ll n, k, m; cin >> n >> k >> m;
-    cout << mbinom(n, k, m) << endl;
-
+    int n, r = 0; cin >> n;
+    for (int i = 1; i <= n; ++i) {
+        int s; cin >> s;
+        for (int j = 1; j <= s; ++j)
+            cin >> pv[j].x >> pv[j].y;
+        pv[s + 1] = pv[1];
+        for (int j = 1; j <= s; ++j)
+            lv[++r] = { pv[j], pv[j + 1] - pv[j] };
+    }
+    int m = halfplane_intersection(lv, r, pv);
+    dbl res = area(pv, m);
+    cout << fixed << setprecision(3) << res << endl;
     return 0;
 }
