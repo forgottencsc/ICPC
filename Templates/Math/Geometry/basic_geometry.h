@@ -19,8 +19,8 @@ vec unif(vec v) { return (1./len(v))*v; }
 vec univ(dbl f) { return { cos(f), sin(f) }; }
 vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
 vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
-vec litsc(line l1, line l2) { return l2.p+((l1.p^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
-dbl lpdis(line l vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
+vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
+dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
 dbl area(vec* pv, int n) {
     dbl sum = pv[n] ^ pv[1];
     for (int i = 1; i <= n - 1; ++i)
