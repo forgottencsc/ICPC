@@ -1,5 +1,8 @@
-#include <bits/stdc++.h>
-#define N 1001
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <algorithm>
+#define N 101
 using namespace std;
 
 typedef long long ll;
@@ -33,7 +36,7 @@ dbl spdis(seg s, vec p) {
 }
 
 int sitsc(seg s1, seg s2) {
-    vec p1 = s1.p1, p2 = s2.p2, q1 = s2.p1, q2 = s2.p2;
+    vec p1 = s1.p1, p2 = s1.p2, q1 = s2.p1, q2 = s2.p2;
     if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
     if (max(p1.y,p2.y)<min(q1.y,q2.y)||min(p1.y,p2.y)>max(q1.y,q2.y)) return 0;
     dbl x=crx(p2,p1,q1),y=crx(p2,p1,q2);
@@ -70,32 +73,40 @@ int halfplane_intersection(line* lv, int n, vec* pv) {
     return m;
 }
 
-dbl area(vec* pv, int n) {
-    dbl sum = pv[n] ^ pv[1];
-    for (int i = 1; i <= n - 1; ++i)
-        sum += (pv[i] ^ pv[i + 1]);
-    return sum / 2;
-}
-
 vec pv[N];
-line lv[N];
+bool used[N];
+int id[N], ord[N];
 
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    int n, r = 0; cin >> n;
-    for (int i = 1; i <= n; ++i) {
-        int s; cin >> s;
-        for (int j = 1; j <= s; ++j)
-            cin >> pv[j].x >> pv[j].y;
-        pv[s + 1] = pv[1];
-        for (int j = 1; j <= s; ++j)
-            lv[++r] = { pv[j], pv[j + 1] - pv[j] };
+    int T; cin >> T;
+    while(T--) {
+        int n; cin >> n;
+        for (int i = 1; i <= n; ++i)
+            cin >> id[i] >> pv[i].x >> pv[i].y;
+        fill(used + 1, used + n + 1, 0);
+        fill(ord + 1, ord + n + 1, 0);
+        for (int i = 1; i <= n; ++i)
+            if (!ord[1] || pv[i].y < pv[ord[1]].y)
+                ord[1] = i;
+        used[ord[1]] = 1;
+        for (int i = 1; i <= n - 1; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (used[j]) continue;
+                if (!ord[i + 1] || dc(crx(pv[ord[i]], pv[j], pv[ord[i + 1]])) == 1
+                                || (dc(crx(pv[ord[i]], pv[j], pv[ord[i + 1]])) == 0
+                                    && len(pv[ord[i]]-pv[j]) < len(pv[ord[i]]-pv[ord[i+1]])))
+                {
+                    ord[i + 1] = j;
+                }
+            }
+            used[ord[i + 1]] = 1;
+        }
+        cout << n; for (int i = 1; i <= n; ++i) cout << ' ' << id[ord[i]];
+        cout << endl;
     }
-    int m = halfplane_intersection(lv, r, pv);
-    dbl res = area(pv, m);
-    cout << fixed << setprecision(3) << res << endl;
     return 0;
 }
