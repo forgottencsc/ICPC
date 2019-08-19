@@ -32,12 +32,12 @@ int convex_hull(vec* pv, int n, vec* cv) {
     sort(pv + 1, pv + n + 1);
     int m = 0;
     for (int i = 1; i <= n; ++i) {
-        while (m>1 && crx(cv[m-1], cv[m], pv[i]) < -eps) m--;
+        while (m>1 && dc(crx(cv[m-1], cv[m], pv[i]))==-1) m--;
         cv[++m] = pv[i];
     }
     int k = m;
     for (int i = n - 1; i; --i) {
-        while (m>k && crx(cv[m-1], cv[m], pv[i]) < -eps) m--;
+        while (m>k && dc(crx(cv[m-1], cv[m], pv[i]))==-1) m--;
         cv[++m] = pv[i];
     }
     return m>1?m-1:m;
