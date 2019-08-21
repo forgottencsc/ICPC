@@ -54,6 +54,9 @@ vector<ll> ifd(ll n) {
 }
 
 ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
+ll sgn(ll x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
+ll ceil(ll b, ll a) { return b/a+(b%a!=0&&sgn(a)*sgn(b)>0); }
+ll floor(ll b, ll a) { return b/a-(b%a!=0&&sgn(a)*sgn(b)<0); }
 
 //	Extended Euclidean Algorithm
 ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;

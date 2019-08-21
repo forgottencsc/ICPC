@@ -60,6 +60,7 @@ int halfplane_intersection(line* lv, int n, vec* pv) {
     }
     while(l<r&&judge(lv[q[l]],lv[q[r]],lv[q[r-1]]))--r;
     while(l<r&&judge(lv[q[r]],lv[q[l]],lv[q[l+1]]))++l;
+    if (r <= l + 1) return 0;
     int m = 0; q[r+1]=q[l];
     for (int i = l; i <= r; ++i)
         pv[++m]=litsc(lv[q[i]],lv[q[i+1]]);
@@ -81,14 +82,7 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
 }
 
 struct seg { vec p1, p2; };
-dbl spdis(seg s, vec p) {
-    if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
-    if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
-    return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
-}
-
 //  0为不相交，1为严格相交，2表示交点为某线段端点，3为线段平行且部分重合
-
 int sitsc(seg s1, seg s2) {
     vec p1 = s1.p1, p2 = s1.p2, q1 = s2.p1, q2 = s2.p2;
     if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
@@ -98,4 +92,10 @@ int sitsc(seg s1, seg s2) {
     if (dc(x)*dc(y)<0&&dc(z)*dc(w)<0) return 1;
     if (dc(x)*dc(y)<=0&&dc(z)*dc(w)<=0) return 2;
     return 0;
+}
+
+dbl spdis(seg s, vec p) {
+    if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
+    if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
+    return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
 }
