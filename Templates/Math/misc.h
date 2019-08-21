@@ -50,7 +50,21 @@ ll lintp(const vector<ll>& y, ll x) {
     return res;
 }
 
-//  Cantor expansion
+//  Cantor expansion when S is huge, 1 based
+ll cexp(int* a, int n) {
+    static int b[N] = {0};
+    fill(b+1,b+n+1,0);
+	ll res = 0;
+	for (int i = n; i >= 1; --i) {
+        ll cnt = 0;
+        for (int j=a[i]; j; j-=j&-j) cnt += b[j];
+        res = M(res + cnt * f[n-i]);
+        for (int j=a[i]; j<=n; j+=j&-j) b[j]++;
+	}
+	return res + 1;
+}
+
+//  Cantor expansion when S is small, 0 based
 ll cexp(array<int, S> a) {
 	int res = 0;
 	for (int i = 0; i != S - 1; ++i)
