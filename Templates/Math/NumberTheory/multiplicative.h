@@ -170,21 +170,16 @@ ll get_f(ll p, ll e, ll q) {
     return 114514;
 }
 
-ll get_s(ll n, ll i) {
+ll get_s(ll n, ll i = 0) {
+    if (!i) init(n);
     if (ps[i] >= n) return 0;
     ll k = id(n), s[3];
     for (int j = 0; j != 3; ++j) s[j] = M(g[j][k] - sp[j][i]);
     ll sum = M(s[2] - s[1] + s[0]);    //  f(p) = p^2-p+1
-    for (int j = i + 1; j <= r && ps[j] * ps[j] <= n; ++j) {
-        ll p = ps[j], q = p;
-        for (int e = 1; q <= n; q *= p, ++e)
-            sum = M(sum + M(get_f(p, e, q) * (get_s(n / q, j) + (e != 1))));
-    }
-    return sum;
-}
-
-ll solve(ll n) {
-    return M(get_s(n, 0) + 1);
+    for (int j = i + 1; j <= r && ps[j] * ps[j] <= n; ++j)
+        for (ll q = ps[j], e = 1; q <= n; q *= ps[j], ++e)
+            sum = M(sum + M(get_f(ps[j], e, q) * (get_s(n / q, j) + (e != 1))));
+    return sum + (i == 0);
 }
 
 }
