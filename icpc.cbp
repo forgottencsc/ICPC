@@ -265,6 +265,7 @@
 		<Unit filename="Templates/Math/NumberTheory/multiplicative.h" />
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
 		<Unit filename="Templates/Math/bitwise.h" />
+		<Unit filename="Templates/Math/counting.h" />
 		<Unit filename="Templates/Math/matrix.h" />
 		<Unit filename="Templates/Math/misc.h" />
 		<Unit filename="Templates/Math/polynomial.h" />
