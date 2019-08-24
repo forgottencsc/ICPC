@@ -171,7 +171,6 @@ ll get_f(ll p, ll e, ll q) {
 }
 
 ll get_s(ll n, ll i = 0) {
-    if (!i) init(n);
     if (ps[i] >= n) return 0;
     ll k = id(n), s[3];
     for (int j = 0; j != 3; ++j) s[j] = M(g[j][k] - sp[j][i]);

@@ -21,11 +21,22 @@ vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y };
 vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
 vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
 dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
+
 dbl area(vec* pv, int n) {
     dbl sum = pv[n] ^ pv[1];
     for (int i = 1; i <= n - 1; ++i)
         sum += (pv[i] ^ pv[i + 1]);
     return sum / 2;
+}
+
+vec gravity(vec* pv, int n) {
+    vec g = { 0, 0 }; dbl sum = 0;
+    for (int i = 3; i <= n; ++i) {
+        dbl s = crx(pv[1], pv[i - 1], pv[i]);
+        sum += s;
+        g = g + s * (pv[1] + pv[i - 1] + pv[i]);
+    }
+    return (1 / (sum * 3)) * g;
 }
 
 int convex_hull(vec* pv, int n, vec* cv) {
@@ -82,6 +93,11 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
 }
 
 struct seg { vec p1, p2; };
+
+bool onseg(seg s, vec p) {
+    return !dc(crx(p, s.p1, s.p2))
+         && dc(dot(p, s.p1, s.p2)) == -1;
+}
 //  0为不相交，1为严格相交，2表示交点为某线段端点，3为线段平行且部分重合
 int sitsc(seg s1, seg s2) {
     vec p1 = s1.p1, p2 = s1.p2, q1 = s2.p1, q2 = s2.p2;
@@ -98,4 +114,16 @@ dbl spdis(seg s, vec p) {
     if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
     if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
     return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
+}
+
+int pip(vec* pv, int n, vec p) {
+    int w = 0; pv[n + 1] = pv[1];
+    for (int i = 1; i <= n; ++i) {
+        if (onseg({ pv[i], pv[i + 1] }, p)) return -1;
+        int k = dc(crx(pv[i], pv[i + 1], p));
+        int d1 = dc(pv[i].y - p.y), d2 = dc(pv[i + 1].y - p.y);
+        if (k > 0 && d1 <= 0 && d2 > 0) w++;
+        if (k < 0 && d2 <= 0 && d1 > 0) w--;
+    }
+    return w != 0;
 }
