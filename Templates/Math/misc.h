@@ -177,6 +177,31 @@ template<class F> dbl spsint(const F& f, dbl l, dbl r, dbl eps) {
 	return sps1(f, l, r, eps, sps0(f, l, r));
 }
 
+//  golden section search
+typedef double dbl;
+const dbl eps = 1e-8, phi = (sqrt(5) - 1) / 2;
+pair<dbl, dbl> gss0(const function<dbl(dbl)>& f,
+         dbl l1, dbl l2, dbl r2, dbl r1,
+         dbl l1v, dbl l2v, dbl r2v, dbl r1v) {
+    //cout << (r2 - l1) / (r1 - l1) << ' ' << (r1 - l2) / (r1 - l1) << endl;
+    if (l2 + eps >= r2) {
+        if (l2v < r2v) return { l2, l2v };
+        else return { r2, r2v };
+    }
+    if (l2v > r2v)  //  < for minimum, > for maximum
+        return gss0(f, l1, r2 - phi * (r2 - l1), l2, r2,
+                    l1v, f(r2 - phi * (r2 - l1)), l2v, r2v);
+    else
+        return gss0(f, l2, r2, l2 + phi * (r1 - l2), r1,
+                    l2v, r2v, f(l2 + phi * (r1 - l2)), r1v);
+}
+
+pair<dbl, dbl> gss(const function<dbl(dbl)>& f,
+                   dbl l1, dbl r1) {
+    dbl t = phi * (r1 - l1), l2 = r1 - t, r2 = l1 + t;
+    return gss0(f, l1, l2, r2, r1, f(l1), f(l2), f(r2), f(r1));
+}
+
 vector<ll> BM(const vector<ll>& x) {
     vector<ll> ls, cur;
     int pn = 0, lf, ld;

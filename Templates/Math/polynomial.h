@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#define N (1<<18)
+#define N (1<<19)
 #define P 998244353
 #define M(x) (((x) + P) % P)
 typedef long long ll;
@@ -126,31 +126,32 @@ namespace poly {
     }
 
     vector<ll> integ(const vector<ll>& p1) {
-        int n1 = p1.size();
-        vector<ll> p2(n1 + 1);
-        p2[0] = 0;
-        for (int i = 0; i != n1; ++i) p2[i + 1] = M(p1[i] * invs[i + 1]);
+        vector<ll> p2(p1.size() + 1, 0);
+        for (int i = 0; i != p1.size(); ++i) p2[i + 1] = M(p1[i]*invs[i + 1]);
         return p2;
     }
 
     vector<ll> log(const vector<ll>& p1) {
-        int n1 = p1.size();
-        return integ(mul(deriv(p1), inv(p1), n1 - 1));
+        return integ(mul(deriv(p1), inv(p1), p1.size() - 1));
     }
 
     vector<ll> exp(const vector<ll>& p1) {
-        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1) return vector<ll>(1, 1);
+        if (p1.size() == 1) return { 1 };
         else {
-            vector<ll> p2 = exp(vector<ll>(p1.begin(), p1.begin() + n2));
-            p2.resize(n1, 0);
-            vector<ll> one(n1, 0); one[0] = 1;
-            return mul(p2, add(sub(one, log(p2)), p1), n1);
+            vector<ll> p2 = exp({p1.begin(),p1.begin()+(p1.size()+1>>1)});
+            p2.resize(p1.size(), 0);
+            return mul(p2, add(sub({ 1 }, log(p2)), p1), p1.size());
         }
     }
 
+    //  k mod P, not P - 1
     vector<ll> pow(const vector<ll>& p1, int k) {
         return exp(mul(log(p1), k));
+    }
+
+    //  f[i] = \sum f[i-j]g[j]
+    vector<ll> conv(const vector<ll>& g) {
+        return inv(sub({ 1 }, g));
     }
 
 }
