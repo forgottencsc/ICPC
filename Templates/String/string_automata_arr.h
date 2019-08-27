@@ -73,7 +73,7 @@ int extend(int p, int o) {
 
 int c[N], pos[N];
 void sort_sam() {
-    iota(pos, pos + nc, 0);
+    fill(c, c + n + 1, 0);
     for (int p = 0; p != nc; ++p) c[l[p]]++;
     for (int i = 1; i <= n; ++i) c[i] += c[i - 1];
     for (int p = 0; p != nc; ++p) pos[--c[l[p]]] = p;
