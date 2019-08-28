@@ -61,65 +61,65 @@ ll isap(int s, int t, ll f = inf) {
 //  你的板子很不错，但打完这场之后就变成我的了
 template< typename flow_t, typename cost_t >
 struct PrimalDual {
-    const cost_t INF;
+    const cost_t inf;
 
     struct edge {
-        int to;
-        flow_t cap;
-        cost_t cost;
-        int rev;
+        int v;
+        flow_t f;
+        cost_t c;
+        int p;
         bool isrev;
     };
-    vector< vector< edge > > graph;
-    vector< cost_t > potential, min_cost;
-    vector< int > prevv, preve;
+    vector< vector< edge > > g;
+    vector< cost_t > pot, d;
+    vector< int > pv, pe;
 
-    PrimalDual(int V) : graph(V), INF(numeric_limits< cost_t >::max()) {}
+    PrimalDual(int V) : g(V), inf(numeric_limits< cost_t >::max()) {}
 
-    void add_edge(int from, int to, flow_t cap, cost_t cost) {
-        graph[from].emplace_back((edge) {to, cap, cost, (int) graph[to].size(), false});
-        graph[to].emplace_back((edge) {from, 0, -cost, (int) graph[from].size() - 1, true});
+    void add_edge(int u, int v, flow_t f, cost_t c) {
+        g[u].push_back({v, f, c, (int) g[v].size(), false});
+        g[v].push_back({u, 0, -c, (int) g[u].size() - 1, true});
     }
 
     pair<flow_t, cost_t> min_cost_flow(int s, int t, flow_t f) {
-        int V = (int) graph.size();
+        int V = (int) g.size();
         cost_t ret = 0; flow_t f0 = 0;
         using Pi = pair< cost_t, int >;
-        priority_queue< Pi, vector< Pi >, greater< Pi > > que;
-        potential.assign(V, 0); preve.assign(V, -1); prevv.assign(V, -1);
+        priority_queue< Pi, vector< Pi >, greater< Pi > > q;
+        pot.assign(V, 0); pe.assign(V, -1); pv.assign(V, -1);
         while(f > 0) {
-            min_cost.assign(V, INF);
-            que.emplace(0, s); min_cost[s] = 0;
-            while(!que.empty()) {
-                Pi p = que.top(); que.pop();
-                if(min_cost[p.second] < p.first) continue;
-                for(int i = 0; i < graph[p.second].size(); i++) {
-                    edge &e = graph[p.second][i];
-                    cost_t nextCost = min_cost[p.second] + e.cost + potential[p.second] - potential[e.to];
-                    if(e.cap > 0 && min_cost[e.to] > nextCost) {
-                        min_cost[e.to] = nextCost;
-                        prevv[e.to] = p.second, preve[e.to] = i;
-                        que.emplace(min_cost[e.to], e.to);
+            d.assign(V, inf);
+            q.emplace(0, s); d[s] = 0;
+            while(!q.empty()) {
+                Pi p = q.top(); q.pop();
+                cost_t du = p.first; int u = p.second;
+                if(d[u] < du) continue;
+                for(int i = 0; i < g[u].size(); i++) {
+                    edge &e = g[u][i];
+                    cost_t dv = du + e.c + pot[u] - pot[e.v];
+                    if(e.f > 0 && d[e.v] > dv) {
+                        d[e.v] = dv;
+                        pv[e.v] = u, pe[e.v] = i;
+                        q.emplace(d[e.v], e.v);
                     }
                 }
             }
-            if(min_cost[t] == INF) return { f0, ret };
-            for(int v = 0; v < V; v++) potential[v] += min_cost[v];
-            flow_t addflow = f;
-            for(int v = t; v != s; v = prevv[v])
-                addflow = min(addflow, graph[prevv[v]][preve[v]].cap);
-            f -= addflow; f0 += addflow;
-            ret += addflow * potential[t];
-            for(int v = t; v != s; v = prevv[v]) {
-                edge &e = graph[prevv[v]][preve[v]];
-                e.cap -= addflow;
-                graph[v][e.rev].cap += addflow;
+            if(d[t] == inf) return { f0, ret };
+            for(int v = 0; v < V; v++) pot[v] += d[v];
+            flow_t df = f;
+            for(int v = t; v != s; v = pv[v])
+                df = min(df, g[pv[v]][pe[v]].f);
+            f -= df; f0 += df;
+            ret += df * pot[t];
+            for(int v = t; v != s; v = pv[v]) {
+                edge &e = g[pv[v]][pe[v]];
+                e.f -= df;
+                g[v][e.p].f += df;
             }
         }
         return { f0, ret };
     }
 };
-
 //  Hopcroft-Karp Algorithm
 vector<int> g[N]; int n1, n2;
 int lnk[N], dis[N], dm; bool vis[N];

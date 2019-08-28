@@ -42,3 +42,27 @@ int lcp(int u, int v) {
     int k = lg2[r - l];
     return min(st[l][k], st[r - (1 << k)][k]);
 }
+
+int getl(int p, int w) {
+    int l = 1, r = rk[p] - 1;
+    while (l <= r) {
+        int mid = (l + r) >> 1;
+        if (lcp(p, sa[mid]) < w)
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return l;
+}
+
+int getr(int p, int w) {
+    int l = rk[p] + 1, r = n;
+    while (l <= r) {
+        int mid = (l + r) >> 1;
+        if (lcp(p, sa[mid]) < w)
+            r = mid - 1;
+        else
+            l = mid + 1;
+    }
+    return r;
+}
