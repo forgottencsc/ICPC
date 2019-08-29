@@ -45,26 +45,27 @@ void build() {
 char s[N]; int n;
 int g[N][26], f[N], l[N], w[N], nc;
 
-int gn(int len, int q = 0) {
-    int p = nc++; l[p] = len; f[p] = f[q];
-    memcpy(g[p], g[q], sizeof(g[p]));
+inline int gn(int len, int q = 0) {
+    int p = nc++; l[p] = len;
+    if (q) memcpy(g[p], g[q], sizeof(g[p])), f[p] = f[q];
+    else memset(g[p], 0, sizeof(g[p])), f[p] = 0;
     return p;
 }
 
-void clr() { nc = 1; gn(0); }
+void clr() { nc = 0; gn(0); f[0] = -1; }
 
 int extend(int p, int o) {
     int np = gn(l[p] + 1);
-    for (; p && !g[p][o]; p = f[p])
+    for (; ~p && !g[p][o]; p = f[p])
         g[p][o] = np;
-    if (!p) f[np] = 1;
+    if (!~p) f[np] = 0;
     else {
         int q = g[p][o];
         if (l[q] == l[p] + 1) f[np] = q;
         else {
             int nq = gn(l[p] + 1, q);
-            f[np] = f[q] = nq;
-            for (; p && g[p][o] == q; p = f[p])
+            f[q] = f[np] = nq;
+            for (; ~p && g[p][o] == q; p = f[p])
                 g[p][o] = nq;
         }
     }
