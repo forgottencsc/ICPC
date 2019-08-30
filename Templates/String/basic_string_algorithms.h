@@ -92,10 +92,10 @@ pll geth(int l, int r) {
     return { v1, v2 };
 }
 
-hs concat(hs lh, int ln, hs rh, int rn) {
-    hs r; r.n = ln + rn;
-    r.v1 = (lh.v1 * hb1[rn] + rh.v1) % p1;
-    r.v2 = (lh.v2 * hb2[rn] + rh.v2) % p2;
+pll concat(pll lh, int ln, pll rh, int rn) {
+    pll r;
+    r.first = (lh.first * hb1[rn] + rh.first) % p1;
+    r.second = (lh.second * hb2[rn] + rh.second) % p2;
     return r;
 }
 

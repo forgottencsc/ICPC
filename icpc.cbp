@@ -254,6 +254,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Solved/Gym102012J.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Templates/DataStructures/basic_data_structures.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
 		<Unit filename="Templates/GraphTheory/basic_graph_algorithms.h" />

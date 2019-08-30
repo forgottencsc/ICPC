@@ -40,7 +40,7 @@ ll moebiusmu(ll n) {
 	return res;
 }
 
-//	Euler Sieve
+//	Eulerian Sieve
 
 //	Power of minimum prime factor pk[i];
 //	(1): 1;	(2): 1; (3): pk[i] + 1;
