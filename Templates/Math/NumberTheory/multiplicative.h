@@ -153,7 +153,7 @@ void init(ll n_) {
         (v <= sq ? id1[v] : id2[n/v]) = c;
         g[0][c] = M(v - 1);
         g[1][c] = M(s1(v) - 1);
-        g[1][c] = M(s2(v) - 1);
+        g[2][c] = M(s2(v) - 1);
     }
     for (int i = 1; i <= r; ++i) {
         ll p = ps[i];

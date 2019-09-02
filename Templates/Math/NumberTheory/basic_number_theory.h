@@ -64,8 +64,8 @@ ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
 	else d = a, u = 1, v = 0; return d;
 }
 
-//	Try to reduce ax = b(mod p) to x = b'(mod p')
 //  Solve linear congurence equation
+//	Try to reduce ax = b(mod p) to x = b'(mod p')
 bool lce(ll& a, ll& b, ll& p) {
 	ll x, k, d = exgcd(a, p, x, k);
 	if (b % d == 0) {
