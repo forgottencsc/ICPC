@@ -7,7 +7,7 @@ typedef long long ll;
 using namespace std;
 
 ll invs[N], f[N], fi[N];
-ll inv(ll x, ll p) { return x == 1 ? 1 : inv(p % x, p) * (p - p / x) % p; }
+ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 ll binom(ll n, ll k) { return M(f[n] * M(fi[n - k] * fi[k])); }
 void ginv() {
     invs[1] = 1; f[0] = fi[0] = 1;
@@ -16,6 +16,14 @@ void ginv() {
     for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
 }
 
+ll qp(ll a, ll b) {
+    ll r = 1;
+    do if (b & 1) r = M(r * a);
+    while (a = M(a * a), b >>= 1);
+    return r;
+}
+
+ll inv(ll x, ll p) { return x == 1 ? 1 : inv(p % x, p) * (p - p / x) % p; }
 ll qpm(ll a, ll b, ll q) {
     ll r = 1;
     do if (b & 1) r = r * a % q;
@@ -70,26 +78,6 @@ namespace poly {
             fr[i] = (fr[i >> 1] >> 1) | (i & 1 ? (fs >> 1) : 0);
     }
 
-    void ntt(ll* a, int f, ll q) {
-        static const ll g = 3;
-        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(a[i], a[fr[i]]);
-        for (int i = 1; i != fs; i <<= 1) {
-            ll e = (q - 1) / (i << 1), w0 = qpm(g, f == 1 ? e : q - 1 - e, q);
-            for (int j = 0; j != fs; j += (i << 1)) {
-                ll w = 1;
-                for (int k = 0; k != i; k++, w = w * w0 % q) {
-                    ll u = a[j + k], v = w * a[i + j + k] % q;
-                    a[j + k] = (u + v) % q; a[i + j + k] = (u - v + q) % q;
-                }
-            }
-        }
-        if (f == -1) {
-            ll d = inv(fs, q);
-            for (ll i = 0; i != fs; ++i)
-                a[i] = a[i] * d % q;
-        }
-    }
-
     vector<ll> add(const vector<ll>& p1, const vector<ll>& p2) {
         int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
         vector<ll> pr(n3, 0);
@@ -117,18 +105,26 @@ namespace poly {
         return p2;
     }
 
-    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
-        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
-        init(n3 + 1); vector<ll> pr(n3);
-        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
-        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
-        ntt(pa, 1, P); ntt(pb, 1, P);
-        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
-        ntt(pc, -1, P); copy(pc, pc + n3, pr.begin());
-        if (n) pr.resize(n, 0);
-        return pr;
-    }
-
+//  MTT
+//    void ntt(ll* a, int f, ll q) {
+//        static const ll g = 3;
+//        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(a[i], a[fr[i]]);
+//        for (int i = 1; i != fs; i <<= 1) {
+//            ll e = (q - 1) / (i << 1), w0 = qpm(g, f == 1 ? e : q - 1 - e, q);
+//            for (int j = 0; j != fs; j += (i << 1)) {
+//                ll w = 1;
+//                for (int k = 0; k != i; k++, w = w * w0 % q) {
+//                    ll u = a[j + k], v = w * a[i + j + k] % q;
+//                    a[j + k] = (u + v) % q; a[i + j + k] = (u - v + q) % q;
+//                }
+//            }
+//        }
+//        if (f == -1) {
+//            ll d = inv(fs, q);
+//            for (ll i = 0; i != fs; ++i)
+//                a[i] = a[i] * d % q;
+//        }
+//    }
 //    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
 //        ll q[4] = { 469762049, 998244353, 1004535809 }; q[3] = q[0] * q[1];
 //        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
@@ -152,9 +148,40 @@ namespace poly {
 //        return pr;
 //    }
 
+    void ntt(ll* p, int f) {
+        static const ll g = 3;
+        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
+        for (int i = 1; i != fs; i <<= 1) {
+            ll e = (P - 1) / (i << 1), w0 = qp(g, f == 1 ? e : P - 1 - e);
+            for (int j = 0; j != fs; j += (i << 1)) {
+                ll w = 1;
+                for (int k = 0; k != i; k++, w = M(w * w0)) {
+                    ll u = p[j + k], v = M(w * p[i + j + k]);
+                    p[j + k] = M(u + v); p[i + j + k] = M(u - v);
+                }
+            }
+        }
+        if (f == -1)
+            for (ll i = 0; i != fs; ++i)
+                p[i] = M(p[i] * invs[fs]);
+    }
+
+    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
+        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
+        init(n3 + 1); vector<ll> pr(n3);
+        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
+        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
+        ntt(pa, 1); ntt(pb, 1);
+        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
+        ntt(pc, -1); copy(pc, pc + n3, pr.begin());
+        if (n) pr.resize(n, 0);
+        return pr;
+    }
+
+
     vector<ll> inv(const vector<ll>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
-        if (n1 == 1) return { ::inv(p1[0], P) };
+        if (n1 == 1) return { ::inv(p1[0]) };
         else {
             vector<ll> p2 = inv(vector<ll>(p1.begin(), p1.begin() + n2));
             return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
@@ -202,19 +229,30 @@ namespace poly {
         }
     }
 
-    //  Huge constant warning
     vector<ll> sqrt(const vector<ll>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
         if (n1 == 1) return { ::msqrt(p1[0], P) };
         else {
             vector<ll> p2 = sqrt(vector<ll>(p1.begin(), p1.begin() + n2));
             vector<ll> p3 = mul(p2, 2); p3.resize(n1);
-            return mul(add(mul(p2, p2, n1), p1), inv(p3), n1);
+            p3 = inv(p3);
+            return mul(add(mul(p2, p2, n1), p1), p3, n1);
         }
     }
     //  k mod P, not P - 1
-    vector<ll> pow(const vector<ll>& p1, int k) {
+    vector<ll> pow0(const vector<ll>& p1, int k) {
         return exp(mul(log(p1), k));
+    }
+
+    vector<ll> pow(const vector<ll>& p1, int k) {
+        int n1 = p1.size(), n2 = n1;
+        while (n2 && !p1[n1 - n2]) n2--;
+        int n3 = max(n1 - 1ll * (n1 - n2) * k, 0ll);
+        if (!n2 || !n3) return vector<ll>(n1, 0);
+        vector<ll> p2(p1.begin() + n1 - n2, p1.begin() + n1 - n2 + n3);
+        ll c = p2[0]; p2 = mul(pow0(mul(p2, ::inv(c)), k), qp(c, k));
+        p2.resize(n1, 0); rotate(p2.begin(), p2.begin() + n3, p2.end());
+        return p2;
     }
 
     //  f[i] = \sum f[i-j]g[j]
