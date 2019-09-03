@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-5;
+const dbl pi = acos(-1), eps = 1e-7;
 int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
@@ -29,7 +29,7 @@ dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
 struct seg { vec p1, p2; };
 bool onseg(seg s, vec p){return!dc(crx(p,s.p1,s.p2))&&dc(dot(p, s.p1, s.p2))==-1;}
 
-//  0Îª²»Ïà½»£¬1ÎªÑÏ¸ñÏà½»£¬2±íÊ¾½»µãÎªÄ³Ïß¶Î¶Ëµã£¬3ÎªÏß¶ÎÆ½ĞĞÇÒ²¿·ÖÖØºÏ
+//  0ä¸ºä¸ç›¸äº¤ï¼Œ1ä¸ºä¸¥æ ¼ç›¸äº¤ï¼Œ2è¡¨ç¤ºäº¤ç‚¹ä¸ºæŸçº¿æ®µç«¯ç‚¹ï¼Œ3ä¸ºçº¿æ®µå¹³è¡Œä¸”éƒ¨åˆ†é‡åˆ
 int sitsc(seg s1, seg s2) {
     vec p1 = s1.p1, p2 = s1.p2, q1 = s2.p1, q2 = s2.p2;
     if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
@@ -85,40 +85,4 @@ bool cptan(cir c, vec p, vec& p1, vec& p2) {
     vec o = (c.r*c.r/x)*(p-c.o), d =(-c.r*sqrt(y)/x)*(p-c.o);
     d = { d.y, -d.x }; o = o + c.o; p1 = o + d; p2 = o - d;
     return true;
-}
-
-mt19937_64 mt(time(0));
-
-dbl urd(dbl r) {
-    uniform_real_distribution<> u(-r, r);
-    return u(mt);
-}
-
-vec urp(dbl r) {
-    return { urd(r), urd(r) };
-}
-
-int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
-    #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
-    #endif // ONLINE_JUDGE
-    int T = 1000000; dbl w = 1e3;
-    for (int t = 0; t != T; ++t) {
-        cir c = { urp(w), abs(urd(w)) };
-        vec p = urp(w);
-        vec p1, p2;
-        if (!cptan(c, p, p1, p2)) {
-            assert(dc(c.r-len(c.o-p))==1);
-        }
-        else {
-            assert(!dc(len(c.o-p1)-c.r));
-            assert(!dc(len(c.o-p2)-c.r));
-            line l1 = { p, p1 - p };
-            line l2 = { p, p2 - p };
-            assert(!dc(lpdis(l1, c.o)-c.r));
-            assert(!dc(lpdis(l2, c.o)-c.r));
-        }
-    }
-    return 0;
 }
