@@ -240,20 +240,17 @@ namespace poly {
         }
     }
     //  k mod P, not P - 1
-    vector<ll> pow0(const vector<ll>& p1, int k) {
-        return exp(mul(log(p1), k));
-    }
-
     vector<ll> pow(const vector<ll>& p1, int k) {
         int n1 = p1.size(), n2 = n1;
         while (n2 && !p1[n1 - n2]) n2--;
         int n3 = max(n1 - 1ll * (n1 - n2) * k, 0ll);
         if (!n2 || !n3) return vector<ll>(n1, 0);
         vector<ll> p2(p1.begin() + n1 - n2, p1.begin() + n1 - n2 + n3);
-        ll c = p2[0]; p2 = mul(pow0(mul(p2, ::inv(c)), k), qp(c, k));
+        ll c = p2[0]; p2 = mul(exp(mul(log(mul(p2, ::inv(c))), k)), qp(c, k));
         p2.resize(n1, 0); rotate(p2.begin(), p2.begin() + n3, p2.end());
         return p2;
     }
+
 
     //  f[i] = \sum f[i-j]g[j]
     vector<ll> conv(const vector<ll>& g) {
