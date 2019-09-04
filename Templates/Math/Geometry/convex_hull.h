@@ -1,18 +1,30 @@
-#include "basic_geometry_2d.h"
-
-int convex_hull(vec* pv, int n, vec* cv) {
-    sort(pv + 1, pv + n + 1);
-    int m = 0;
+int convex_hull(vec* p, int n, vec* c) {
+    sort(p + 1, p + n + 1); int m = 0, t;
+    c[1] = p[++m];
     for (int i = 1; i <= n; ++i) {
-        while (m>1 && dc(crx(cv[m-1], cv[m], pv[i]))==-1) m--;
-        cv[++m] = pv[i];
+        while (m > 1 && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
+        c[++m] = p[i];
     }
-    int k = m;
+    t = m;
     for (int i = n - 1; i; --i) {
-        while (m>k && dc(crx(cv[m-1], cv[m], pv[i]))==-1) m--;
-        cv[++m] = pv[i];
+        while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
+        c[++m] = p[i];
     }
-    return m>1?m-1:m;
+    return m - (n > 1);
+}
+
+dbl rotating_calipers(vec* c, int n) {
+    #define nxt(x) ((x)==n?1:(x)+1)
+    for (int p = 1, q1 = 1, q2 = 1, q3 = 1; p <= n; ++p) {
+        line l = { c[p], c[nxt(p)] - c[p] };
+        while (dc(l.v*(c[nxt(q1)]-c[q1]))!=-1) q1 = nxt(q1);
+        while (dc(l.v^(c[nxt(q2)]-c[q2]))!=-1) q2 = nxt(q2);
+        if (p == 1) q3 = q2;
+        while (dc(l.v*(c[nxt(q3)]-c[q3]))!=1) q3 = nxt(q3);
+        //  ...
+    }
+    #undef nxt
+    return ans;
 }
 
 bool judge(line l0, line l1, line l2) { return dc((litsc(l1, l2)-l0.p)^l0.v)==1; }

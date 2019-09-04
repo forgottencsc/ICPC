@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-7;
+const dbl pi = acos(-1), eps = 1e-8;
 int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
@@ -14,12 +14,13 @@ dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
 dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
 dbl len(vec v) { return hypot(v.x, v.y); }
 dbl arg(vec v) { dbl r = atan2(v.y, v.x); return r<0?2*pi+r:r; }
-
-struct line { vec p, v; };
 vec unif(vec v) { return (1./len(v))*v; }
 vec univ(dbl f) { return { cos(f), sin(f) }; }
 vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
 vec rot(vec o, vec p, dbl f) { return o + rot(p - o, f); }
+vec rot90(vec p) { return { p.y, -p.x }; }
+
+struct line { vec p, v; };
 vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
 vec refl(vec o, vec p) { return o + o - p; }
 vec refl(line l, vec p) { return refl(proj(l, p), p); }
@@ -71,10 +72,11 @@ bool clitsc(cir c, line l, vec& p1, vec& p2) {
 bool ccitsc(cir c1, cir c2, vec& p1, vec& p2) {
     //assert(c1 != c2);
     dbl s1 = len(c1.o - c2.o);
-    if (dc(s1 - c1.r - c2.r)==1||dc(s1-abs(c1.r-c2.r))==-1) return false;
+    if (dc(s1 - c1.r - c2.r)==1||dc(s1-abs(c1.r-c2.r))==-1)
+        return false;
     dbl s2 = (c1.r*c1.r-c2.r*c2.r)/s1, a=(s1+s2)/2, b=(s1-s2)/2;
     vec o = (a/(a+b)) * (c2.o-c1.o) + c1.o;
-    vec d = unif(c2.o - c1.o); d = sqrt(c1.r*c1.r-a*a) * vec{ d.y, -d.x };
+    vec d = sqrt(c1.r*c1.r-a*a) * rot90(unif(c2.o - c1.o));
     p1 = o + d; p2 = o - d;
     return true;
 }
@@ -82,15 +84,16 @@ bool ccitsc(cir c1, cir c2, vec& p1, vec& p2) {
 bool cptan(cir c, vec p, vec& p1, vec& p2) {
     dbl x = (p-c.o)*(p-c.o), y=x-c.r*c.r;
     if (y < eps) return false;
-    vec o = (c.r*c.r/x)*(p-c.o), d =(-c.r*sqrt(y)/x)*(p-c.o);
-    d = { d.y, -d.x }; o = o + c.o; p1 = o + d; p2 = o - d;
+    vec o = (c.r*c.r/x)*(p-c.o);
+    vec d =rot90((-c.r*sqrt(y)/x)*(p-c.o));
+    o = o + c.o; p1 = o + d; p2 = o - d;
     return true;
 }
 
 bool ccetan(cir c1, cir c2, line& l1, line& l2) {
     //  assert(c1 != c2)
     if (!dc(c1.r - c2.r)) {
-        vec v = c1.r * unif(c2.o - c1.o); v = { v.y, -v.x };
+        vec v = rot90(c1.r * unif(c2.o - c1.o));
         l1 = { c1.o + v, c2.o - c1.o };
         l2 = { c1.o - v, c2.o - c1.o };
         return true;
