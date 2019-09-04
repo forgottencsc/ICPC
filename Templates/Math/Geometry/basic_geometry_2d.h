@@ -86,3 +86,33 @@ bool cptan(cir c, vec p, vec& p1, vec& p2) {
     d = { d.y, -d.x }; o = o + c.o; p1 = o + d; p2 = o - d;
     return true;
 }
+
+bool ccetan(cir c1, cir c2, line& l1, line& l2) {
+    //  assert(c1 != c2)
+    if (!dc(c1.r - c2.r)) {
+        vec v = c1.r * unif(c2.o - c1.o); v = { v.y, -v.x };
+        l1 = { c1.o + v, c2.o - c1.o };
+        l2 = { c1.o - v, c2.o - c1.o };
+        return true;
+    }
+    else {
+        vec p = (1/(c1.r-c2.r))*(c1.r*c2.o-c2.r*c1.o);
+        vec p1, p2, q1, q2;
+        if (cptan(c1,p,p1,p2)&&cptan(c2,p,q1,q2)) {
+            if (c1.r < c2.r) swap(p1, p2), swap(q1, q2);
+            l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ccitan(cir c1, cir c2, line& l1, line& l2) {
+    vec p = (1/(c1.r + c2.r)) * (c2.r * c1.o + c1.r * c2.o);
+    vec p1, p2, q1, q2;
+    if (cptan(c1, p, p1, p2) && cptan(c2, p, q1, q2)) {
+        l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
+        return true;
+    }
+    return false;
+}

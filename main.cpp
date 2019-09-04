@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-5;
+const dbl pi = acos(-1), eps = 1e-8;
 int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
@@ -87,6 +87,36 @@ bool cptan(cir c, vec p, vec& p1, vec& p2) {
     return true;
 }
 
+bool ccetan(cir c1, cir c2, line& l1, line& l2) {
+    //  assert(c1 != c2)
+    if (!dc(c1.r - c2.r)) {
+        vec v = c1.r * unif(c2.o - c1.o); v = { v.y, -v.x };
+        l1 = { c1.o + v, c2.o - c1.o };
+        l2 = { c1.o - v, c2.o - c1.o };
+        return true;
+    }
+    else {
+        vec p = (1/(c1.r-c2.r))*(c1.r*c2.o-c2.r*c1.o);
+        vec p1, p2, q1, q2;
+        if (cptan(c1,p,p1,p2)&&cptan(c2,p,q1,q2)) {
+            if (c1.r < c2.r) swap(p1, p2), swap(q1, q2);
+            l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ccitan(cir c1, cir c2, line& l1, line& l2) {
+    vec p = (1/(c1.r + c2.r)) * (c2.r * c1.o + c1.r * c2.o);
+    vec p1, p2, q1, q2;
+    if (cptan(c1, p, p1, p2) && cptan(c2, p, q1, q2)) {
+        l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
+        return true;
+    }
+    return false;
+}
+
 mt19937_64 mt(time(0));
 
 dbl urd(dbl r) {
@@ -98,26 +128,25 @@ vec urp(dbl r) {
     return { urd(r), urd(r) };
 }
 
+bool tan(cir c, line l) { return !dc(lpdis(l, c.o)-c.r); }
+bool on(cir c, vec p) { return !dc(len(p - c.o) - c.r); }
+
+int side(line l, vec p) { return dc(l.v ^ (p - l.p)); };
+bool sameside(line l, vec p1, vec p2) { return side(l, p1) == side(l, p2); }
+
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
-    int T = 1000000; dbl w = 1e3;
+    int T = 1000000; dbl w = 1e6;
     for (int t = 0; t != T; ++t) {
-        cir c = { urp(w), abs(urd(w)) };
-        vec p = urp(w);
-        vec p1, p2;
-        if (!cptan(c, p, p1, p2)) {
-            assert(dc(c.r-len(c.o-p))==1);
-        }
-        else {
-            assert(!dc(len(c.o-p1)-c.r));
-            assert(!dc(len(c.o-p2)-c.r));
-            line l1 = { p, p1 - p };
-            line l2 = { p, p2 - p };
-            assert(!dc(lpdis(l1, c.o)-c.r));
-            assert(!dc(lpdis(l2, c.o)-c.r));
+        cir c1 = { urp(w), abs(urd(w / 3)) };
+        cir c2 = { urp(w), abs(urd(w / 3)) };
+        line l1, l2;
+        if (ccitan(c1, c2, l1, l2)) {
+            assert(tan(c1, l1) && tan(c2, l1) && tan(c1, l2) && tan(c2, l2));
+            assert(!sameside(l1, c1.o, c2.o) && !sameside(l2, c1.o, c2.o));
         }
     }
     return 0;
