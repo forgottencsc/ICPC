@@ -5,3 +5,4 @@
 *.a
 *.exe
 *.chk
+*.save-failed
