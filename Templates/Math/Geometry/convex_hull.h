@@ -51,9 +51,8 @@ int halfplane_intersection(line* lv, int n, vec* pv) {
     return m;
 }
 
-
 int convex_hull(vec* p, int n, vec* c) {
-    sort(p + 1, p + n + 1);
+    sort(p + 1, p + n + 1); n = unique(p + 1, p + n + 1) - p - 1;
     int m = 0;
     c[1] = p[++m];
     for (int i = 1; i <= n; ++i) {
@@ -65,37 +64,47 @@ int convex_hull(vec* p, int n, vec* c) {
         while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
         c[++m] = p[i];
     }
-    return m - (m > 1);
+    if (m > 1) m--; c[m + 1] = c[1]; return m;
 }
 
 int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
+    if (n1 == 1 || n2 == 1) {
+        if (n1 == 1) swap(n1, n2), swap(cv1, cv2);
+        for (int i = 1; i <= n1; ++i)
+            cv[i] = cv1[i] + cv2[1];
+        return n1;
+    }
     static vec dv1[N], dv2[N], dv;
     cv1[n1 + 1] = cv1[1]; cv2[n2 + 1] = cv2[1];
     for (int i = 1; i <= n1; ++i) dv1[i] = cv1[i + 1] - cv1[i];
     for (int i = 1; i <= n2; ++i) dv2[i] = cv2[i + 1] - cv2[i];
     int m = 0; cv[++m] = cv1[1] + cv2[1];
     int p1 = 1, p2 = 1;
-    while (p1 <= n1 && p2 <= n2)
-        ++m, cv[m] = cv[m - 1] + (dc((dv1[p1])^(dv2[p2]))!=-1?dv1[p1++]:dv2[p2++]);
-    while (p1 <= n1)
-        ++m, cv[m] = cv[m - 1] + dv1[p1++];
-    while (p2 <= n2)
-        ++m, cv[m] = cv[m - 1] + dv2[p2++];
-    assert(cv[m].x == cv[1].x && cv[m].y == cv[1].y);
-    return m - 1;
+    while (p1 <= n1 || p2 <= n2) {
+        if (p1 <= n1 && p2 <= n2)
+            dv = (dc((dv1[p1])^(dv2[p2]))!=-1?dv1[p1++]:dv2[p2++]);
+        else if (p1 <= n1)
+            dv = dv1[p1++];
+        else
+            dv = dv2[p2++];
+        while (m > 1 && !dc((cv[m] - cv[m - 1]) ^ dv)) {
+            dv = dv + cv[m] - cv[m - 1];
+            m--;
+        }
+        cv[m + 1] = cv[m] + dv;
+        m++;
+    }
+    if (m > 1) m--; return m;
 }
 
 namespace cvq {
-    vec c[M], lw[M], up[M];
+    vec c[N], lw[N], up[N];
     int n, n1, n2;
 
     void build(vec* cv, int n_) {
         copy(cv + 1, cv + n_ + 1, c); n = n_;
-        int p = 0;
-        for (int i = 1; i != n; ++i)
-            if (c[p]<c[i]) p = i;
-        copy(c, c + p + 1, lw);
-        copy(c + p, c + n, up); up[n] = c[0];
+        int p = 0; for (int i = 1; i != n; ++i) if (c[p]<c[i]) p = i;
+        copy(c, c + p + 1, lw); copy(c + p, c + n, up); up[n - p] = c[0];
         n1 = p + 1; n2 = n - p + 1;
     }
 
@@ -129,7 +138,8 @@ namespace cvq {
     }
 
     bool contain(vec p) {
-        if (p.x<lw[0].x||p.x>up[0].x) return false;
+        if (p.x<lw[0].x||p.x>lw[n1-1].x)
+            return false;
         int id = lower_bound(lw, lw + n1, vec{p.x,-inf})-lw;
         if (!dc(lw[id].x-p.x)) {
             if (dc(lw[id].y-p.y)==1)

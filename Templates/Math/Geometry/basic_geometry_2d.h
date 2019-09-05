@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-8;
+const dbl pi = acos(-1), eps = 1e-6;
 int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
@@ -10,6 +10,8 @@ dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
 dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
 vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
 bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
+bool operator==(vec v1, vec v2) { return v1.x==v2.x && v1.y == v2.y; }
+bool operator>(vec v1, vec v2) { return v1.x==v2.x?v1.y>v2.y:v1.x>v2.x; }
 dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
 dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
 dbl len(vec v) { return hypot(v.x, v.y); }
@@ -18,7 +20,7 @@ vec unif(vec v) { return (1./len(v))*v; }
 vec univ(dbl f) { return { cos(f), sin(f) }; }
 vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
 vec rot(vec o, vec p, dbl f) { return o + rot(p - o, f); }
-vec rot90(vec p) { return { p.y, -p.x }; }
+vec rot90(vec p) { return { -p.y, p.x }; }
 
 struct line { vec p, v; };
 vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
@@ -50,13 +52,14 @@ dbl spdis(seg s, vec p) {
 
 struct cir { vec o; dbl r; };
 dbl ccarea(cir c1, cir c2) {
+    if (c1.r > c2.r) swap(c1, c2);
     dbl d = len(c1.o - c2.o);
-    if (dc(d - (c1.r + c2.r)) != -1) return 0;
+    if (dc(d - (c1.r + c2.r)) >=0) return 0;
     if (dc(d - abs(c1.r - c2.r)) <= 0) {
         dbl r = min(c1.r, c2.r);
         return r * r * pi;
     }
-    dbl x = (d * d + c1.r * c1.r - c2.r * c2.r) / 2 * d;
+    dbl x = (d * d + c1.r * c1.r - c2.r * c2.r) / (2 * d);
     dbl t1 = acos(x / c1.r), t2 = acos((d - x) / c2.r);
     return c1.r * c1.r * t1 + c2.r * c2.r * t2 - d * c1.r * sin(t1);
 }
@@ -118,4 +121,24 @@ bool ccitan(cir c1, cir c2, line& l1, line& l2) {
         return true;
     }
     return false;
+}
+
+vec incenter(vec a, vec b, vec c) {
+    dbl d1 = len(b-c),d2=len(c-a),d3=len(a-b),
+        s = fabs(crx(a,b,c));
+    return (1/(d1+d2+d3))*(d1*a+d2*b+d3*c);
+}
+
+vec circumcenter(vec a, vec b, vec c) {
+    b=b-a; c=c-a; dbl d1 = b*b, d2 = c*c, d = 2*(b^c);
+    return a - (1/d)*vec{b.y*d2-c.y*d1,c.x*d1-b.x*d2};
+}
+
+vec orthocenter(vec a, vec b, vec c) {
+    vec ba = b - a, ca = c - a, bc = b - c;
+    dbl y = ba.y*ca.y*bc.y,A=ca.x*ba.y-ba.x*ca.y,
+        x0=(1/A)*(y+ca.x*ba.y*b.x-ba.x*ca.y*c.x),
+        y0=(-ba.x)*(x0-c.x)/ba.y+ca.y;
+    return { x0, y0 };
+    //return litsc({a,rot90(b-c)},{b,rot90(c-a)});
 }
