@@ -1,311 +1,300 @@
 #include <bits/stdc++.h>
-#define N 400001
+#define N (1<<19)
+#define P 998244353
+#define M(x) (((x) + P) % P)
+typedef long long ll;
+
 using namespace std;
-typedef long long dbl;
-const dbl pi = acos(-1), eps = 0, inf=1.145e14;
-int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
-struct vec { dbl x, y; };
-vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
-vec operator-(vec v1, vec v2) { return { v1.x - v2.x, v1.y - v2.y }; }
-dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
-dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
-vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
-bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
-bool operator>(vec v1, vec v2) { return v1.x==v2.x?v1.y>v2.y:v1.x>v2.x; }
-dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
-dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
-dbl len(vec v) { return hypot(v.x, v.y); }
-dbl arg(vec v) { dbl r = atan2(v.y, v.x); return r<0?2*pi+r:r; }
-vec unif(vec v) { return (1./len(v))*v; }
-vec univ(dbl f) { return { cos(f), sin(f) }; }
-vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
-vec rot(vec o, vec p, dbl f) { return o + rot(p - o, f); }
-vec rot90(vec p) { return { -p.y, p.x }; }
 
-struct line { vec p, v; };
-vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
-vec refl(vec o, vec p) { return o + o - p; }
-vec refl(line l, vec p) { return refl(proj(l, p), p); }
-vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
-dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
-
-struct seg { vec p1, p2; };
-bool onseg(seg s, vec p){return!dc(crx(p,s.p1,s.p2))&&dc(dot(p, s.p1, s.p2))==-1;}
-
-//  0为不相交，1为严格相交，2表示交点为某线段端点，3为线段平行且部分重合
-int sitsc(seg s1, seg s2) {
-    vec p1 = s1.p1, p2 = s1.p2, q1 = s2.p1, q2 = s2.p2;
-    if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
-    if (max(p1.y,p2.y)<min(q1.y,q2.y)||min(p1.y,p2.y)>max(q1.y,q2.y)) return 0;
-    dbl x=crx(p2,p1,q1),y=crx(p2,p1,q2),z=crx(q2,q1,p1),w=crx(q2,q1,p2);
-    if (dc(x)==0&&dc(y)==0) return 3;
-    if (dc(x)*dc(y)<0&&dc(z)*dc(w)<0) return 1;
-    if (dc(x)*dc(y)<=0&&dc(z)*dc(w)<=0) return 2;
-    return 0;
+ll invs[N], f[N], fi[N];
+ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
+ll binom(ll n, ll k) { return M(f[n] * M(fi[n - k] * fi[k])); }
+void ginv() {
+    invs[1] = 1; f[0] = fi[0] = 1;
+    for (int i = 2; i != N; ++i) invs[i] = M(invs[P % i] * (P - P / i));
+    for (int i = 1; i != N; ++i) f[i] = M(f[i - 1] * i);
+    for (int i = 1; i != N; ++i) fi[i] = M(fi[i - 1] * invs[i]);
 }
 
-dbl spdis(seg s, vec p) {
-    if (dot(s.p1, s.p2, p) < eps) return len(p - s.p1);
-    if (dot(s.p2, s.p1, p) < eps) return len(p - s.p2);
-    return fabs(crx(p, s.p1, s.p2)) / len(s.p1 - s.p2);
+ll qp(ll a, ll b) {
+    ll r = 1;
+    do if (b & 1) r = M(r * a);
+    while (a = M(a * a), b >>= 1);
+    return r;
 }
 
-struct cir { vec o; dbl r; };
-dbl ccarea(cir c1, cir c2) {
-    dbl d = len(c1.o - c2.o);
-    if (dc(d - (c1.r + c2.r)) != -1) return 0;
-    if (dc(d - abs(c1.r - c2.r)) <= 0) {
-        dbl r = min(c1.r, c2.r);
-        return r * r * pi;
+ll inv(ll x, ll p) { return x == 1 ? 1 : inv(p % x, p) * (p - p / x) % p; }
+ll qpm(ll a, ll b, ll q) {
+    ll r = 1;
+    do if (b & 1) r = r * a % q;
+    while (a = a * a % q, b >>= 1);
+    return r;
+}
+
+ll msqrt(ll n, ll p) {
+    if (!n) return 0;
+    ll q = p - 1, s = 0, z = 2;
+    //while (~q & 1) q >>= 1, s++;
+    q >>= (s = __builtin_ctzll(q));
+    if (s == 1) return qpm(n, (p + 1) / 4, p);
+    while(qpm(z, (p - 1) / 2, p) == 1) ++z;
+    ll c = qpm(z, q, p), t = qpm(n, q, p),
+       r = qpm(n, (q + 1) / 2, p), m = s;
+    while(t % p != 1) {
+        ll i = 1; while(qpm(t, 1ll << i, p) != 1) ++i;
+        ll b = qpm(c, 1ll << (m - i - 1), p);
+        r = r * b % p; c = (b * b) % p;
+        t = (t * c) % p; m = i;
     }
-    dbl x = (d * d + c1.r * c1.r - c2.r * c2.r) / 2 * d;
-    dbl t1 = acos(x / c1.r), t2 = acos((d - x) / c2.r);
-    return c1.r * c1.r * t1 + c2.r * c2.r * t2 - d * c1.r * sin(t1);
+    return min(r, p - r); //    r^2=(p-r)^2=n
 }
 
-bool clitsc(cir c, line l, vec& p1, vec& p2) {
-    dbl x = l.v * (l.p - c.o), y = l.v * l.v;
-    dbl d = x * x - y * ((l.p - c.o) * (l.p - c.o) - c.r * c.r);
-    if (dc(d) == -1) return false; d = max(d, 0ll);
-    vec p = l.p - (x / y) * l.v, w = (sqrt(d) / y) * l.v;
-    p1 = p + w; p2 = p - w; return true;
+typedef unsigned long long ull;
+typedef long double ld;
+ull mul(ull a, ull b, ull p) {
+    return ((__int128)a * b) % p;
+	ll res = a * b - p * (ull)((ld)a * (ld)b / (ld)p);
+	return res + p * (res < 0) - p * (res >= (ll)p);
 }
 
-bool ccitsc(cir c1, cir c2, vec& p1, vec& p2) {
-    //assert(c1 != c2);
-    dbl s1 = len(c1.o - c2.o);
-    if (dc(s1 - c1.r - c2.r)==1||dc(s1-abs(c1.r-c2.r))==-1)
-        return false;
-    dbl s2 = (c1.r*c1.r-c2.r*c2.r)/s1, a=(s1+s2)/2, b=(s1-s2)/2;
-    vec o = (a/(a+b)) * (c2.o-c1.o) + c1.o;
-    vec d = sqrt(c1.r*c1.r-a*a) * rot90(unif(c2.o - c1.o));
-    p1 = o + d; p2 = o - d;
-    return true;
-}
+namespace poly {
 
-bool cptan(cir c, vec p, vec& p1, vec& p2) {
-    dbl x = (p-c.o)*(p-c.o), y=x-c.r*c.r;
-    if (y < eps) return false;
-    vec o = (c.r*c.r/x)*(p-c.o);
-    vec d =rot90((-c.r*sqrt(y)/x)*(p-c.o));
-    o = o + c.o; p1 = o + d; p2 = o - d;
-    return true;
-}
-
-bool ccetan(cir c1, cir c2, line& l1, line& l2) {
-    //  assert(c1 != c2)
-    if (!dc(c1.r - c2.r)) {
-        vec v = rot90(c1.r * unif(c2.o - c1.o));
-        l1 = { c1.o + v, c2.o - c1.o };
-        l2 = { c1.o - v, c2.o - c1.o };
-        return true;
+    istream& operator>>(istream& is, vector<ll>& p) {
+        for (ll& w : p) is >> w;
+        return is;
     }
-    else {
-        vec p = (1/(c1.r-c2.r))*(c1.r*c2.o-c2.r*c1.o);
-        vec p1, p2, q1, q2;
-        if (cptan(c1,p,p1,p2)&&cptan(c2,p,q1,q2)) {
-            if (c1.r < c2.r) swap(p1, p2), swap(q1, q2);
-            l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
-            return true;
+
+    ostream& operator<<(ostream& os, const vector<ll>& p) {
+        for (ll w : p) os << w << ' ';
+        return os;
+    }
+
+    int fr[N], fs;
+    ll pa[N], pb[N], pc[N], pd[3][N];
+
+    void init(int s) {
+        for (fs = 1; fs < s; fs <<= 1);
+        for (int i = 0; i != fs; ++i)
+            fr[i] = (fr[i >> 1] >> 1) | (i & 1 ? (fs >> 1) : 0);
+    }
+
+    vector<ll> add(const vector<ll>& p1, const vector<ll>& p2) {
+        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
+        vector<ll> pr(n3, 0);
+        for (int i = 0; i != n3; ++i) {
+            if (i < n1) pr[i] = M(pr[i] + p1[i]);
+            if (i < n2) pr[i] = M(pr[i] + p2[i]);
+        }
+        return pr;
+    }
+
+    vector<ll> sub(const vector<ll>& p1, const vector<ll>& p2) {
+        int n1 = p1.size(), n2 = p2.size(), n3 = max(n1, n2);
+        vector<ll> pr(n3);
+        for (int i = 0; i != n3; ++i) {
+            if (i < n1) pr[i] = M(pr[i] + p1[i]);
+            if (i < n2) pr[i] = M(pr[i] - p2[i]);
+        }
+        return pr;
+    }
+
+    vector<ll> mul(const vector<ll>& p1, ll k) {
+        int n1 = p1.size();
+        vector<ll> p2(n1);
+        for (int i = 0; i != n1; ++i) p2[i] = M(k * p1[i]);
+        return p2;
+    }
+
+//  MTT
+//    void ntt(ll* a, int f, ll q) {
+//        static const ll g = 3;
+//        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(a[i], a[fr[i]]);
+//        for (int i = 1; i != fs; i <<= 1) {
+//            ll e = (q - 1) / (i << 1), w0 = qpm(g, f == 1 ? e : q - 1 - e, q);
+//            for (int j = 0; j != fs; j += (i << 1)) {
+//                ll w = 1;
+//                for (int k = 0; k != i; k++, w = w * w0 % q) {
+//                    ll u = a[j + k], v = w * a[i + j + k] % q;
+//                    a[j + k] = (u + v) % q; a[i + j + k] = (u - v + q) % q;
+//                }
+//            }
+//        }
+//        if (f == -1) {
+//            ll d = inv(fs, q);
+//            for (ll i = 0; i != fs; ++i)
+//                a[i] = a[i] * d % q;
+//        }
+//    }
+//    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
+//        ll q[4] = { 469762049, 998244353, 1004535809 }; q[3] = q[0] * q[1];
+//        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
+//        init(n3 + 1); vector<ll> pr(n3);
+//        for (int j = 0; j != 3; ++j) {
+//            copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
+//            copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
+//            ntt(pa, 1, q[j]); ntt(pb, 1, q[j]);
+//            for (int i = 0; i != fs; ++i) pd[j][i] = pa[i] * pb[i] % q[j];
+//            ntt(pd[j], -1, q[j]);
+//        }
+//        ll i1 = inv(q[1] % q[0], q[0]), i2 = inv(q[0] % q[1], q[1]),
+//                 i3 = inv(q[3] % q[2], q[2]);
+//        for (int i = 0; i != n3; ++i) {
+//            ll A = (::mul(pd[0][i] * q[1] % q[3], i1, q[3])
+//                  + ::mul(pd[1][i] * q[0] % q[3], i2, q[3])) % q[3];
+//            ll k = (((pd[2][i] - A) % q[2] + q[2]) % q[2]) * i3 % q[2];
+//            pr[i] = M(M(M(k) * M(q[3])) + M(A));
+//        }
+//        if (n) pr.resize(n, 0);
+//        return pr;
+//    }
+
+    void ntt(ll* p, int f) {
+        static const ll g = 3;
+        for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
+        for (int i = 1; i != fs; i <<= 1) {
+            ll e = (P - 1) / (i << 1), w0 = qp(g, f == 1 ? e : P - 1 - e);
+            for (int j = 0; j != fs; j += (i << 1)) {
+                ll w = 1;
+                for (int k = 0; k != i; k++, w = M(w * w0)) {
+                    ll u = p[j + k], v = M(w * p[i + j + k]);
+                    p[j + k] = M(u + v); p[i + j + k] = M(u - v);
+                }
+            }
+        }
+        if (f == -1)
+            for (ll i = 0; i != fs; ++i)
+                p[i] = M(p[i] * invs[fs]);
+    }
+
+    vector<ll> mul(const vector<ll>& p1, const vector<ll>& p2, int n = 0) {
+        int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
+        init(n3 + 1); vector<ll> pr(n3);
+        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
+        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
+        ntt(pa, 1); ntt(pb, 1);
+        for (int i = 0; i != fs; ++i) pc[i] = M(pa[i] * pb[i]);
+        ntt(pc, -1); copy(pc, pc + n3, pr.begin());
+        if (n) pr.resize(n, 0);
+        return pr;
+    }
+
+
+    vector<ll> inv(const vector<ll>& p1) {
+        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
+        if (n1 == 1) return { ::inv(p1[0]) };
+        else {
+            vector<ll> p2 = inv(vector<ll>(p1.begin(), p1.begin() + n2));
+            return sub(mul(p2, 2), mul(p1, mul(p2, p2, n1), n1));
         }
     }
-    return false;
-}
 
-bool ccitan(cir c1, cir c2, line& l1, line& l2) {
-    vec p = (1/(c1.r + c2.r)) * (c2.r * c1.o + c1.r * c2.o);
-    vec p1, p2, q1, q2;
-    if (cptan(c1, p, p1, p2) && cptan(c2, p, q1, q2)) {
-        l1 = { p1, q1 - p1 }; l2 = { p2, q2 - p2 };
-        return true;
+
+    pair<vector<ll>, vector<ll>> div(const vector<ll>& p1, const vector<ll>& p2) {
+        int n1 = p1.size(), n2 = p2.size(), n3 = n1 - n2 + 1;
+        vector<ll> p1r = p1, p2r = p2;
+        reverse(p1r.begin(), p1r.end());
+        reverse(p2r.begin(), p2r.end());
+        p1r.resize(n3, 0); p2r.resize(n3, 0);
+        vector<ll> p3 = mul(p1r, inv(p2r), n3);
+        reverse(p3.begin(), p3.end());
+        vector<ll> p4 = sub(p1, mul(p2, p3));
+        p4.resize(n2 - 1, 0);
+        return { p3, p4 };
     }
-    return false;
-}
 
-vec incenter(vec a, vec b, vec c) {
-    dbl d1 = len(b-c),d2=len(c-a),d3=len(a-b),
-        s = fabs(crx(a,b,c));
-    return (1/(d1+d2+d3))*(d1*a+d2*b+d3*c);
-}
-
-vec circumcenter(vec a, vec b, vec c) {
-    b=b-a; c=c-a; dbl d1 = b*b, d2 = c*c, d = 2*(b^c);
-    return a - (1/d)*vec{b.y*d2-c.y*d1,c.x*d1-b.x*d2};
-}
-
-vec orthocenter(vec a, vec b, vec c) {
-    vec ba = b - a, ca = c - a, bc = b - c;
-    dbl y = ba.y*ca.y*bc.y,A=ca.x*ba.y-ba.x*ca.y,
-        x0=(1/A)*(y+ca.x*ba.y*b.x-ba.x*ca.y*c.x),
-        y0=(-ba.x)*(x0-c.x)/ba.y+ca.y;
-    return { x0, y0 };
-    //return litsc({a,rot90(b-c)},{b,rot90(c-a)});
-}
-
-int convex_hull(vec* p, int n, vec* c) {
-    sort(p + 1, p + n + 1);
-    int m = 0;
-    c[1] = p[++m];
-    for (int i = 1; i <= n; ++i) {
-        while (m > 1 && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
-        c[++m] = p[i];
+    vector<ll> deriv(const vector<ll>& p1) {
+        int n1 = p1.size();
+        vector<ll> p2(n1 - 1);
+        for (int i = 1; i != n1; ++i) p2[i - 1] = M(i * p1[i]);
+        return p2;
     }
-    int t = m;
-    for (int i = n - 1; i; --i) {
-        while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
-        c[++m] = p[i];
-    }
-    return m - (m > 1);
-}
 
-int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
-    static vec dv1[N], dv2[N], dv;
-    cv1[n1 + 1] = cv1[1]; cv2[n2 + 1] = cv2[1];
-    for (int i = 1; i <= n1; ++i) dv1[i] = cv1[i + 1] - cv1[i];
-    for (int i = 1; i <= n2; ++i) dv2[i] = cv2[i + 1] - cv2[i];
-    int m = 0; cv[++m] = cv1[1] + cv2[1];
-    int p1 = 1, p2 = 1;
-    while (p1 <= n1 || p2 <= n2) {
-        if (p1 <= n1 && p1 <= n2)
-            dv = (dc((dv1[p1])^(dv2[p2]))!=-1?dv1[p1++]:dv2[p2++]);
-        else if (p1 <= n1)
-            dv = dv1[p1++];
-        else
-            dv = dv2[p2++];
-        while (!dc((cv[m] - cv[m - 1]) ^ dv)) {
-            dv = dv + cv[m] - cv[m - 1];
-            m--;
+    vector<ll> integ(const vector<ll>& p1) {
+        int n1 = p1.size();
+        vector<ll> p2(n1 + 1, 0);
+        for (int i = 0; i != n1; ++i) p2[i + 1] = M(p1[i]*invs[i + 1]);
+        return p2;
+    }
+
+    vector<ll> log(const vector<ll>& p1) {
+        return integ(mul(deriv(p1), inv(p1), p1.size() - 1));
+    }
+
+    vector<ll> exp(const vector<ll>& p1) {
+        if (p1.size() == 1) return { 1 };
+        else {
+            vector<ll> p2 = exp({p1.begin(),p1.begin()+(p1.size()+1>>1)});
+            p2.resize(p1.size(), 0);
+            return mul(p2, add(sub({ 1 }, log(p2)), p1), p1.size());
         }
-        cv[m + 1] = cv[m] + dv;
-        m++;
-    }
-    return m - 1;
-}
-
-namespace cvq {
-    vec c[N], lw[N], up[N];
-    int n, n1, n2;
-
-    void build(vec* cv, int n_) {
-        copy(cv + 1, cv + n_ + 1, c); n = n_;
-        int p = 0;
-        for (int i = 1; i != n; ++i)
-            if (c[p]<c[i]) p = i;
-        copy(c, c + p + 1, lw);
-        copy(c + p, c + n, up); up[n - p] = c[0];
-        n1 = p + 1; n2 = n - p + 1;
     }
 
-    pair<dbl, int> get_tangent(vec* cv, int n, vec p) {
-        int l = 0, r = n - 2;
-        while(l+1<r) {
-            int m = (l+r)/2;
-            if (dc((cv[m+1]-cv[m])^p)==1)r=m;
-            else l = m;
+    vector<ll> sqrt(const vector<ll>& p1) {
+        int n1 = p1.size(), n2 = (n1 + 1) >> 1;
+        if (n1 == 1) return { ::msqrt(p1[0], P) };
+        else {
+            vector<ll> p2 = sqrt(vector<ll>(p1.begin(), p1.begin() + n2));
+            vector<ll> p3 = mul(p2, 2); p3.resize(n1);
+            p3 = inv(p3);
+            return mul(add(mul(p2, p2, n1), p1), p3, n1);
         }
-        pair<dbl,int> p1(p^cv[r],r),p2(p^cv[0],0);
-        return max(p1, p2);
+    }
+    //  k mod P, not P - 1
+    vector<ll> pow(const vector<ll>& p1, int k) {
+        int n1 = p1.size(), n2 = n1;
+        while (n2 && !p1[n1 - n2]) n2--;
+        int n3 = max(n1 - 1ll * (n1 - n2) * k, 0ll);
+        if (!n2 || !n3) return vector<ll>(n1, 0);
+        vector<ll> p2(p1.begin() + n1 - n2, p1.begin() + n1 - n2 + n3);
+        ll c = p2[0]; p2 = mul(exp(mul(log(mul(p2, ::inv(c))), k)), qp(c, k));
+        p2.resize(n1, 0); rotate(p2.begin(), p2.begin() + n3, p2.end());
+        return p2;
     }
 
-    void upd_tangent(vec p, int id, int& i0, int& i1) {
-        if (dc(crx(p,c[i0],c[id]))==1) i0=id;
-        if (dc(crx(p,c[i1],c[id]))==-1) i1=id;
+
+    //  f[i] = \sum f[i-j]g[j]
+    vector<ll> conv(const vector<ll>& g) {
+        return inv(sub({ 1 }, g));
     }
 
-    void bin_search(int l, int r, vec p, int& i0, int &i1) {
-        if (l == r) return;
-        upd_tangent(p, l % n, i0, i1);
-        int sl = dc(crx(p,c[l%n],c[(l+1)%n]));
-        while(l+1<r){
-            int m = (l + r) / 2;
-            int sm = dc(crx(p, c[m%n], c[(m+1)%n]));
-            if (sm == sl) l = m;
-            else r = m;
-        }
-        upd_tangent(p, r % n, i0 , i1);
-    }
-
-    bool contain(vec p) {
-        if (p.x<lw[0].x||p.x>up[0].x)
-            return false;
-        int id = lower_bound(lw, lw + n1, vec{p.x,-inf})-lw;
-        if (!dc(lw[id].x-p.x)) {
-            if (dc(lw[id].y-p.y)==1)
-                return false;
-        }
-        else if (dc(crx(p,lw[id-1],lw[id]))==-1)
-            return false;
-        id = lower_bound(up, up + n2, vec{ p.x, inf }, greater<vec>())-up;
-        if (!dc(up[id].x-p.x)) {
-            if (dc(up[id].y-p.y)==-1)
-                return false;
-        }
-        else if (dc(crx(p,up[id-1],up[id]))==-1)
-            return false;
-        return true;
-    }
-
-    bool get_tangent(vec p, int& i0, int& i1) {
-        if (contain(p)) return false;
-        i0 = i1 = 0;
-        int id = lower_bound(lw, lw + n1, p) - lw;
-        bin_search(0, id, p, i0, i1);
-        bin_search(id, n1, p, i0, i1);
-        id = lower_bound(up, up + n2, p, greater<vec>()) - up;
-        bin_search(n1 - 1, n1 - 1 + id, p, i0, i1);
-        bin_search(n1 - 1 + id, n1 - 1 + n2, p, i0, i1);
-        return true;
-    }
-
-    pair<dbl, int> get_crxmax(vec p) {
-        pair<dbl, int> r = get_tangent(up, n2, p);
-        r.second += n1 - 1;
-        r = max(r, get_tangent(lw, n1, p));
+    vector<ll> egf(const vector<ll>& g) {
+        vector<ll> r(g.size());
+        for (int i = 0; i != g.size(); ++i)
+            r[i] = M(g[i] * fi[i]);
         return r;
     }
 
-//    bool get_itsc(line l, int& i0, int& i1) {
-//        int p0 = get_crxmax(u - v), p1 = get_crxmax(v - u);
-//        if (dc(crx(u,v,c[p0]))*dc(crx(u,v,c[p1]))>=0)
-//            return false;
-//        if (p0 > p1) swap(p0, p1);
-//        i0 = binary_search(u, v, p0, p1);
-//        i1 = binary_search(u, v, p1, p0 + n);
-//        return true;
-//    }
+    vector<ll> iegf(const vector<ll>& g) {
+        vector<ll> r(g.size());
+        for (int i = 0; i != g.size(); ++i)
+            r[i] = M(g[i] * f[i]);
+        return r;
+    }
 
 }
 
-vec pv1[N], pv2[N], cv1[N], cv2[N], cv[N], qv[N];
+using namespace poly;
+
+vector<ll> catalan(int n) {
+    vector<ll> a = { 1, P - 4 }; a.resize(n);
+    a = sub({1}, sqrt(a)); a.erase(a.begin());
+    return mul(a, inv(2));
+}
+
+vector<ll> bell(int n) {
+    vector<ll> a(n, 0); a[1] = 1;
+    return iegf(exp(sub(exp(a), {1})));
+}
 
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
+    ginv();
+    cout <<bell(20) << endl;
+    cout << catalan(20) << endl;
 
-    int n1, n2, q;
-    cin >> n1 >> n2 >> q;
-    for (int i = 1; i <= n1; ++i)
-        cin >> pv1[i].x >> pv1[i].y;
-    for (int i = 1; i <= n2; ++i)
-        cin >> pv2[i].x >> pv2[i].y;
-    for (int i = 1; i <= q; ++i)
-        cin >> qv[i].x >> qv[i].y;
-
-    int m1 = convex_hull(pv1, n1, cv1);
-    for (int i = 1; i <= n2; ++i)
-        pv2[i] = -1 * pv2[i];
-    int m2 = convex_hull(pv2, n2, cv2);
-
-    int m = minkowski_sum(cv1, m1, cv2, m2, cv);
-
-
-    cvq::build(cv, m);
-
-    for (int i = 1; i <= q; ++i) {
-        cout << cvq::contain(qv[i]) << endl;
-    }
-
+    //cout << inv(mul({ 0, 2 }, inv(sub({1}, sqrt(a))))) << endl;
     return 0;
 }
