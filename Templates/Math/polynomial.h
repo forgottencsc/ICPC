@@ -274,3 +274,53 @@ namespace poly {
 }
 
 using namespace poly;
+
+using namespace poly;
+
+vector<ll> catalan(int n) {
+    vector<ll> a = { 1, P - 4 }; a.resize(n);
+    a = sub({1}, sqrt(a)); a.erase(a.begin());
+    return mul(a, inv(2));
+}
+
+vector<ll> bell(int n) {
+    vector<ll> a(n, 0); a[1] = 1;
+    return iegf(exp(sub(exp(a), {1})));
+}
+
+vector<ll> connected_graph(int n) {
+    vector<ll> a(n);
+    for (int i = 0; i != n; ++i)
+        a[i] = qp(2, 1ll * i * (i - 1) / 2);
+    return iegf(log(egf(a)));
+}
+
+vector<ll> eulerian_graph(int n) {
+    vector<ll> a(n);
+    a[0] = 1;
+    for (int i = 1; i != n; ++i)
+        a[i] = qp(2, 1ll * (i - 1) * (i - 2) / 2);
+    return iegf(log(egf(a)));
+}
+
+vector<ll> colored_bipartite(int n) {
+    vector<ll> b1(n), b2(n), c;
+    int sqrt2 = msqrt(2, P);
+    for (int i = 0; i != n; ++i) {
+        b1[i] = qp(sqrt2, 1ll * i * i);
+        b2[i] = inv(b1[i]);
+    }
+    b1 = iegf(b1);
+    b2 = egf(b2);
+    c = mul(b2, b2, n);
+    for (int i = 0; i != n; ++i) c[i] = M(c[i] * b1[i]);
+    return c;
+}
+
+vector<ll> bipartite(int n) {
+    return iegf(sqrt(egf(colored_bipartite(n))));
+}
+
+vector<ll> connected_bipartite(int n) {
+    return iegf(log(sqrt(egf(colored_bipartite(n)))));
+}

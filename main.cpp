@@ -286,15 +286,49 @@ vector<ll> bell(int n) {
     return iegf(exp(sub(exp(a), {1})));
 }
 
+vector<ll> connected_graph(int n) {
+    vector<ll> a(n);
+    for (int i = 0; i != n; ++i)
+        a[i] = qp(2, 1ll * i * (i - 1) / 2);
+    return iegf(log(egf(a)));
+}
+
+vector<ll> eulerian_graph(int n) {
+    vector<ll> a(n);
+    a[0] = 1;
+    for (int i = 1; i != n; ++i)
+        a[i] = qp(2, 1ll * (i - 1) * (i - 2) / 2);
+    return iegf(log(egf(a)));
+}
+
+vector<ll> colored_bipartite(int n) {
+    vector<ll> b1(n), b2(n), c;
+    int sqrt2 = msqrt(2, P);
+    for (int i = 0; i != n; ++i) {
+        b1[i] = qp(sqrt2, 1ll * i * i);
+        b2[i] = inv(b1[i]);
+    }
+    b1 = iegf(b1);
+    b2 = egf(b2);
+    c = mul(b2, b2, n);
+    for (int i = 0; i != n; ++i) c[i] = M(c[i] * b1[i]);
+    return c;
+}
+
+vector<ll> bipartite(int n) {
+    return iegf(sqrt(egf(colored_bipartite(n))));
+}
+
+vector<ll> connected_bipartite(int n) {
+    return iegf(log(sqrt(egf(colored_bipartite(n)))));
+}
+
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
     ifstream cin("1.in");
     #endif // ONLINE_JUDGE
     ginv();
-    cout <<bell(20) << endl;
-    cout << catalan(20) << endl;
-
-    //cout << inv(mul({ 0, 2 }, inv(sub({1}, sqrt(a))))) << endl;
+    cout << connected_bipartite(10) << endl;
     return 0;
 }
