@@ -131,3 +131,38 @@ vector<int> eulerian_path(int s) {
     reverse(res.begin(), res.end());
     return res;
 }
+
+vector<int> g[N];
+
+int deg[N]; bool del[N];
+void encode_tree(int* p, int n) {
+    priority_queue<int, vector<int>, greater<int>> pq;
+    fill(del + 1, del + n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        deg[i] = g[i].size();
+        if (deg[i] == 1)
+            pq.push(i);
+    }
+    for (int i = 1; i <= n - 2; ++i) {
+        int u = pq.top(), v; pq.pop(); del[u] = 1;
+        for (int w : g[u]) if (!del[w]) v = w;
+        p[i] = v; if (--deg[v] == 1) pq.push(v);
+    }
+}
+
+int cnt[N];
+void decode_tree(int* p, int n) {
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 1; i <= n - 2; ++i) cnt[p[i]]++;
+    for (int i = 1; i <= n; ++i) if (!cnt[i]) pq.push(i);
+    for (int i = 1; i <= n - 2; ++i) {
+        int u = p[i], v = pq.top(); pq.pop();
+        g[u].push_back(v);
+        g[v].push_back(u);
+        if (!--cnt[u]) pq.push(u);
+    }
+    int u = pq.top(); pq.pop();
+    int v = pq.top(); pq.pop();
+    g[u].push_back(v);
+    g[v].push_back(u);
+}
