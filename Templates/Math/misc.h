@@ -28,7 +28,7 @@ void ginv() {
     //  Equal Power Sum Coef
     for (int i = 1; i != N; ++i)
         for (int j = 0; j <= i; ++j)
-            ep[i][i + 1 - j] = M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
+            ep[i][i+1-j]=M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
 }
 
 //  \sum_{i=1}^{n}{i^k}
