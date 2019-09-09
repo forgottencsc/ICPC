@@ -275,8 +275,6 @@ namespace poly {
 
 using namespace poly;
 
-using namespace poly;
-
 vector<ll> catalan(int n) {
     vector<ll> a = { 1, P - 4 }; a.resize(n);
     a = sub({1}, sqrt(a)); a.erase(a.begin());
@@ -286,6 +284,14 @@ vector<ll> catalan(int n) {
 vector<ll> bell(int n) {
     vector<ll> a(n, 0); a[1] = 1;
     return iegf(exp(sub(exp(a), {1})));
+}
+
+vector<ll> bernoulli(int n) {
+    vector<ll> a(n + 1, 1);
+    a = sub(egf(a), { 1 });
+    rotate(a.begin(), a.begin() + 1, a.end());
+    a.pop_back();
+    return iegf(inv(a));
 }
 
 vector<ll> connected_graph(int n) {
