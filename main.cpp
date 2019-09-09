@@ -1,13 +1,11 @@
 #include <bits/stdc++.h>
 #define N 2001
-#define P 998244353
 #define M(x) (((x) + P) % P)
+#define P 998244353
 typedef long long ll;
-
 using namespace std;
-
 ll invs[N], f[N], fi[N];
-ll bi[N][N], be[N];
+ll bi[N][N], be[N], ep[N][N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 void ginv() {
     invs[1] = 1; f[0] = fi[0] = 1;
@@ -24,21 +22,18 @@ void ginv() {
     for (int i = 1; i != N; ++i)
         for (int j = 0; j != i; ++j)
             be[i] = M(be[i] - M(bi[i][j] * M(be[j] * invs[i - j + 1])));
+    //  Equal Power Sum Coef
+    for (int i = 1; i != N; ++i)
+        for (int j = 0; j <= i; ++j)
+            ep[i][i + 1 - j] = M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
 }
 
 //  \sum_{i=1}^{n}{i^k}
 ll epsum(ll n, ll k) {
-    static ll pn[N];
-    pn[0] = 1;
-    for (int i = 1; i <= k + 1; ++i)
-        pn[i] = M(pn[i - 1] * n);
-    ll res = 0;
-    for (int i = 0; i <= k; ++i) {
-        if (i >= 3 && i & 1) continue;
-        ll u = M(M(bi[k + 1][i] * be[i]) * pn[k + 1 - i]);
-        if (i & 1) res = M(res - u); else res = M(res + u);
-    }
-    return M(res * invs[k + 1]);
+    ll w = n, r = 0;
+    for (int i = 1; i <= k + 1; ++i, w = M(w * n))
+        r = M(r + M(w * ep[k][i]));
+    return r;
 }
 
 signed main(void) {
@@ -48,7 +43,7 @@ signed main(void) {
     #endif // ONLINE_JUDGE
     ginv();
 
-    cout << epsum(11451419, 1000) << endl;
+    cout << epsum2(120000, 900) << endl;
 
     return 0;
 }
