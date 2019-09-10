@@ -291,24 +291,24 @@ void fft_res(cplx* p) {
 }
 
 
-void ntt(ul* p, int f) {
-	static const ul g;
+void ntt(ll* p, int f) {
+	static const ll g;
 	// ((3u<<30)|1)->5; ((119u<<23)|1)->3; ((479u<<21)|1)->3;
 	for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
 	for (int i = 1; i != fs; i <<= 1) {
-		ul e = (MOD - 1) / (i << 1), w0 = qp(g, f ? e : MOD - 1 - e);
+		ll e = (MOD - 1) / (i << 1), w0 = qp(g, f ? e : MOD - 1 - e);
 		for (int j = 0; j != fs; j += (i << 1)) {
-			ul w = 1;
+			ll w = 1;
 			for (int k = 0; k != i; k++, w = M(w * w0)) {
-				ul u = p[j + k], v = M(w * p[i + j + k]);
+				ll u = p[j + k], v = M(w * p[i + j + k]);
 				p[j + k] = M(u + v); p[i + j + k] = M(u - v);
 			}
 		}
 	}
 }
 
-void ntt_res(ul* p) {
-	for (ul i = 0, is = inv(fs); i != fs; ++i)
+void ntt_res(ll* p) {
+	for (ll i = 0, is = inv(fs); i != fs; ++i)
 		p[i] = M(p[i] * is);
 }
 
