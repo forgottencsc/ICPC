@@ -215,7 +215,6 @@ const dbl eps = 1e-8, phi = (sqrt(5) - 1) / 2;
 pair<dbl, dbl> gss0(const function<dbl(dbl)>& f,
          dbl l1, dbl l2, dbl r2, dbl r1,
          dbl l1v, dbl l2v, dbl r2v, dbl r1v) {
-    //cout << (r2 - l1) / (r1 - l1) << ' ' << (r1 - l2) / (r1 - l1) << endl;
     if (l2 + eps >= r2) {
         if (l2v < r2v) return { l2, l2v };
         else return { r2, r2v };
@@ -311,6 +310,18 @@ void ntt(ul* p, int f) {
 void ntt_res(ul* p) {
 	for (ul i = 0, is = inv(fs); i != fs; ++i)
 		p[i] = M(p[i] * is);
+}
+
+void fmt(ll* a, int w) {
+    for (int i = 0; i != w; ++i)
+        for (int j = 0; j != (1 << w); ++j)
+            if (j & (1 << i)) a[j] += a[s ^ (1 << i)];
+}
+
+void ifmt(ll* a, int w) {
+    for (int i = 0; i != w; ++i)
+        for (int j = 0; j != (1 << w); ++j)
+            if (j & (1 << i)) a[j] -= a[s ^ (1 << i)];
 }
 
 void fwt(ll* a, int n) {
