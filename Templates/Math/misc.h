@@ -28,7 +28,7 @@ void ginv() {
     //  Equal Power Sum Coef
     for (int i = 1; i != N; ++i)
         for (int j = 0; j <= i; ++j)
-            ep[i][i + 1 - j] = M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
+            ep[i][i+1-j]=M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
 }
 
 //  \sum_{i=1}^{n}{i^k}
@@ -215,7 +215,6 @@ const dbl eps = 1e-8, phi = (sqrt(5) - 1) / 2;
 pair<dbl, dbl> gss0(const function<dbl(dbl)>& f,
          dbl l1, dbl l2, dbl r2, dbl r1,
          dbl l1v, dbl l2v, dbl r2v, dbl r1v) {
-    //cout << (r2 - l1) / (r1 - l1) << ' ' << (r1 - l2) / (r1 - l1) << endl;
     if (l2 + eps >= r2) {
         if (l2v < r2v) return { l2, l2v };
         else return { r2, r2v };
@@ -292,25 +291,37 @@ void fft_res(cplx* p) {
 }
 
 
-void ntt(ul* p, int f) {
-	static const ul g;
+void ntt(ll* p, int f) {
+	static const ll g;
 	// ((3u<<30)|1)->5; ((119u<<23)|1)->3; ((479u<<21)|1)->3;
 	for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
 	for (int i = 1; i != fs; i <<= 1) {
-		ul e = (MOD - 1) / (i << 1), w0 = qp(g, f ? e : MOD - 1 - e);
+		ll e = (MOD - 1) / (i << 1), w0 = qp(g, f ? e : MOD - 1 - e);
 		for (int j = 0; j != fs; j += (i << 1)) {
-			ul w = 1;
+			ll w = 1;
 			for (int k = 0; k != i; k++, w = M(w * w0)) {
-				ul u = p[j + k], v = M(w * p[i + j + k]);
+				ll u = p[j + k], v = M(w * p[i + j + k]);
 				p[j + k] = M(u + v); p[i + j + k] = M(u - v);
 			}
 		}
 	}
 }
 
-void ntt_res(ul* p) {
-	for (ul i = 0, is = inv(fs); i != fs; ++i)
+void ntt_res(ll* p) {
+	for (ll i = 0, is = inv(fs); i != fs; ++i)
 		p[i] = M(p[i] * is);
+}
+
+void fmt(ll* a, int w) {
+    for (int i = 0; i != w; ++i)
+        for (int j = 0; j != (1 << w); ++j)
+            if (j & (1 << i)) a[j] += a[s ^ (1 << i)];
+}
+
+void ifmt(ll* a, int w) {
+    for (int i = 0; i != w; ++i)
+        for (int j = 0; j != (1 << w); ++j)
+            if (j & (1 << i)) a[j] -= a[s ^ (1 << i)];
 }
 
 void fwt(ll* a, int n) {

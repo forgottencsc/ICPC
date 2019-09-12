@@ -294,6 +294,18 @@ vector<ll> bernoulli(int n) {
     return iegf(inv(a));
 }
 
+ll epsum(const vector<ll>& b, ll n, ll k) {
+    n = M(n);
+    ll ans = 0; ll w = M(n);
+    for (int i = 1; i <= k + 1; ++i) {
+        ll t = M(binom(k + 1, k + 1 - i) * b[k + 1 - i]);
+        if ((k + 1 - i) & 1) ans = M(ans - M(w * t));
+        else ans = M(ans + M(w * t));
+        w = M(w * n);
+    }
+    return M(ans * invs[k + 1]);
+}
+
 vector<ll> connected_graph(int n) {
     vector<ll> a(n);
     for (int i = 0; i != n; ++i)
