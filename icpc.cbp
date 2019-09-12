@@ -264,6 +264,7 @@
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
 		<Unit filename="Templates/Math/Geometry/basic_geometry_2d.h" />
 		<Unit filename="Templates/Math/Geometry/convex_hull.h" />
+		<Unit filename="Templates/Math/Geometry/testlib.h" />
 		<Unit filename="Templates/Math/NumberTheory/basic_number_theory.h" />
 		<Unit filename="Templates/Math/NumberTheory/multiplicative.h" />
 		<Unit filename="Templates/Math/NumberTheory/primality.h" />
