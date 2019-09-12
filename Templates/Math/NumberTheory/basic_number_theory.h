@@ -274,3 +274,19 @@ bool pell_roots(ll d, ll& x, ll& y) {
     else x = 2 * p * p + 1, y = 2 * p * q;
     return true;
 }
+
+// Primitive Pythagorean Triple
+#define W 10000000
+void get_ppt() {
+    ll sum = 0;
+    for (ll b = 1; 2 * b * b <= W; ++b) {
+        for (ll a = b + 1;; a += 2) {
+            if (gcd(a, b) != 1) continue;
+            ll x = 2 * a * b;
+            ll y = a * a - b * b;
+            ll z = a * a + b * b;
+            if (x + y + z >= W) break;
+            //cout << x << ' ' << y << ' ' << z << endl;
+        }
+    }
+}
