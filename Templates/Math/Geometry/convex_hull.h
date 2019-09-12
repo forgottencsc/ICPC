@@ -1,16 +1,17 @@
 int convex_hull(vec* p, int n, vec* c) {
-    sort(p + 1, p + n + 1); int m = 0, t;
+    sort(p + 1, p + n + 1); n = unique(p + 1, p + n + 1) - p - 1;
+    int m = 0;
     c[1] = p[++m];
     for (int i = 1; i <= n; ++i) {
         while (m > 1 && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
         c[++m] = p[i];
     }
-    t = m;
+    int t = m;
     for (int i = n - 1; i; --i) {
         while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
         c[++m] = p[i];
     }
-    return m - (n > 1);
+    if (m > 1) m--; c[m + 1] = c[1]; return m;
 }
 
 dbl rotating_calipers(vec* c, int n) {
@@ -51,22 +52,6 @@ int halfplane_intersection(line* lv, int n, vec* pv) {
     return m;
 }
 
-int convex_hull(vec* p, int n, vec* c) {
-    sort(p + 1, p + n + 1); n = unique(p + 1, p + n + 1) - p - 1;
-    int m = 0;
-    c[1] = p[++m];
-    for (int i = 1; i <= n; ++i) {
-        while (m > 1 && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
-        c[++m] = p[i];
-    }
-    int t = m;
-    for (int i = n - 1; i; --i) {
-        while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
-        c[++m] = p[i];
-    }
-    if (m > 1) m--; c[m + 1] = c[1]; return m;
-}
-
 int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
     if (n1 == 1 || n2 == 1) {
         if (n1 == 1) swap(n1, n2), swap(cv1, cv2);
@@ -97,93 +82,85 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
     if (m > 1) m--; return m;
 }
 
+typedef pair<dbl, int> pdi;
 namespace cvq {
-    vec c[N], lw[N], up[N];
-    int n, n1, n2;
+    vec c[N];
+    int w, n;
 
-    void build(vec* cv, int n_) {
-        copy(cv + 1, cv + n_ + 1, c); n = n_;
-        int p = 0; for (int i = 1; i != n; ++i) if (c[p]<c[i]) p = i;
-        copy(c, c + p + 1, lw); copy(c + p, c + n, up); up[n - p] = c[0];
-        n1 = p + 1; n2 = n - p + 1;
+    void init(vec* cv, int m) {
+        copy_n(cv + 1, m, c); n = m;
+        rotate(c, min_element(c, c + n), c + n);
+        c[n] = c[0]; c[n + 1] = c[1];
+        w = 0; while (c[w] < c[w + 1]) ++w;
     }
 
-    pair<dbl, int> get_tangent(vec* cv, int n, vec p) {
-        int l = 0, r = n - 2;
-        while(l+1<r) {
-            int m = (l+r)/2;
-            if (dc((cv[m+1]-cv[m])^p)==1)r=m;
-            else l = m;
+    //  0：在凸包外，1：在凸包上或凸包内
+    int contain(vec p) {
+        if (p.x < c[0].x || c[w].x < p.x) return false;
+        if (crx(c[0], c[w], p) > 0) {
+            int e = lower_bound(c + w, c + n + 1, vec{ p.x, inf }, greater<vec>()) - c;
+            if (!sgn(p.x - c[e].x)) return p.y <= c[e].y;
+            else return crx(c[e - 1], c[e], p) >= 0;
         }
-        pair<dbl,int> p1(p^cv[r],r),p2(p^cv[0],0);
-        return max(p1, p2);
-    }
-
-    void upd_tangent(vec p, int id, int& i0, int& i1) {
-        if (dc(crx(p,c[i0],c[id]))==1) i0=id;
-        if (dc(crx(p,c[i1],c[id]))==-1) i1=id;
-    }
-
-    void bin_search(int l, int r, vec p, int& i0, int &i1) {
-        if (l == r) return;
-        upd_tangent(p, l % n, i0, i1);
-        int sl = dc(crx(p,c[l%n],c[(l+1)%n]));
-        while(l+1<r){
-            int m = (l + r) / 2;
-            int sm = dc(crx(p, c[m%n], c[(m+1)%n]));
-            if (sm == sl) l = m;
-            else r = m;
+        else {
+            int e = lower_bound(c, c + w + 1, vec{ p.x, -inf }) - c;
+            if (!sgn(p.x - c[e].x)) return p.y >= c[e].y;
+            else return crx(c[e - 1], c[e], p) >= 0;
         }
-        upd_tangent(p, r % n, i0 , i1);
     }
 
-    bool contain(vec p) {
-        if (p.x<lw[0].x||p.x>lw[n1-1].x)
-            return false;
-        int id = lower_bound(lw, lw + n1, vec{p.x,-inf})-lw;
-        if (!dc(lw[id].x-p.x)) {
-            if (dc(lw[id].y-p.y)==1)
-                return false;
+    pdi crxmax(int l, int r, vec p) {
+        int r0 = r;
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            if ((p ^ (c[m + 1] - c[m])) >= 0) l = m + 1;
+            else r = m - 1;
         }
-        else if (dc(crx(p,lw[id-1],lw[id]))==-1)
-            return false;
-        id = lower_bound(up, up + n2, vec{ p.x, inf }, greater<vec>())-up;
-        if (!dc(up[id].x-p.x)) {
-            if (dc(up[id].y-p.y)==-1)
-                return false;
+        return pdi(p^c[l],l);
+    }
+
+    pair<dbl, int> crxmax(vec p) {
+        pdi res = sgn(p.x) <= 0 ? crxmax(0, w - 1, p) : crxmax(w, n - 1, p);
+        return max({ res, pdi(p ^ c[0], 0), pdi(p ^ c[w], w) });
+    }
+    pair<dbl, int> crxmin(vec p) { return crxmax(p * -1); }
+
+    bool ltan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])<=0&&crx(p,c[i],c[i+1])<=0; }
+    bool rtan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])>=0&&crx(p,c[i],c[i+1])>=0; }
+
+    int ltan(int l, int r, vec p) {
+        if (ltan(p, r)) return r; r--;
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            if (crx(p,c[m],c[m+1])<0) r = m - 1;
+            else l = m + 1;
         }
-        else if (dc(crx(p,up[id-1],up[id]))==-1)
-            return false;
-        return true;
+        return l;
     }
 
-    bool get_tangent(vec p, int& i0, int& i1) {
-        if (contain(p)) return false;
-        i0 = i1 = 0;
-        int id = lower_bound(lw, lw + n1, p) - lw;
-        bin_search(0, id, p, i0, i1);
-        bin_search(id, n1, p, i0, i1);
-        id = lower_bound(up, up + n2, p, greater<vec>()) - up;
-        bin_search(n1 - 1, n1 - 1 + id, p, i0, i1);
-        bin_search(n1 - 1 + id, n1 - 1 + n2, p, i0, i1);
-        return true;
-    }
-
-    pair<dbl, int> get_crxmax(vec p) {
-        pair<dbl, int> r = get_tangent(up, n2, p);
-        r.second += n1 - 1;
-        r = max(r, get_tangent(lw, n1, p));
+    int rtan(int l, int r, vec p) {
+        if (rtan(p, r)) return r; l++;
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            if (crx(p,c[m],m?c[m - 1]:c[n - 1])>0) l = m + 1;
+            else r = m - 1;
+        }
         return r;
     }
 
-//    bool get_itsc(line l, int& i0, int& i1) {
-//        int p0 = get_crxmax(u - v), p1 = get_crxmax(v - u);
-//        if (dc(crx(u,v,c[p0]))*dc(crx(u,v,c[p1]))>=0)
-//            return false;
-//        if (p0 > p1) swap(p0, p1);
-//        i0 = binary_search(u, v, p0, p1);
-//        i1 = binary_search(u, v, p1, p0 + n);
-//        return true;
-//    }
-
-}
+    bool tangent(vec p, int& lp, int& rp) {
+        if (contain(p)) return false;
+        if (p.x < c[0].x) { lp = ltan(w, n, p); rp = rtan(0, w, p); }
+        else if (p.x > c[w].x) { lp = ltan(0, w, p); rp = rtan(w, n, p); }
+        else if (crx(c[0], c[w], p) > 0) {
+            int e = lower_bound(c + w, c + n + 1, p, greater<vec>()) - c;
+            lp = ltan(w, e, p); rp = rtan(e, n, p);
+        }
+        else {
+            int e = lower_bound(c + 0, c + w + 1, p) - c;
+            lp = ltan(0, e, p); rp = rtan(e, w, p);
+        }
+        lp %= n; rp %= n;
+        return true;
+    }
+};
