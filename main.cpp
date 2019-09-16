@@ -25,6 +25,7 @@ fwt(ixor, M(M(x+y)*i2), M(M(x-y)*i2))
 ll a[4][N], b[4][N], c[4][N];
 
 int main(void) {
+    iota
     #ifndef ONLINE_JUDGE
     freopen("1.in", "r", stdin);
     #endif // ONLINE_JUDGE
