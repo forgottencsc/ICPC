@@ -312,37 +312,3 @@ void ntt_res(ll* p) {
 		p[i] = M(p[i] * is);
 }
 
-void fmt(ll* a, int w) {
-    for (int i = 0; i != w; ++i)
-        for (int j = 0; j != (1 << w); ++j)
-            if (j & (1 << i)) a[j] += a[s ^ (1 << i)];
-}
-
-void ifmt(ll* a, int w) {
-    for (int i = 0; i != w; ++i)
-        for (int j = 0; j != (1 << w); ++j)
-            if (j & (1 << i)) a[j] -= a[s ^ (1 << i)];
-}
-
-void fwt(ll* a, int n) {
-	for (int k = 1; k < n; k <<= 1)
-		for (int m = k << 1, i = 0; i < n; i += m)
-			for (int j = 0; j != k; j++) {
-				ll x = a[i + j], y = a[i + j + k];
-				//^: a[i + j] = x + y, a[i + j + d]= x - y;
-				//&: a[i + j] = x + y;
-				//|: a[i + j + d] = x + y;
-			}
-}
-
-
-void ifwt(ll* a, int n) {
-	for (int k = 1; k < n; k <<= 1)
-		for (int m = k << 1, i = 0; i < n; i += m)
-			for (int j = 0; j != k; j++) {
-				ll x = a[i + j], y = a[i + j + k];
-				//^: a[i + j] = (x + y) / 2, a[i + j + d] = (x - y) /2;
-				//&: a[i + j] = x - y;
-				//|: a[i + j + d] = y - x;
-			}
-}

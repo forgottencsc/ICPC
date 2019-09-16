@@ -1,64 +1,52 @@
 #include <bits/stdc++.h>
-#define N 1<<21
+#define N 1<<18
+#define P 998244353
+#define M(x) (((x) + P) % P)
+#define i2 ((P+1)/2)
 using namespace std;
-
-typedef double dbl;
-typedef complex<dbl> cplx;
-const dbl pi = acos(-1);
-
-int fr[N], fs;
-void init(int s) {
-	for (fs = 1; fs <= s; fs <<= 1);
-	for (int i = 0; i != fs; ++i)
-		fr[i] = (fr[i >> 1] >> 1) | (i & 1 ? (fs >> 1) : 0);
+#define fwt(op, u, v) \
+void fwt_##op (ll* a, int n) {\
+    for (int k = 1; k < n; k <<= 1)\
+        for (int m = k << 1, i = 0; i < n; i += m)\
+            for (int j = 0; j != k; j++) {\
+                ll x = a[i + j], y = a[i + j + k];\
+                a[i + j] = u ; \
+                a[i + j + k] = v ; \
+            }\
 }
+typedef long long ll;
+fwt(or, x, M(x+y))
+fwt(ior, x, M(y-x))
+fwt(and, M(x+y), y)
+fwt(iand, M(x-y), y)
+fwt(xor, M(x+y), M(x-y))
+fwt(ixor, M(M(x+y)*i2), M(M(x-y)*i2))
 
-void fft(cplx* p, int f) {
-	for (int i = 0; i != fs; ++i) if (i < fr[i]) swap(p[i], p[fr[i]]);
-	for (int i = 1; i != fs; i <<= 1) {
-		cplx w0{ cos(pi / i), f * sin(pi / i) };
-		for (int j = 0; j != fs; j += (i << 1)) {
-			for (int k = 0; k != i; k++) {
-                cplx w{ cos(k * pi / i), f * sin(k * pi / i) };
-				cplx u = p[j + k], v = w * p[i + j + k];
-				p[j + k] = u + v; p[i + j + k] = u - v;
-			}
-		}
-	}
-}
-
-void fft_res(cplx* p) {
-	for (int i = 0; i != fs; ++i)
-		p[i] = p[i] * (1. / fs);
-}
-
-cplx p1[N], p2[N], p3[N];
-int conv(int* a, int n, int* b, int m, int* c) {
-    init(n + m + 1);
-    for (int i = 0; i <= n; ++i) p1[i] = a[i];
-    fill(p1 + n + 1, p1 + fs, cplx{});
-    for (int i = 0; i <= m; ++i) p2[i] = b[i];
-    fill(p2 + m + 1, p2 + fs, cplx{});
-    fft(p1, 1); fft(p2, 1);
-    for (int i = 0; i != fs; ++i) p3[i] = p1[i] * p2[i];
-    fft(p3, -1); fft_res(p3);
-    for (int i = 0; i != fs; ++i)
-        c[i] = round(p3[i].real());
-    return fs;
-}
-
-int a[N], b[N], c[N];
+ll a[4][N], b[4][N], c[4][N];
 
 int main(void) {
     #ifndef ONLINE_JUDGE
     freopen("1.in", "r", stdin);
     #endif // ONLINE_JUDGE
 
-    int n, m; scanf("%d%d", &n, &m);
-    for (int i = 0; i <= n; ++i) scanf("%d", &a[i]);
-    for (int i = 0; i <= m; ++i) scanf("%d", &b[i]);
-    conv(a, n + 1, b, m + 1, c);
-    for (int i = 0; i <= n + m; ++i) printf("%d ", c[i]);
-
+    int w; cin >> w; int n = 1 << w;
+    for (int i = 0; i != n; ++i) scanf("%d", a[0] + i);
+    for (int i = 0; i != n; ++i) scanf("%d", b[0] + i);
+    for (int i = 1; i != 4; ++i) {
+        copy_n(a[0], n, a[i]);
+        copy_n(b[0], n, b[i]);
+    }
+    fwt_or(a[1], n); fwt_or(b[1], n);
+    fwt_and(a[2], n); fwt_and(b[2], n);
+    fwt_xor(a[3], n); fwt_xor(b[3], n);
+    for (int i = 1; i != 4; ++i)
+        for (int j = 0; j != n; ++j)
+            c[i][j] = M(a[i][j] * b[i][j]);
+    fwt_ior(c[1], n);
+    fwt_iand(c[2], n);
+    fwt_ixor(c[3], n);
+    for (int i = 1; i != 4; ++i)
+        for (int j = 0; j != n; ++j)
+            printf("%d%c", c[i][j], " \n"[j == n - 1]);
     return 0;
 }
