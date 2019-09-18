@@ -7,50 +7,50 @@ using namespace std;
 typedef long long ll;
 
 ll qp(ll a, ll b) {
-	ll r = 1;
-	for (ll i = 1; i <= b; i <<= 1, a = M(a * a))
-		if (i & b) r = M(r * a);
-	return r;
+    ll r = 1;
+    for (ll i = 1; i <= b; i <<= 1, a = M(a * a))
+        if (i & b) r = M(r * a);
+    return r;
 }
 
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 
-//	O(n) prime generator
+//    O(n) prime generator
 #define W 1000001
 bool ip[W]; vector<ll> ps;
 void sieve() {
-	ps.reserve(W * 1.3 / log(W));
-	memset(ip, 1, sizeof(ip)); ip[1] = 0;
-	for (int i = 2; i != W; ++i) {
-		if (ip[i]) ps.push_back(i);
-		for (int p : ps) {
-			if (i * p >= W) break;
-			ip[i * p] = 0;
-			if (i % p == 0) break;
-		}
-	}
+    ps.reserve(W * 1.3 / log(W));
+    memset(ip, 1, sizeof(ip)); ip[1] = 0;
+    for (int i = 2; i != W; ++i) {
+        if (ip[i]) ps.push_back(i);
+        for (int p : ps) {
+            if (i * p >= W) break;
+            ip[i * p] = 0;
+            if (i % p == 0) break;
+        }
+    }
 }
 
 vector<pair<ll, ll>> pfd(ll n) {
-	vector<pair<ll, ll>> res;
-	for (ll p : ps) {
-		if (p * p > n) break;
-		if (n % p) continue;
-		res.emplace_back(p, 0);
-		do res.back().second++;
-		while ((n /= p) % p == 0);
-	}
-	if (n != 1) res.emplace_back(n, 1);
-	return res;
+    vector<pair<ll, ll>> res;
+    for (ll p : ps) {
+        if (p * p > n) break;
+        if (n % p) continue;
+        res.emplace_back(p, 0);
+        do res.back().second++;
+        while ((n /= p) % p == 0);
+    }
+    if (n != 1) res.emplace_back(n, 1);
+    return res;
 }
 
 vector<ll> ifd(ll n) {
-	vector<ll> v;
-	for (ll d = 1; d * d <= n; ++d) {
-		if (n % d) continue; v.push_back(d);
-		if (d * d != n) v.push_back(n / d);
-	}
-	return v;
+    vector<ll> v;
+    for (ll d = 1; d * d <= n; ++d) {
+        if (n % d) continue; v.push_back(d);
+        if (d * d != n) v.push_back(n / d);
+    }
+    return v;
 }
 
 ll mod(ll x, ll p) { x %= p; return x + (x < 0 ? p : 0); }
@@ -58,38 +58,38 @@ ll sgn(ll x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
 ll ceil(ll b, ll a) { return b/a+(b%a!=0&&sgn(a)*sgn(b)>0); }
 ll floor(ll b, ll a) { return b/a-(b%a!=0&&sgn(a)*sgn(b)<0); }
 
-//	Extended Euclidean Algorithm
+//    Extended Euclidean Algorithm
 ll exgcd(ll a, ll b, ll& u, ll& v) { ll d;
-	if (b) d = exgcd(b, a % b, v, u), v -= (a / b) * u;
-	else d = a, u = 1, v = 0; return d;
+    if (b) d = exgcd(b, a % b, v, u), v -= (a / b) * u;
+    else d = a, u = 1, v = 0; return d;
 }
 
 //  Solve linear congurence equation
-//	Try to reduce ax = b(mod p) to x = b'(mod p')
+//    Try to reduce ax = b(mod p) to x = b'(mod p')
 bool lce(ll& a, ll& b, ll& p) {
-	ll x, k, d = exgcd(a, p, x, k);
-	if (b % d == 0) {
+    ll x, k, d = exgcd(a, p, x, k);
+    if (b % d == 0) {
         a = 1; p /= d;
         b = ((x * b / d) % p + p) % p;
-	}
-	return a == 1;
+    }
+    return a == 1;
 }
 
 //  Try to reduce x=b1(mod m1) && x=b2(mod m2) to x=b(mod m)
 bool crt(ll& b1, ll& m1, ll b2, ll m2) {
-	ll a = m1, b = b2 - b1, p = m2;
-	if (!lce(a, b, p)) return false;
-	else { b1 += b * m1; m1 *= p; return true; }
+    ll a = m1, b = ((b2 - b1) % m2 + m2) % m2, p = m2;
+    if (!lce(a, b, p)) return false;
+    else { b1 += b * m1; m1 *= p; return true; }
 }
 
 ll inv(ll x, ll m) { ll b = 1; lce(x %= m, b, m); return b; }
 
 //  a^b(mod p) = a^(b%phi(p)+(b>=phi(p)?phi(p):0))
 ll qpm(ll a, ll b, ll p) {
-	ll r = 1;
-	do if (b & 1) r = r * a % p;
+    ll r = 1;
+    do if (b & 1) r = r * a % p;
     while (a = a * a % p, b >>= 1);
-	return r % p;
+    return r % p;
 }
 
 //  Extend Lucas Theorem
@@ -122,22 +122,22 @@ ll mbinom(ll n, ll k, ll m) {
     return b;
 }
 
-//	Basic Lucas Theorem
+//    Basic Lucas Theorem
 //  assert(isprime(p))
 ll mbinom(ll n, ll k, ll p) {
-	static ll f[N];
-	for (int i = f[0] = 1; i != p; ++i) f[i] = f[i - 1] * i % p;
-	ll ans = 1;
-	do {
-		if (n % p < k % p) return 0;
-		ans = ans * (f[n % p] * inv(f[k % p] * f[(n - k) % p], p) % p) % p;
-		n /= p; k /= p;
-	} while (n);
-	return ans;
+    static ll f[N];
+    for (int i = f[0] = 1; i != p; ++i) f[i] = f[i - 1] * i % p;
+    ll ans = 1;
+    do {
+        if (n % p < k % p) return 0;
+        ans = ans * (f[n % p] * inv(f[k % p] * f[(n - k) % p], p) % p) % p;
+        n /= p; k /= p;
+    } while (n);
+    return ans;
 }
 
 
-//	Solve a^x=b(mod p), O(sqrt(p))
+//    Solve a^x=b(mod p), O(sqrt(p))
 //  Usage: bsgs.init(a, p); bsgs.solve(b);
 struct bsgs_t {
     const int S = 1 << 19;
