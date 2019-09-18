@@ -5,9 +5,6 @@
 typedef long long ll;
 
 ll invs[N], f[N], fi[N];
-ll bi[N][N], be[N];
-ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
-ll invs[N], f[N], fi[N];
 ll bi[N][N], be[N], ep[N][N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
 void ginv() {
