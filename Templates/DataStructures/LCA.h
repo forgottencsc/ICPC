@@ -65,3 +65,102 @@ ll dis(int u, int v) {
     int w = lca(u, v);
     return dis[u] + dis[v] - 2 * dis[w];
 }
+
+namespace VT {
+
+int st[N], sc;
+int vs[N], vc;
+vector<int> gt[N]; int rt;
+int fa[N], vdep[N], sz[N];
+
+int val[N];
+
+int tc;
+
+inline void gn(int u, int s) {
+    sz[u] = s; gt[u].clear();
+    val[u] = vdep[u] = fa[u] = 0;
+    vs[++vc] = u;
+}
+
+inline void conn(int u, int v) {
+    int cnt = dep[v] - dep[u] - 1;
+    if (cnt) {
+        int w = dfc + (++tc);
+        gn(w, cnt);
+        fa[v] = w; fa[w] = u;
+    }
+    else fa[v] = u;
+}
+
+void dfs_vdep(int u, int f) {
+    vdep[u] = vdep[f] + 1;
+    for (int v : gt[u]) if (v != f) dfs_vdep(v, u);
+}
+
+void build(int* us, int uc) {
+    tc = vc = sc = 0;
+    sort(us + 1, us + uc + 1, [](int u, int v) { return dfn[u] < dfn[v]; });
+    uc = unique(us + 1, us + uc + 1) - us - 1;
+    for (int i = 1; i <= uc; ++i) {
+        int u = us[i]; gn(u, 1);
+        if (sc) {
+            int v = st[sc], w = LCA::lca(v, u);
+            for (; sc > 1 && dep[w] <= dep[st[sc - 1]]; --sc)
+                conn(st[sc - 1], st[sc]);
+            if (w != st[sc]) {
+                gn(w, 1);
+                conn(w, st[sc]);
+                st[sc] = w;
+            }
+        }
+        st[++sc] = u;
+    }
+    for (; sc > 1; --sc) conn(st[sc - 1], st[sc]);
+    for (int i = 1; i <= vc; ++i) {
+        int u = vs[i], v = fa[u];
+        if (!v) rt = u;
+        else {
+            gt[u].push_back(v);
+            gt[v].push_back(u);
+        }
+    }
+    vdep[rt] = 0; dfs_vdep(rt, 0);
+}
+
+
+void qry(int t, int u, int k, ll& x, ll& y) {
+    if (t == 1) val[u] += k;
+    if (t == 2) val[u] ^= k;
+    if (t == 3) { if (val[u] >= k) val[u] -= k; }
+    if (t == 4) x += 1ll * sz[u] * val[u];
+    if (t == 5) { if (sz[u] & 1) x ^= val[u]; }
+    if (t == 6) { x = max(x, 1ll * val[u]); y = min(y, 1ll * val[u]); }
+    if (t == 7) { y = min(y, 1ll * abs(val[u] - k)); }
+}
+
+void process(query_t* qs, int q) {
+    for (int i = 1; i <= q; ++i) {
+        int u = qs[i].u, v = qs[i].v, t = qs[i].t, k = qs[i].k;
+        if (vdep[u] < vdep[v]) swap(u, v);
+        ll x = 0, y = 0;
+        if (t == 4 || t == 5) x = 0;
+        if (t == 6 || t == 7) x = 0, y = LLONG_MAX;
+        while (vdep[u] != vdep[v]) {
+            qry(t, u, k, x, y);
+            u = fa[u];
+        }
+        while (u != v) {
+            qry(t, u, k, x, y);
+            qry(t, v, k, x, y);
+            u = fa[u];
+            v = fa[v];
+        }
+        qry(t, u, k, x, y);
+        if (t == 4 || t == 5) cout << x << endl;
+        if (t == 6) cout << x - y << endl;
+        if (t == 7) cout << y << endl;
+    }
+}
+
+}

@@ -1,16 +1,6 @@
 # depslib dependency file v1.0
-1568821683 source:d:\cosecant\projects\icpc\main.cpp
-	<ctime>
-	<cstdio>
-	<algorithm>
-	<ctime>
-	<iostream>
-	<queue>
-	<bitset>
-	<string>
-	<cstring>
-	<set>
-	<cmath>
+1568899811 source:d:\cosecant\projects\icpc\main.cpp
+	<bits/stdc++.h>
 
 1557167711 source:d:\cosecant\projects\icpc\problems\throughput\gen.cpp
 	<bits/stdc++.h>
