@@ -20,7 +20,7 @@ int vdc(int u, int s) {
 
     for (int v : g[u]) {
         if (vis[v]) continue;
-        int w = dc(v, sz[v] < sz[u] ? sz[v] : s - sz[u]);
+        int w = vdc(v, sz[v] < sz[u] ? sz[v] : s - sz[u]);
 
     }
     return u;
