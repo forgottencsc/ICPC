@@ -102,21 +102,15 @@ void build(int* us, int uc) {
     tc = vc = sc = 0;
     sort(us + 1, us + uc + 1, [](int u, int v) { return dfn[u] < dfn[v]; });
     uc = unique(us + 1, us + uc + 1) - us - 1;
-    for (int i = 1; i <= uc; ++i) {
-        int u = us[i]; gn(u, 1);
-        if (sc) {
-            int v = st[sc], w = LCA::lca(v, u);
-            for (; sc > 1 && dep[w] <= dep[st[sc - 1]]; --sc)
-                conn(st[sc - 1], st[sc]);
-            if (w != st[sc]) {
-                gn(w, 1);
-                conn(w, st[sc]);
-                st[sc] = w;
-            }
-        }
+    st[++sc] = us[1]; gn(us[1]);
+    for (int i = 2; i <= uc; ++i) {
+        int v = st[sc], w = LCA::lca(v, us[i]); gn(us[i]);
+        while (sc > 1 && dep[w] <= dep[st[sc - 1]])
+            conn(st[sc - 1], st[sc]), --sc;
+        if (w != st[sc]) gn(w, 1), conn(w, st[sc]), st[sc] = w;
         st[++sc] = u;
     }
-    for (; sc > 1; --sc) conn(st[sc - 1], st[sc]);
+    while(sc > 1) conn(st[sc - 1], st[sc]), --sc;
     for (int i = 1; i <= vc; ++i) {
         int u = vs[i], v = fa[u];
         if (!v) rt = u;
