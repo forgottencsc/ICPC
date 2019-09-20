@@ -51,14 +51,14 @@ void fmt(ll* f, ll* g, int w) {
     copy_n(f, 1 << w, g);
     for (int i = 0; i != w; ++i)
         for (int j = 0; j != (1 << w); ++j)
-            if (j & (1 << i)) g[j] += f[s ^ (1 << i)];
+            if (j & (1 << i)) g[j] += g[j ^ (1 << i)];
 }
 
 void ifmt(ll* f, ll* g, int w) {
     copy_n(f, 1 << w, g);
     for (int i = 0; i != w; ++i)
         for (int j = 0; j != (1 << w); ++j)
-            if (j & (1 << i)) g[j] -= f[s ^ (1 << i)];
+            if (j & (1 << i)) g[j] -= g[j ^ (1 << i)];
 }
 
 void fwt(ll* a, int n) {
