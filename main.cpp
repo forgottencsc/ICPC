@@ -252,6 +252,16 @@ bool chk_tan(int n, int m) {bool fail = 0;
         for (int i = 1; i <= m; ++i) {
             os1 << pv[i].x << ' ' << pv[i].y << endl;
         }
+        res = rs[i];
+        while (!pq.empty()) res += pq.top(), pq.pop();
+        ans = max(ans, res);
+        for (int j = 0; j != n2; ++j)
+            cs[j] += a[i][j];
+    }
+
+    for (int i = 0; i != n2; ++i) {
+        pq.push(cs[i]);
+        if (pq.size() > 4) pq.pop();
     }
     return !fail;
 }
