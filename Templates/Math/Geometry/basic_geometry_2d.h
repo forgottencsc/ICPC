@@ -1,14 +1,16 @@
 #include <bits/stdc++.h>
+#define N 10005
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-6;
-int dc(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
+const dbl pi = acos(-1), eps = 1e-8;
+int sgn(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
 vec operator-(vec v1, vec v2) { return { v1.x - v2.x, v1.y - v2.y }; }
 dbl operator*(vec v1, vec v2) { return v1.x * v2.x + v1.y * v2.y; }
 dbl operator^(vec v1, vec v2) { return v1.x * v2.y - v1.y * v2.x; }
-vec operator*(dbl k, vec v) { return { k * v.x, k * v.y }; }
+vec operator*(vec v, dbl k) { return { k * v.x, k * v.y }; }
+vec operator/(vec v, dbl k) { return { v.x / k, v.y / k }; }
 bool operator<(vec v1, vec v2) { return v1.x==v2.x?v1.y<v2.y:v1.x<v2.x; }
 bool operator==(vec v1, vec v2) { return v1.x==v2.x && v1.y == v2.y; }
 bool operator>(vec v1, vec v2) { return v1.x==v2.x?v1.y>v2.y:v1.x>v2.x; }
@@ -16,7 +18,7 @@ dbl dot(vec v0, vec v1, vec v2) { return (v1 - v0) * (v2 - v0); }
 dbl crx(vec v0, vec v1, vec v2) { return (v1 - v0) ^ (v2 - v0); }
 dbl len(vec v) { return hypot(v.x, v.y); }
 dbl arg(vec v) { dbl r = atan2(v.y, v.x); return r<0?2*pi+r:r; }
-vec unif(vec v) { return (1./len(v))*v; }
+vec unif(vec v) { return v/len(v); }
 vec univ(dbl f) { return { cos(f), sin(f) }; }
 vec rot(vec p, dbl f) { return { cos(f)*p.x-sin(f)*p.y, sin(f)*p.x+cos(f)*p.y }; }
 vec rot(vec o, vec p, dbl f) { return o + rot(p - o, f); }
@@ -30,7 +32,7 @@ vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v;
 dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
 
 struct seg { vec p1, p2; };
-bool onseg(seg s, vec p){return!dc(crx(p,s.p1,s.p2))&&dc(dot(p, s.p1, s.p2))==-1;}
+bool onseg(seg s, vec p){return!sgn(crx(p,s.p1,s.p2))&&sgn(dot(p, s.p1, s.p2))==-1;}
 
 //  0为不相交，1为严格相交，2表示交点为某线段端点，3为线段平行且部分重合
 int sitsc(seg s1, seg s2) {
@@ -38,9 +40,9 @@ int sitsc(seg s1, seg s2) {
     if (max(p1.x,p2.x)<min(q1.x,q2.x)||min(p1.x,p2.x)>max(q1.x,q2.x)) return 0;
     if (max(p1.y,p2.y)<min(q1.y,q2.y)||min(p1.y,p2.y)>max(q1.y,q2.y)) return 0;
     dbl x=crx(p2,p1,q1),y=crx(p2,p1,q2),z=crx(q2,q1,p1),w=crx(q2,q1,p2);
-    if (dc(x)==0&&dc(y)==0) return 3;
-    if (dc(x)*dc(y)<0&&dc(z)*dc(w)<0) return 1;
-    if (dc(x)*dc(y)<=0&&dc(z)*dc(w)<=0) return 2;
+    if (sgn(x)==0&&sgn(y)==0) return 3;
+    if (sgn(x)*sgn(y)<0&&sgn(z)*sgn(w)<0) return 1;
+    if (sgn(x)*sgn(y)<=0&&sgn(z)*sgn(w)<=0) return 2;
     return 0;
 }
 
@@ -54,8 +56,8 @@ struct cir { vec o; dbl r; };
 dbl ccarea(cir c1, cir c2) {
     if (c1.r > c2.r) swap(c1, c2);
     dbl d = len(c1.o - c2.o);
-    if (dc(d - (c1.r + c2.r)) >=0) return 0;
-    if (dc(d - abs(c1.r - c2.r)) <= 0) {
+    if (sgn(d - (c1.r + c2.r)) >=0) return 0;
+    if (sgn(d - abs(c1.r - c2.r)) <= 0) {
         dbl r = min(c1.r, c2.r);
         return r * r * pi;
     }
@@ -67,7 +69,7 @@ dbl ccarea(cir c1, cir c2) {
 bool clitsc(cir c, line l, vec& p1, vec& p2) {
     dbl x = l.v * (l.p - c.o), y = l.v * l.v;
     dbl d = x * x - y * ((l.p - c.o) * (l.p - c.o) - c.r * c.r);
-    if (dc(d) == -1) return false; d = max(d, 0.);
+    if (sgn(d) == -1) return false; d = max(d, 0.);
     vec p = l.p - (x / y) * l.v, w = (sqrt(d) / y) * l.v;
     p1 = p + w; p2 = p - w; return true;
 }
@@ -75,7 +77,7 @@ bool clitsc(cir c, line l, vec& p1, vec& p2) {
 bool ccitsc(cir c1, cir c2, vec& p1, vec& p2) {
     //assert(c1 != c2);
     dbl s1 = len(c1.o - c2.o);
-    if (dc(s1 - c1.r - c2.r)==1||dc(s1-abs(c1.r-c2.r))==-1)
+    if (sgn(s1 - c1.r - c2.r)==1||sgn(s1-abs(c1.r-c2.r))==-1)
         return false;
     dbl s2 = (c1.r*c1.r-c2.r*c2.r)/s1, a=(s1+s2)/2, b=(s1-s2)/2;
     vec o = (a/(a+b)) * (c2.o-c1.o) + c1.o;
@@ -95,7 +97,7 @@ bool cptan(cir c, vec p, vec& p1, vec& p2) {
 
 bool ccetan(cir c1, cir c2, line& l1, line& l2) {
     //  assert(c1 != c2)
-    if (!dc(c1.r - c2.r)) {
+    if (!sgn(c1.r - c2.r)) {
         vec v = rot90(c1.r * unif(c2.o - c1.o));
         l1 = { c1.o + v, c2.o - c1.o };
         l2 = { c1.o - v, c2.o - c1.o };
