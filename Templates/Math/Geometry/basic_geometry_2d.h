@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
-#define N 10005
 using namespace std;
 typedef double dbl;
-const dbl pi = acos(-1), eps = 1e-8;
+const dbl pi = acos(-1), eps = 1e-6;
 int sgn(dbl x) { return x < -eps ? -1 : x > eps ? 1 : 0; }
 struct vec { dbl x, y; };
 vec operator+(vec v1, vec v2) { return { v1.x + v2.x, v1.y + v2.y }; }
@@ -25,14 +24,17 @@ vec rot(vec o, vec p, dbl f) { return o + rot(p - o, f); }
 vec rot90(vec p) { return { -p.y, p.x }; }
 
 struct line { vec p, v; };
-vec proj(line l, vec p) { return p+(((l.p-p)*l.v)/(l.v*l.v))*l.v; }
+vec proj(line l, vec p) { return p+l.v*(((l.p-p)*l.v)/(l.v*l.v)); }
 vec refl(vec o, vec p) { return o + o - p; }
 vec refl(line l, vec p) { return refl(proj(l, p), p); }
-vec litsc(line l1, line l2) { return l2.p+((l1.v^(l2.p-l1.p))/(l2.v^l1.v))*l2.v; }
+vec litsc(line l1, line l2) { return l2.p+l2.v*((l1.v^(l2.p-l1.p))/(l2.v^l1.v)); }
 dbl lpdis(line l, vec p) { return fabs(crx(p, l.p, l.p + l.v)) / len(l.v); }
 
 struct seg { vec p1, p2; };
 bool onseg(seg s, vec p){return!sgn(crx(p,s.p1,s.p2))&&sgn(dot(p, s.p1, s.p2))==-1;}
+bool lsitsc(seg s, line l) {
+    return sgn(crx(l.p,l.p+l.v,s.p1))*sgn(crx(l.p,l.p+l.v,s.p2))<=0;
+}
 
 //  0为不相交，1为严格相交，2表示交点为某线段端点，3为线段平行且部分重合
 int sitsc(seg s1, seg s2) {

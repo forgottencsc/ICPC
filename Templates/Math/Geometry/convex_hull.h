@@ -82,7 +82,10 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
     if (m > 1) m--; return m;
 }
 
+
+typedef long long ll;
 typedef pair<dbl, int> pdi;
+const dbl inf = 1e10;
 namespace cvq {
     vec c[N];
     int w, n;
@@ -109,21 +112,21 @@ namespace cvq {
         }
     }
 
-    pdi crxmax(int l, int r, vec p) {
+    pdi crxmax0(int l, int r, vec p) {
         int r0 = r;
         while (l <= r) {
             int m = (l + r) >> 1;
             if ((p ^ (c[m + 1] - c[m])) >= 0) l = m + 1;
             else r = m - 1;
         }
-        return pdi(p^c[l],l);
+        return pdi(p^c[l],l % n);
     }
 
-    pair<dbl, int> crxmax(vec p) {
-        pdi res = sgn(p.x) <= 0 ? crxmax(0, w - 1, p) : crxmax(w, n - 1, p);
+    pdi crxmax(vec p) {
+        pdi res = p.x <= 0 ? crxmax0(0, w - 1, p) : crxmax0(w, n - 1, p);
         return max({ res, pdi(p ^ c[0], 0), pdi(p ^ c[w], w) });
     }
-    pair<dbl, int> crxmin(vec p) { return crxmax(p * -1); }
+    pdi crxmin(vec p) { return crxmax(p * -1); }
 
     bool ltan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])<=0&&crx(p,c[i],c[i+1])<=0; }
     bool rtan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])>=0&&crx(p,c[i],c[i+1])>=0; }
@@ -161,6 +164,25 @@ namespace cvq {
             lp = ltan(0, e, p); rp = rtan(e, w, p);
         }
         lp %= n; rp %= n;
+        return true;
+    }
+
+    int secant0(line s, int l, int r) {
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            if (crx(s.p, s.p+s.v, c[m%n]) <= 0) r=m-1;
+            else l = m + 1;
+        }
+        return r % n;
+    }
+
+    bool secant(line s, int& p1, int& p2) {
+        pdi lc = crxmax(s.v), rc = crxmin(s.v);
+        int lp = lc.second, rp = rc.second;
+        if (crx(s.p, s.p + s.v, c[lp]) * crx(s.p, s.p + s.v, c[rp]) > 0)
+            return false;
+        p1 = secant0(s, lp, rp < lp ? rp + n : rp);
+        p2 = secant0({ s.p, s.v * -1 }, rp, lp < rp ? lp + n : lp);
         return true;
     }
 };
