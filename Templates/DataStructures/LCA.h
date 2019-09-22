@@ -36,36 +36,46 @@ inline ll qdis(int u, int v) {
 //  Doubling LCA O(nlogn)-O(logn)
 struct edge { int v, w; };
 vector<edge> g[N];
-ll mp[N][18], dis[N]; int dep[N];
-void dfs_lca(int u, int f, ll w)  {
-    dis[u] = w; mp[u][0] = f; dep[u] = dep[f] + 1;
-    for (edge e : g[u]) if (e.v != f) dfs_lca(e.v, u, w + e.w);
+
+namespace LCA {
+
+int dfn[N], dep[N], dfc;
+ll dis[N]; int mp[N][20], m;
+
+void dfs_lca(int u, int f, ll w) {
+    if (f) dep[u] = dep[f] + 1;
+    dfn[u] = ++dfc; mp[u][0] = f; dis[u] = w;
+    for (int i = 1; (1 << i) <= dep[u]; ++i)
+        mp[u][i] = mp[mp[u][i - 1]][i - 1];
+    for (edge e : g[u]) if (e.v != f)
+        dfs_lca(e.v, u, w + e.w);
 }
 
-void build_lca() {
-    dfs_lca(1);
-    for (int j = 1; (1 << j) <= n - 1; ++j)
-        for (int i = 1; i <= n; ++i)
-            mp[i][j] = mp[mp[i][j - 1]][j - 1];
+void build(int n, int r) {
+    for (m = 1; (1 << m) <= n - 1; m++);
+    for (int i = 1; i <= n; ++i)
+        fill_n(mp[i], m + 1, 0);
+    mp[r][0] = 0;
+    dfc = 0; dfs_lca(r, 0, 0);
 }
 
 int lca(int u, int v) {
     if (dep[u] < dep[v]) swap(u, v);
-    for (int i = 18; dep[u] != dep[v]; --i)
-        if ((1 << i) & (dep[u] - dep[v]))
+    for (int i = m; dep[u] - dep[v]; --i)
+        if ((dep[u] - dep[v]) & (1 << i))
             u = mp[u][i];
     if (u == v) return u;
-    for (int i = 18; i >= 0; --i)
+    for (int i = m; i >= 0; --i)
         if (mp[u][i] != mp[v][i])
             u = mp[u][i], v = mp[v][i];
     return mp[u][0];
 }
 
-ll dis(int u, int v) {
-    int w = lca(u, v);
-    return dis[u] + dis[v] - 2 * dis[w];
+ll qdis(int u, int v) {
+    return dis[u] + dis[v] - 2 * dis[lca(u, v)];
 }
 
+}
 namespace VT {
 
 int st[N], sc;

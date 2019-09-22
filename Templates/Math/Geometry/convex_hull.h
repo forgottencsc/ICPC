@@ -3,12 +3,12 @@ int convex_hull(vec* p, int n, vec* c) {
     int m = 0;
     c[1] = p[++m];
     for (int i = 1; i <= n; ++i) {
-        while (m > 1 && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
+        while (m > 1 && sgn(crx(c[m - 1], c[m], p[i])) != 1) m--;
         c[++m] = p[i];
     }
     int t = m;
     for (int i = n - 1; i; --i) {
-        while (m > t && dc(crx(c[m - 1], c[m], p[i])) != 1) m--;
+        while (m > t && sgn(crx(c[m - 1], c[m], p[i])) != 1) m--;
         c[++m] = p[i];
     }
     if (m > 1) m--; c[m + 1] = c[1]; return m;
@@ -18,17 +18,17 @@ dbl rotating_calipers(vec* c, int n) {
     #define nxt(x) ((x)==n?1:(x)+1)
     for (int p = 1, q1 = 1, q2 = 1, q3 = 1; p <= n; ++p) {
         line l = { c[p], c[nxt(p)] - c[p] };
-        while (dc(l.v*(c[nxt(q1)]-c[q1]))!=-1) q1 = nxt(q1);
-        while (dc(l.v^(c[nxt(q2)]-c[q2]))!=-1) q2 = nxt(q2);
+        while (sgn(l.v*(c[nxt(q1)]-c[q1]))!=-1) q1 = nxt(q1);
+        while (sgn(l.v^(c[nxt(q2)]-c[q2]))!=-1) q2 = nxt(q2);
         if (p == 1) q3 = q2;
-        while (dc(l.v*(c[nxt(q3)]-c[q3]))!=1) q3 = nxt(q3);
+        while (sgn(l.v*(c[nxt(q3)]-c[q3]))!=1) q3 = nxt(q3);
         //  ...
     }
     #undef nxt
     return ans;
 }
 
-bool judge(line l0, line l1, line l2) { return dc((litsc(l1, l2)-l0.p)^l0.v)==1; }
+bool judge(line l0, line l1, line l2) { return sgn((litsc(l1, l2)-l0.p)^l0.v)==1; }
 int halfplane_intersection(line* lv, int n, vec* pv) {
     static pair<pair<dbl,dbl>, int> a[N];
     for (int i = 1; i <= n; ++i)
@@ -36,7 +36,7 @@ int halfplane_intersection(line* lv, int n, vec* pv) {
     sort(a + 1, a + n + 1);
     static int b[N], q[N]; int w = 0, l = 1, r = 0;
     for (int i = 1; i <= n; ++i)
-        if (i == 1 || dc(a[i].first.first-a[i-1].first.first))
+        if (i == 1 || sgn(a[i].first.first-a[i-1].first.first))
             b[++w] = a[i].second;
     for (int i = 1; i <= w; ++i) {
         while (l<r&&judge(lv[b[i]],lv[q[r]],lv[q[r-1]]))--r;
@@ -67,12 +67,12 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
     int p1 = 1, p2 = 1;
     while (p1 <= n1 || p2 <= n2) {
         if (p1 <= n1 && p2 <= n2)
-            dv = (dc((dv1[p1])^(dv2[p2]))!=-1?dv1[p1++]:dv2[p2++]);
+            dv = (sgn((dv1[p1])^(dv2[p2]))!=-1?dv1[p1++]:dv2[p2++]);
         else if (p1 <= n1)
             dv = dv1[p1++];
         else
             dv = dv2[p2++];
-        while (m > 1 && !dc((cv[m] - cv[m - 1]) ^ dv)) {
+        while (m > 1 && !sgn((cv[m] - cv[m - 1]) ^ dv)) {
             dv = dv + cv[m] - cv[m - 1];
             m--;
         }
@@ -82,7 +82,10 @@ int minkowski_sum(vec* cv1, int n1, vec* cv2, int n2, vec* cv) {
     if (m > 1) m--; return m;
 }
 
+
+typedef long long ll;
 typedef pair<dbl, int> pdi;
+const dbl inf = 1e10;
 namespace cvq {
     vec c[N];
     int w, n;
@@ -109,21 +112,21 @@ namespace cvq {
         }
     }
 
-    pdi crxmax(int l, int r, vec p) {
+    pdi crxmax0(int l, int r, vec p) {
         int r0 = r;
         while (l <= r) {
             int m = (l + r) >> 1;
             if ((p ^ (c[m + 1] - c[m])) >= 0) l = m + 1;
             else r = m - 1;
         }
-        return pdi(p^c[l],l);
+        return pdi(p^c[l],l % n);
     }
 
-    pair<dbl, int> crxmax(vec p) {
-        pdi res = sgn(p.x) <= 0 ? crxmax(0, w - 1, p) : crxmax(w, n - 1, p);
+    pdi crxmax(vec p) {
+        pdi res = p.x <= 0 ? crxmax0(0, w - 1, p) : crxmax0(w, n - 1, p);
         return max({ res, pdi(p ^ c[0], 0), pdi(p ^ c[w], w) });
     }
-    pair<dbl, int> crxmin(vec p) { return crxmax(p * -1); }
+    pdi crxmin(vec p) { return crxmax(p * -1); }
 
     bool ltan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])<=0&&crx(p,c[i],c[i+1])<=0; }
     bool rtan(vec p, int i) { return crx(p,c[i],i?c[i-1]:c[n-1])>=0&&crx(p,c[i],c[i+1])>=0; }
@@ -161,6 +164,25 @@ namespace cvq {
             lp = ltan(0, e, p); rp = rtan(e, w, p);
         }
         lp %= n; rp %= n;
+        return true;
+    }
+
+    int secant0(line s, int l, int r) {
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            if (crx(s.p, s.p+s.v, c[m%n]) <= 0) r=m-1;
+            else l = m + 1;
+        }
+        return r % n;
+    }
+
+    bool secant(line s, int& p1, int& p2) {
+        pdi lc = crxmax(s.v), rc = crxmin(s.v);
+        int lp = lc.second, rp = rc.second;
+        if (crx(s.p, s.p + s.v, c[lp]) * crx(s.p, s.p + s.v, c[rp]) > 0)
+            return false;
+        p1 = secant0(s, lp, rp < lp ? rp + n : rp);
+        p2 = secant0({ s.p, s.v * -1 }, rp, lp < rp ? lp + n : lp);
         return true;
     }
 };
