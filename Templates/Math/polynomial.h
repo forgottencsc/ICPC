@@ -294,6 +294,38 @@ vector<ll> bernoulli(int n) {
     return iegf(inv(a));
 }
 
+vector<ll> shift(const vector<ll>& a, ll d) {
+    int n = a.size();
+    vector<ll> b = a, c(n);
+    reverse(b.begin(), b.end());
+    for (int i = 0; i != n; ++i) {
+        b[i] = M(b[i] * f[n - i - 1]);
+        if (!i) c[i] = 1;
+        else c[i] = M(c[i - 1] * M(d * invs[i]));
+    }
+    vector<ll> r = mul(b, c, n);
+    reverse(r.begin(), r.end());
+    return egf(r);
+}
+
+vector<ll> stirling1_row0(int l, int r) {
+    if (l == r) return { l, 1 };
+    else {
+        int n = r - l + 1, n1 = n / 2, n2 = n - n1;
+        vector<ll> a = stirling1_row0(l, l + n1 - 1);
+        vector<ll> b = shift(a, n1);
+        vector<ll> res = mul(a, b);
+        if (n1 == n2) return res;
+        vector<ll> tmp(n + 1);
+        copy(res.begin(), res.end(), tmp.begin() + 1);
+        return add(mul(res, r), tmp);
+    }
+}
+
+vector<ll> stirling1_row(int n) {
+    return stirling1_row0(0, n - 1);
+}
+
 ll epsum(const vector<ll>& b, ll n, ll k) {
     n = M(n);
     ll ans = 0; ll w = M(n);

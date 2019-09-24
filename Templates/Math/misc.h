@@ -309,3 +309,45 @@ void ntt_res(ll* p) {
 		p[i] = M(p[i] * is);
 }
 
+typedef double dbl;
+const dbl eps = 1e-8;
+int sgn(dbl x) { return x < -eps ? -1 : x > eps; }
+
+dbl dis(const vector<dbl>& p, const vector<dbl>& v,
+        const vector<dbl>& q) {
+    int n = p.size();
+    dbl d1 = 0, d = 0;
+    for (int i = 0; i != n; ++i) {
+        d += v[i] * v[i];
+        d1 += v[i] * (p[i] - q[i]);
+    }
+    dbl t = -d1 / d;
+    dbl res = 0;
+    for (int i = 0; i != n; ++i)
+        res = hypot(res, v[i] * t + p[i] - q[i]);
+    return res;
+}
+
+dbl dis(const vector<dbl>& p1, const vector<dbl>& v1,
+        const vector<dbl>& p2, const vector<dbl>& v2) {
+    int n = p1.size();
+    dbl a1 = 0, b1 = 0, c1 = 0,
+        a2 = 0, b2 = 0, c2 = 0;
+    for (int i = 0; i != n; ++i) {
+        a1 += v1[i] * v1[i];
+        b1 -= v1[i] * v2[i];
+        c1 += v1[i] * (p1[i] - p2[i]);
+        a2 -= v1[i] * v2[i];
+        b2 += v2[i] * v2[i];
+        c2 -= v2[i] * (p1[i] - p2[i]);
+    }
+    dbl d1 = c1 * b2 - c2 * b1,
+        d2 = a1 * c2 - a2 * c1,
+        d = a1 * b2 - a2 * b1;
+    if (!sgn(d)) return dis(p1, v1, p2);
+    dbl t1 = - d1 / d, t2 = - d2 / d;
+    dbl res = 0;
+    for (int i = 0; i != n; ++i)
+        res = hypot(res, p1[i] - p2[i] + t1 * v1[i] - t2 * v2[i]);
+    return res;
+}

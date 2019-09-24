@@ -20,7 +20,7 @@ int main(void){
         }
         if (!d) cout << -1 << endl;
         else {
-            cout << (x - m - 1) / d + 1 + (x > m) << endl;
+            cout << max(x - m - 1, 0) / d + 1 + (x > m) << endl;
         }
     }
 
