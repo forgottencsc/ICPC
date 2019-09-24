@@ -86,51 +86,50 @@ vector<int> eulerian_path() {
 }
 
 //  Eulerian path in undirect graph
-struct edge { int v, p; };
-vector<edge> g[N];
 
-void adde(int u, int v, int w) {
-    g[u].push_back({ v, w, g[v].size() });
-    g[v].push_back({ u, w, g[u].size() - 1 });
-}
+int deg[N];
+typedef pair<int, int> pii;
+vector<pii> g[N];
 
-int finde(int u, int v) {
-    for (int i = 0; i != g[u].size(); ++i)
-        if (g[u][i].v == v) return i;
-}
-
-void dele(int u, int v) {
-    int i = finde(u, v), j = g[u][i].p;
-    if (i != g[u].size() - 1) {
-        g[g[u].back().v][g[u].back().p].p = i;
-        swap(g[u].back(), g[u][i]);
+void adde(int u, int v) {
+    if (u != v) {
+        g[u].push_back({ v, g[v].size() });
+        g[v].push_back({ u, g[u].size() - 1 });
     }
-    g[u].pop_back();
-    if (j != g[v].size() - 1) {
-        g[g[v].back().v][g[v].back().p].p = j;
-        swap(g[v].back(), g[v][j]);
+    else {
+        g[u].push_back({ u, g[u].size() });
     }
-    g[v].pop_back();
 }
 
-vector<int> eulerian_path(int s) {
-    vector<int> res, stk;
-    stk.push_back(s);
-    while (!stk.empty()) {
-        int u = stk.back();
-        if (g[u].empty()) {
-            res.push_back(u);
-            stk.pop_back();
-        }
+int eulerian_path(int* r, int w) {
+    static int s[N], t; int m = 0; s[++t] = w;
+    while (t) {
+        int u = s[t];
+        if (g[u].empty())
+            r[++m] = u, --t;
         else {
-            int v = g[u].front().v;
-            dele(u, e.v);
-            stk.push_back(v);
+            pii p = g[u].back();
+            int v = p.first, i = p.second;
+            if (v != u) {
+                if (i + 1 != g[v].size()) {
+                    pii& q = g[v].back();
+                    g[q.first][q.second].second = i;
+                    swap(g[v][i], q);
+                }
+                g[u].pop_back();
+                g[v].pop_back();
+                s[++t] = v;
+            }
+            else {
+                g[u].pop_back();
+                s[++t] = u;
+            }
         }
     }
-    reverse(res.begin(), res.end());
-    return res;
+    return m;
 }
+
+
 
 vector<int> g[N];
 
