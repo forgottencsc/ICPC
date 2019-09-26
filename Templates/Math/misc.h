@@ -4,6 +4,7 @@
 #define P 1000000007
 typedef long long ll;
 
+
 ll invs[N], f[N], fi[N];
 ll bi[N][N], be[N], ep[N][N];
 ll inv(ll x) { return x == 1 ? 1 : M(inv(P % x) * (P - P / x)); }
@@ -23,18 +24,58 @@ void ginv() {
         for (int j = 0; j != i; ++j)
             be[i] = M(be[i] - M(bi[i][j] * M(be[j] * invs[i - j + 1])));
     //  Equal Power Sum Coef
+    ep[0][0] = ep[0][1] = 1;
     for (int i = 1; i != N; ++i)
         for (int j = 0; j <= i; ++j)
             ep[i][i+1-j]=M(M(j&1?-invs[i+1]:invs[i+1])*M(bi[i + 1][j]*be[j]));
 }
 
-//  \sum_{i=1}^{n}{i^k}
+//  \sum_{i=0}^{n}{i^k}
 ll epsum(ll n, ll k) {
-    ll w = n, r = 0;
-    for (int i = 1; i <= k + 1; ++i, w = M(w * n))
+    ll w = 1, r = 0;
+    for (int i = 0; i <= k + 1; ++i, w = M(w * n))
         r = M(r + M(w * ep[k][i]));
     return r;
 }
+
+#define W 11
+typedef array<array<ll, W>, W> arr;
+arr g(ll a, ll b, ll c, ll n) {
+    arr u; u[0].fill(0); u.fill(u[0]);
+    if (a >= c || b >= c) {
+        ll qa = a / c, ra = a % c, qb = b / c, rb = b % c;
+        ll pqa[W], pqb[W]; pqa[0] = pqb[0] = 1;
+        for (int i = 1; i != W; ++i)
+            pqa[i] = M(pqa[i - 1] * qa),
+            pqb[i] = M(pqb[i - 1] * qb);
+        arr v = g(ra, rb, c, n);
+        for (int k1 = 0; k1 != W; ++k1)
+            for (int k2 = 0; k2 + k1 != W; ++k2)
+                for (int i = 0; i <= k2; ++i)
+                    for (int j = 0; j <= i; ++j)
+                        u[k1][k2] = M(u[k1][k2] + v[k1+j][k2-i] *
+                        M(M(bi[k2][i] * bi[i][j]) * M(pqa[j] * pqb[i - j])));
+    }
+    else if (a == 0) {
+        for (int k1 = 0; k1 != W; ++k1)
+            for (int k2 = 0; k2 + k1 != W; ++k2)
+                u[k1][k2] = M(qp(b / c, k2) * epsum(n, k1));
+    }
+    else if (a * n + b >= c) {
+        arr v = g(c, c - b - 1, a, (a * n + b) / c - 1);
+        for (int k1 = 0; k1 != W; ++k1) {
+            for (int k2 = 0; k2 + k1 != W; ++k2) {
+                u[k1][k2] = M(epsum(n, k1) * qp((a * n + b) / c, k2));
+                for (int i = 0; i <= k2 - 1; ++i)
+                    for (int j = 0; j <= k1 + 1; ++j)
+                        u[k1][k2] = M(u[k1][k2] - M(v[i][j] *
+                        M(bi[k2][i] * ep[k1][j])));
+            }
+        }
+    }
+    return u;
+}
+
 
 //  fraction representation with farey sequence
 pair<ll, ll> get_frac(dbl x, ll p1, ll q1, ll p2, ll q2) {
