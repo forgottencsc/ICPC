@@ -129,7 +129,38 @@ int eulerian_path(int* r, int w) {
     return m;
 }
 
+//  minimum mean weight cycle
+typedef double dbl;
+struct edge { int v; dbl w; };
+vector<edge> g[N];
 
+dbl dp[N][N];
+dbl minmwc(int n) {
+    for (int i = 1; i <= n; ++i)
+        g[n + 1].push_back({ i, 0 });
+    n++;
+    for (int i = 1; i <= n; ++i)
+        dp[i][0] = DBL_MAX;
+    dp[n][0] = 0;
+    for (int k = 0; k < n; ++k) {
+        for (int u = 0; u <= n; ++u)
+            dp[u][k + 1] = DBL_MAX;
+        for (int u = 0; u <= n; ++u)
+            if (dp[u][k] != DBL_MAX)
+                for (edge e : g[u])
+                    dp[e.v][k + 1] = min(dp[e.v][k + 1], dp[u][k] + e.w);
+    }
+    dbl ans = DBL_MAX;
+    for (int u = 1; u <= n; ++u) {
+        if (dp[u][n] == DBL_MAX) continue;
+        dbl res = -DBL_MAX;
+        for (int k = 0; k < n; ++k)
+            if (dp[u][k] != DBL_MAX)
+                res = max(res, (dp[u][n] - dp[u][k]) / (n - k));
+        ans = min(ans, res);
+    }
+    return ans;
+}
 
 vector<int> g[N];
 
