@@ -1,3 +1,4 @@
+#pragma GCC optimize (2)
 #include <bits/stdc++.h>
 #define N (1<<19)
 #define P 998244353
