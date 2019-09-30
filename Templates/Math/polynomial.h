@@ -383,6 +383,40 @@ vector<int> stirling1_row(int n) {
     return stirling1_row0(0, n - 1);
 }
 
+vector<int> stirling1_col(int n, int m) {
+    vector<int> a(n + 1, 0);
+    for (int i = 1; i <= n; ++i) a[i] = invs[i];
+    return iegf(mul(pow(a, m), fi[m]));
+}
+
+vector<int> stirling2_row(int n) {
+    vector<int> a(n + 1, 0), b(n + 1, 0);
+    for (int i = 0; i <= n; ++i)
+        a[i] = (i & 1 ? sub(0, fi[i]) : add(0, fi[i]));
+    for (int i = 0; i <= n; ++i)
+        b[i] = mul(qpm(i, n), fi[i]);
+    return mul(a, b, n + 1);
+}
+
+vector<int> stirling2_col0(int l, int r) {
+    if (l == r) return { 1 };
+    if (l + 1 == r) return { 1, sub(0, l) };
+    else {
+        int mid = (l + r) >> 1;
+        return mul(stirling2_col0(l, mid)
+                 , stirling2_col0(mid, r));
+    }
+}
+
+vector<int> stirling2_col(int n, int m) {
+    if (n < m) return vector<int>(n + 1, 0);
+    vector<int> a = stirling2_col0(1, m + 1);
+    a.resize(n - m + 1, 0);
+    vector<int> b = inv(a); b.resize(n + 1, 0);
+    rotate(b.begin(), b.begin() + n + 1 - m, b.end());
+    return b;
+}
+
 vector<int> bernoulli(int n) {
     vector<int> a(n + 1, 1);
     a = sub(egf(a), { 1 });
