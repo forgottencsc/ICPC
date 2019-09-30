@@ -435,3 +435,5 @@ vector<int> bipartite(int n) {
 }
 
 vector<int> connected_bipartite(int n) {
+    return iegf(mul(log(egf(colored_bipartite(n))),invs[2]));
+}
