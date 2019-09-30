@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #define N (1<<20)
-#define P 167772161
+#define P 998244353
 typedef long long ll;
 
 using namespace std;
@@ -414,14 +414,32 @@ vector<int> stirling2_col(int n, int m) {
 }
 
 int main(void) {
-    ios::sync_with_stdio(0); cin.tie(0);
+    freopen("02", "r", stdin);
     #ifndef ONLINE_JUDGE
-    ifstream cin("1.in");
     #endif // ONLINE_JUDGE
     init(); ginv();
-
-    vector<int> a(10, 1);
-    cout << scale(a, 5) << endl;
-
+    int T; scanf("%d", &T);
+    while(T--) {
+        int n, m; scanf("%d%d", &n, &m);
+        vector<int> a(n), b1(n), b2(n), b3(n);
+        for (int i = 0; i != n; ++i)
+            scanf("%d", &a[i]);
+        for (int i = 0; i < n; ++i) b1[i] = 1;
+        for (int i = 0; i < n; i += 2) b2[i] = 1;
+        for (int i = 0; i < n; i += 3) b3[i] = 1;
+        int c1 = 0, c2 = 0, c3 = 0;
+        for (int i = 1; i <= m; ++i) {
+            int o; scanf("%d", &o);
+            if (o == 1) c1++;
+            if (o == 2) c2++;
+            if (o == 3) c3++;
+        }
+        vector<int> r = mul(mul(a, pow(b1, c1), n), mul(pow(b2, c2), pow(b3, c3), n), n);
+        ll ans = 0;
+        for (int i = 0; i != n; ++i)
+            //printf("%d%c", r[i], " \n"[i == n - 1]);
+            ans ^= (1ll * (i + 1) * r[i]);
+        printf("%lld\n", ans);
+    }
     return 0;
 }

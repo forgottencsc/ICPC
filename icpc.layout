@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
-	<ActiveTarget name="Debug" />
+	<ActiveTarget name="Release" />
+	<File name="Templates\GraphTheory\basic_graph_algorithms.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3697" topLine="169" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\Geometry\3d_geometry.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1495" topLine="43" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\Geometry\basic_geometry_2d.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1704" topLine="109" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\Geometry\convex_hull.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2907" topLine="120" />
+		</Cursor>
+	</File>
 	<File name="Templates\Math\Geometry\testlib.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="48" topLine="0" />
@@ -15,11 +35,6 @@
 	<File name="Templates\Math\NumberTheory\multiplicative.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="3429" topLine="133" />
-		</Cursor>
-	</File>
-	<File name="1.in" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Templates\Math\NumberTheory\primality.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -47,7 +62,12 @@
 			<Cursor1 position="119" topLine="21" />
 		</Cursor>
 	</File>
-	<File name="Templates\Math\polynomial.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="1.in" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Templates\Math\polynomial.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="13768" topLine="417" />
 		</Cursor>
@@ -57,34 +77,14 @@
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14045" topLine="407" />
+		</Cursor>
+	</File>
 	<File name="Templates\DataStructures\LCA.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2075" topLine="40" />
-		</Cursor>
-	</File>
-	<File name="Templates\GraphTheory\basic_graph_algorithms.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3697" topLine="169" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\Geometry\3d_geometry.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1495" topLine="43" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\Geometry\basic_geometry_2d.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1704" topLine="109" />
-		</Cursor>
-	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="7526" topLine="204" />
-		</Cursor>
-	</File>
-	<File name="Templates\Math\Geometry\convex_hull.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2907" topLine="120" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
