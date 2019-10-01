@@ -236,19 +236,17 @@ namespace poly {
     vector<int> inv(const vector<int>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
         if (n1 == 1) return { ::inv(p1[0]) };
-        else {
-            vector<int> p2 = inv(vector<int>(p1.begin(), p1.begin() + n2));
-            init(n1 << 1);
-            copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
-            copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
-            ntt(pa, 0); ntt(pb, 0);
-            for (int i = 0; i != fs; ++i)
-                pc[i] = mul(sub(2, mul(pa[i], pb[i])), pb[i]);
-            ntt(pc, 1);
-            vector<int> r(n1);
-            copy(pc, pc + n1, r.begin());
-            return r;
-        }
+        vector<int> p2 = inv(vector<int>(p1.begin(), p1.begin() + n2));
+        init(n1 << 1);
+        copy_n(p1.begin(), n1, pa); fill(pa + n1, pa + fs, 0);
+        copy_n(p2.begin(), n2, pb); fill(pb + n2, pb + fs, 0);
+        ntt(pa, 0); ntt(pb, 0);
+        for (int i = 0; i != fs; ++i)
+            pc[i] = mul(sub(2, mul(pa[i], pb[i])), pb[i]);
+        ntt(pc, 1);
+        vector<int> r(n1);
+        copy(pc, pc + n1, r.begin());
+        return r;
     }
 
     pair<vector<int>, vector<int>> div(const vector<int>& p1, const vector<int>& p2) {
@@ -285,22 +283,18 @@ namespace poly {
 
     vector<int> exp(const vector<int>& p1) {
         if (p1.size() == 1) return { 1 };
-        else {
-            vector<int> p2 = exp({p1.begin(),p1.begin()+(p1.size()+1>>1)});
-            p2.resize(p1.size(), 0);
-            return mul(p2, add(sub({ 1 }, log(p2)), p1), p1.size());
-        }
+        vector<int> p2 = exp({p1.begin(),p1.begin()+(p1.size()+1>>1)});
+        p2.resize(p1.size(), 0);
+        return mul(p2, add(sub({ 1 }, log(p2)), p1), p1.size());
     }
 
     vector<int> sqrt(const vector<int>& p1) {
         int n1 = p1.size(), n2 = (n1 + 1) >> 1;
         if (n1 == 1) return { ::msqrt(p1[0]) };
-        else {
-            vector<int> p2 = sqrt(vector<int>(p1.begin(), p1.begin() + n2));
-            vector<int> p3 = mul(p2, 2); p3.resize(n1);
-            p3 = inv(p3);
-            return mul(add(mul(p2, p2, n1), p1), p3, n1);
-        }
+        vector<int> p2 = sqrt({p1.begin(), p1.begin() + n2});
+        vector<int> p3 = mul(p2, 2); p3.resize(n1);
+        p3 = inv(p3);
+        return mul(add(mul(p2, p2, n1), p1), p3, n1);
     }
     //  k mod P, not P - 1
     vector<int> pow(const vector<int>& p1, int k) {
@@ -414,32 +408,13 @@ vector<int> stirling2_col(int n, int m) {
 }
 
 int main(void) {
-    freopen("02", "r", stdin);
+    ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
+    ifstream cin("1.in");
     #endif // ONLINE_JUDGE
     init(); ginv();
-    int T; scanf("%d", &T);
-    while(T--) {
-        int n, m; scanf("%d%d", &n, &m);
-        vector<int> a(n), b1(n), b2(n), b3(n);
-        for (int i = 0; i != n; ++i)
-            scanf("%d", &a[i]);
-        for (int i = 0; i < n; ++i) b1[i] = 1;
-        for (int i = 0; i < n; i += 2) b2[i] = 1;
-        for (int i = 0; i < n; i += 3) b3[i] = 1;
-        int c1 = 0, c2 = 0, c3 = 0;
-        for (int i = 1; i <= m; ++i) {
-            int o; scanf("%d", &o);
-            if (o == 1) c1++;
-            if (o == 2) c2++;
-            if (o == 3) c3++;
-        }
-        vector<int> r = mul(mul(a, pow(b1, c1), n), mul(pow(b2, c2), pow(b3, c3), n), n);
-        ll ans = 0;
-        for (int i = 0; i != n; ++i)
-            //printf("%d%c", r[i], " \n"[i == n - 1]);
-            ans ^= (1ll * (i + 1) * r[i]);
-        printf("%lld\n", ans);
-    }
+    int n; cin >> n;
+    vector<int> a(n); cin >> a;
+    cout << exp(a) << endl;
     return 0;
 }
