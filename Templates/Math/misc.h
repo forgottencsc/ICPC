@@ -40,14 +40,11 @@ ll epsum(ll n, ll k) {
 
 #define W 11
 typedef array<array<ll, W>, W> arr;
-
-typedef array<array<ll, W>, W> arr;
 arr g(ll a, ll b, ll c, ll n) {
     arr u; u[0].fill(0); u.fill(u[0]);
     if (a >= c || b >= c) {
         ll qa = a / c, ra = a % c, qb = b / c, rb = b % c;
-        ll pqa[W], pqb[W];
-        pqa[0] = pqb[0] = 1;
+        ll pqa[W], pqb[W]; pqa[0] = pqb[0] = 1;
         for (int i = 1; i != W; ++i)
             pqa[i] = M(pqa[i - 1] * qa),
             pqb[i] = M(pqb[i - 1] * qb);
