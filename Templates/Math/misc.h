@@ -40,11 +40,14 @@ ll epsum(ll n, ll k) {
 
 #define W 11
 typedef array<array<ll, W>, W> arr;
+
+typedef array<array<ll, W>, W> arr;
 arr g(ll a, ll b, ll c, ll n) {
     arr u; u[0].fill(0); u.fill(u[0]);
     if (a >= c || b >= c) {
         ll qa = a / c, ra = a % c, qb = b / c, rb = b % c;
-        ll pqa[W], pqb[W]; pqa[0] = pqb[0] = 1;
+        ll pqa[W], pqb[W];
+        pqa[0] = pqb[0] = 1;
         for (int i = 1; i != W; ++i)
             pqa[i] = M(pqa[i - 1] * qa),
             pqb[i] = M(pqb[i - 1] * qb);
@@ -53,8 +56,8 @@ arr g(ll a, ll b, ll c, ll n) {
             for (int k2 = 0; k2 + k1 != W; ++k2)
                 for (int i = 0; i <= k2; ++i)
                     for (int j = 0; j <= i; ++j)
-                        u[k1][k2] = M(u[k1][k2] + v[k1+j][k2-i] *
-                        M(M(bi[k2][i] * bi[i][j]) * M(pqa[j] * pqb[i - j])));
+                        u[k1][k2] = M(u[k1][k2] + v[k1 + j][k2 - i] *
+                            M(M(bi[k2][i] * bi[i][j]) * M(pqa[j] * pqb[i - j])));
     }
     else if (a == 0) {
         for (int k1 = 0; k1 != W; ++k1)
@@ -68,10 +71,13 @@ arr g(ll a, ll b, ll c, ll n) {
                 u[k1][k2] = M(epsum(n, k1) * qp((a * n + b) / c, k2));
                 for (int i = 0; i <= k2 - 1; ++i)
                     for (int j = 0; j <= k1 + 1; ++j)
-                        u[k1][k2] = M(u[k1][k2] - M(v[i][j] *
-                        M(bi[k2][i] * ep[k1][j])));
+                        u[k1][k2] = M(u[k1][k2] - M(v[i][j] * M(bi[k2][i] * ep[k1][j])));
             }
         }
+    }
+    else {
+        for (int k1 = 0; k1 != W; ++k1)
+            u[k1][0] = epsum(n, k1);
     }
     return u;
 }
