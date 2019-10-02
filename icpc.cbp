@@ -257,6 +257,10 @@
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
+		<Unit filename="Solved/CF1218B.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="Solved/Gym102012J.cpp">
 			<Option compile="0" />
 			<Option link="0" />
