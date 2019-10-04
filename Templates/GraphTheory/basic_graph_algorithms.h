@@ -162,6 +162,48 @@ dbl minmwc(int n) {
     return ans;
 }
 
+//  Steiner tree
+typedef long long ll;
+typedef pair<ll, int> pli;
+struct edge { int v; ll w; };
+vector<edge> g[N];
+
+ll dp[1 << W][N]; int tag[N];
+vector<ll> steiner_tree(int n, const vector<int>& e) {
+    int w = e.size();
+    fill(tag + 1, tag + n + 1, 0);
+    for (int s = 1; s != 1 << w; ++s)
+        fill(dp[s] + 1, dp[s] + n + 1, LLONG_MAX);
+    for (int i = 0; i != w; ++i)
+        tag[e[i]] = 1 << i, dp[1 << i][e[i]] = 0;
+    for (int s = 1; s != 1 << w; ++s) {
+        priority_queue<pli> q;
+        for (int u = 1; u <= n; ++u) {
+            for (int t = s & (s - 1); t; t = s & (t - 1)) {
+                ll v1 = dp[t][u], v2 = dp[s ^ t][u];
+                if (v1 != LLONG_MAX && v2 != LLONG_MAX)
+                    dp[s][u] = min(dp[s][u], v1 + v2);
+            }
+            if (dp[s][u] != LLONG_MAX)
+                q.push({ dp[s][u], u });
+        }
+        while (!q.empty()) {
+            pli p = q.top(); q.pop();
+            int u = p.second; ll du = p.first;
+            if (du > dp[s][u]) continue;
+            for (edge e : g[u]) {
+                int v = e.v; ll dv = e.w + du;
+                if (dp[s][v] > dv)
+                    q.push({ dp[s][v] = dv, v });
+            }
+        }
+    }
+    vector<ll> res(1 << w);
+    for (int s = 0; s != 1 << w; ++s)
+        res[s] = *min_element(dp[s] + 1, dp[s] + n + 1);
+    return res;
+}
+
 vector<int> g[N];
 
 int deg[N]; bool del[N];
