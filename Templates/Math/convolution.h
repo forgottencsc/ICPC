@@ -84,3 +84,39 @@ void ifwt(ll* a, int n) {
 			}
 }
 
+//  Subset convolution, O(w^2 2^w)
+void ssconv(int* f, int* g, int* h, int w) {
+    static int pc[N], fi[W+1][N], gi[W+1][N], hi[W+1][N];
+    //  Initialize pc && fi, gi, hi
+    for (int i = 1; i != 1 << w; ++i)
+        pc[i] = pc[i >> 1] + (i & 1);
+    for (int i = 0; i <= w; ++i) {
+        fill_n(fi[i], 1 << w, 0);
+        fill_n(gi[i], 1 << w, 0);
+        fill_n(hi[i], 1 << w, 0);
+    }
+    for (int i = 0; i != 1 << w; ++i) {
+        fi[pc[i]][i] = f[i];
+        gi[pc[i]][i] = g[i];
+    }
+    for (int i = 0; i <= w; ++i)
+        fzt(fi[i], w), fzt(gi[i], w);
+    for (int i = 0; i <= w; ++i)
+        for (int j = 0; j <= i; ++j)
+            for (int k = 0; k != 1 << w; ++k)
+                hi[i][k] = add(hi[i][k], mul(fi[j][k], gi[i - j][k]));
+    for (int i = 0; i <= w; ++i)
+        fmt(hi[i], w);
+    for (int i = 0; i != 1 << w; ++i)
+        h[i] = hi[pc[i]][i];
+}
+
+//  Naiive subset convolution, O(3^w)
+void ssconv0(int* f, int* g, int* h, int w) {
+    for (int i = 0; i != 1 << w; ++i) {
+        h[i] = mul(f[0], g[i]);
+        for (int j = i; j; j = i & (j - 1))
+            h[i] = add(h[i], mul(f[j], g[i ^ j]));
+    }
+}
+
