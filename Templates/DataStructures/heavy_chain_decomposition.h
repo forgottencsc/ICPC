@@ -9,7 +9,7 @@ int dfs_hld1(int u, int f) {
     dh[u] = 0; ds[u] = 1;
     for (int v : g[u]) {
         if (v == f) continue;
-        ds[u] += dfs_hcd1(v, u);
+        ds[u] += dfs_hld1(v, u);
         if (ds[v] > ds[dh[u]]) dh[u] = v;
     }
     return ds[u];
@@ -17,10 +17,10 @@ int dfs_hld1(int u, int f) {
 
 void dfs_hld2(int u, int t) {
     dl[u] = ++dc; di[dc] = u; dt[u] = t;
-    if (dh[u]) dfs_hcd2(dh[u], t);
+    if (dh[u]) dfs_hld2(dh[u], t);
     for (int v : g[u])
         if (v != df[u] && v != dh[u])
-            dfs_hcd2(v, v);
+            dfs_hld2(v, v);
     dr[u] = dc;
 }
 
@@ -80,7 +80,7 @@ ll query(int u, int v) {
         res += query(dl[dt[u]], dl[u] + 1, 0, 1, 1, dc + 1);
     }
     if (dd[u] < dd[v]) swap(u, v);
-    res += query(dl[v], dl[u] + 1, t, 1, 1, dc + 1);
+    res += query(dl[v], dl[u] + 1, 0, 1, 1, dc + 1);
     return res;
 }
 
