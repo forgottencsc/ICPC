@@ -1,4 +1,5 @@
 pandoc -o 数据结构-基础.pdf DataStructures/基础.md --pdf-engine=xelatex -VCJKoptions=BoldFont="SimHei" -VCJKmainfont="SimSun"
+pandoc -o 数据结构-树.pdf DataStructures/树据结构.md --pdf-engine=xelatex -VCJKoptions=BoldFont="SimHei" -VCJKmainfont="SimSun"
 pandoc -o 图论-基础.pdf GraphTheory/杂项.md --pdf-engine=xelatex -VCJKoptions=BoldFont="SimHei" -VCJKmainfont="SimSun"
 pandoc -o 数学-杂项.pdf Math/杂项.md --pdf-engine=xelatex -VCJKoptions=BoldFont="SimHei" -VCJKmainfont="SimSun"
 pandoc -o 数学-多项式.pdf Math/多项式.md --pdf-engine=xelatex -VCJKoptions=BoldFont="SimHei" -VCJKmainfont="SimSun"
