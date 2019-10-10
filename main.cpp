@@ -2,6 +2,7 @@
 #define N 100001
 using namespace std;
 
+
 int main(void) {
     ios::sync_with_stdio(0); cin.tie(0);
     #ifndef ONLINE_JUDGE
