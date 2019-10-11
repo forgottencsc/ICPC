@@ -266,9 +266,11 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="Templates/DataStructures/LCA.h" />
+		<Unit filename="Templates/DataStructures/LCT.h" />
 		<Unit filename="Templates/DataStructures/basic_data_structures.h" />
 		<Unit filename="Templates/DataStructures/divide_and_conquer.h" />
 		<Unit filename="Templates/DataStructures/heavy_chain_decomposition.h" />
+		<Unit filename="Templates/DataStructures/splay.h" />
 		<Unit filename="Templates/GraphTheory/basic_graph_algorithms.h" />
 		<Unit filename="Templates/GraphTheory/flows_matchings.h" />
 		<Unit filename="Templates/Math/Geometry/3d_geometry.h" />
