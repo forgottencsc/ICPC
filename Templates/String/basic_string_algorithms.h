@@ -3,7 +3,7 @@ using namespace std;
 
 //  f[i]为s以i结束的能作为s前缀的最长串长
 void getf(const string& s, vector<int>& f) {
-    int n = s.size(); f.resize(n, 0);// f[0] = -1;
+    int n = s.size(); f.resize(n, 0);
     for (int i = 1, j = 0; i != n; ++i) {
         while (j && s[i] != s[j]) j = f[j - 1];
         if (s[i] == s[j]) ++j;
