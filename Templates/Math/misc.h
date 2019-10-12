@@ -4,6 +4,16 @@
 #define P 1000000007
 typedef long long ll;
 
+int add(int a, int b) { int r = a + b; return r < P ? r : r - P; }
+int sub(int a, int b) { int r = a - b; return r < 0 ? r + P : r; }
+int mul(ll a, ll b) { return a * b % P; }
+int inv(int x) { return x == 1 ? 1 : mul(inv(P % x), P - P / x); }
+int qpm(int a, ll b) {
+    int r = 1;
+    do if (b & 1) r = mul(r, a);
+    while (a = mul(a, a), b >>= 1);
+    return r;
+}
 
 ll invs[N], f[N], fi[N];
 ll bi[N][N], be[N], ep[N][N];
