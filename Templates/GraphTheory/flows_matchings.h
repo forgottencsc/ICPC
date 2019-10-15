@@ -28,7 +28,7 @@ void adde(int u, int v, ll c) {
 ll dfs_isap(int s, int t, int u, ll f) {
     if (u == t) return f;
     ll sf = 0;
-    for (int i = cur[u]; i != g[u].size(); ++i) {
+    for (int& i = cur[u]; i != g[u].size(); ++i) {
         edge& e = g[u][i]; int v = e.v;
         if (e.c <= e.f || dis[u] != dis[v] + 1)
             continue;
