@@ -44,11 +44,8 @@ void ginv() {
     ifac[0] = 1; for (int i = 1; i != N; ++i) ifac[i] = mul(ifac[i - 1], invs[i]);
 }
 
-
 const int W = 18, S = 1 << W;
-
 int w[S + 1], rev[S << 1], *r[W + 1];
-
 void init() {
     for (int s = 0; s <= W&&(r[s]=rev+(1<<s),1); ++s)
         for (int i = 0; i != (1 << s); ++i)
@@ -63,7 +60,6 @@ int init(int n) {
     im = inv(m); return m;
 }
 
-int px[N], py[N];
 void ntt(int* p, int t) {
     for (int i = 0; i != m; ++i) if (i < r[s][i]) swap(p[i], p[r[s][i]]);
     for (int i = 1, z = 0; i != m; i <<= 1, z++)
@@ -74,16 +70,7 @@ void ntt(int* p, int t) {
     if (t) for (int i = 0; i != m; ++i) p[i] = mul(p[i], im);
 }
 
-istream& operator>>(istream& is, vi& p) {
-    for (int& w : p) is >> w;
-    return is;
-}
-
-ostream& operator<<(ostream& os, const vi& p) {
-    for (int w : p) os << w << ' ';
-    return os;
-}
-
+int px[N], py[N];
 vi mul(const vi& p1, const vi& p2, int n = 0) {
     int n1 = p1.size(), n2 = p2.size(), n3 = n1 + n2 - 1;
     init(n3);
@@ -93,6 +80,16 @@ vi mul(const vi& p1, const vi& p2, int n = 0) {
     for (int i = 0; i != m; ++i) px[i] = mul(px[i], py[i]);
     ntt(px, 1); vi p3(n3); copy_n(px, n3, p3.begin());
     if (n && n3 > n) p3.resize(n); return p3;
+}
+
+istream& operator>>(istream& is, vi& p) {
+    for (int& w : p) is >> w;
+    return is;
+}
+
+ostream& operator<<(ostream& os, const vi& p) {
+    for (int w : p) os << w << ' ';
+    return os;
 }
 
 vi add(const vi& p1, const vi& p2) {
